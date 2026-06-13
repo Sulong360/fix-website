@@ -83,7 +83,7 @@ nav.scrolled { box-shadow: 0 4px 24px rgba(13,60,107,0.08); }
   background-size: 60px 60px;
   pointer-events: none;
 }
-.hero-inner { max-width: 1200px; margin: 0 auto; width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; position: relative; z-index: 1; }
+.hero-inner { max-width: 1200px; margin: 0 auto; width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; position: relative; z-index: 2; }
 .hero-eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 3.5px; text-transform: uppercase; color: var(--blue-sky); margin-bottom: 24px; display: block; }
 .hero-h1 { font-size: clamp(40px, 5vw, 62px); font-weight: 700; color: white; line-height: 1.08; letter-spacing: -1.5px; margin-bottom: 24px; }
 .hero-h1 em { font-style: normal; color: var(--blue-sky); }
@@ -128,13 +128,7 @@ nav.scrolled { box-shadow: 0 4px 24px rgba(13,60,107,0.08); }
 .hero-match-btn { width: 100%; background: var(--blue); color: white; border: none; border-radius: 10px; padding: 14px; font-family: var(--font); font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 16px; transition: background 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
 .hero-match-btn:hover { background: var(--blue-dark); }
 
-/* Float card */
-.float-stat { position: absolute; background: white; border-radius: 12px; padding: 12px 16px; box-shadow: 0 8px 32px rgba(13,60,107,0.2); display: flex; align-items: center; gap: 10px; }
-.float-stat-1 { bottom: -20px; left: -24px; }
-.float-stat-2 { top: -16px; right: -20px; }
-.float-stat-icon { width: 36px; height: 36px; border-radius: 8px; background: var(--blue-pale); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
-.float-stat-val { font-size: 16px; font-weight: 700; color: var(--g900); line-height: 1; }
-.float-stat-label { font-size: 11px; color: var(--g400); margin-top: 2px; }
+
 
 /* ── HOW IT WORKS ── */
 .how { padding: 100px 48px; background: var(--off); }
@@ -258,6 +252,164 @@ footer { background: var(--blue-navy); color: white; padding: 64px 48px 40px; }
 .footer-links a { font-size: 13px; color: rgba(255,255,255,0.3); text-decoration: none; transition: color 0.2s; }
 .footer-links a:hover { color: rgba(255,255,255,0.6); }
 
+/* ── HERO HOUSE BACKGROUND ── */
+.hero-house-bg {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+.house-svg {
+  width: 100%;
+  max-width: 960px;
+  height: 100%;
+  opacity: 0.07;
+}
+
+/* Element colors */
+.h-ground        { fill: rgba(168,202,234,0.8); }
+.h-foundation    { fill: rgba(168,202,234,0.6); }
+.h-wall          { fill: none; stroke: rgba(168,202,234,0.9); stroke-width: 2.5; }
+.h-roof          { fill: none; stroke: rgba(168,202,234,1); stroke-width: 3; stroke-linejoin: round; }
+.h-ridge         { stroke: rgba(168,202,234,0.7); stroke-width: 2; }
+.h-chimney       { fill: rgba(168,202,234,0.5); }
+.h-chimney-cap   { fill: rgba(168,202,234,0.8); }
+.h-door          { fill: rgba(168,202,234,0.3); stroke: rgba(168,202,234,0.9); stroke-width: 2; }
+.h-doorknob      { fill: rgba(168,202,234,0.9); }
+.h-window        { fill: rgba(168,202,234,0.15); stroke: rgba(168,202,234,0.9); stroke-width: 2; }
+.h-window-cross  { stroke: rgba(168,202,234,0.6); stroke-width: 1.5; }
+.h-scaffold      { fill: rgba(168,202,234,0.5); }
+.h-plank         { fill: rgba(168,202,234,0.4); }
+.h-brace         { stroke: rgba(168,202,234,0.25); stroke-width: 1.5; }
+.h-crane-mast    { fill: rgba(168,202,234,0.6); }
+.h-crane-arm     { fill: rgba(168,202,234,0.6); }
+.h-crane-cable   { stroke: rgba(168,202,234,0.5); stroke-width: 2; }
+.h-hook          { fill: none; stroke: rgba(168,202,234,0.5); stroke-width: 2; }
+.h-load          { fill: rgba(168,202,234,0.4); stroke: rgba(168,202,234,0.7); stroke-width: 1.5; }
+.h-worker        { fill: rgba(168,202,234,0.7); }
+.h-tree-trunk    { fill: rgba(168,202,234,0.4); }
+.h-tree-top      { fill: rgba(168,202,234,0.25); }
+.h-material      { fill: rgba(168,202,234,0.4); }
+.h-sand          { fill: rgba(168,202,234,0.3); }
+.h-smoke         { fill: rgba(168,202,234,0.2); }
+
+/* ── CONTINUOUS DRAWING ANIMATIONS ── */
+
+/* Master draw-erase-redraw loop */
+@keyframes drawLoop {
+  0%   { stroke-dashoffset: var(--len); opacity: 0; }
+  5%   { opacity: 1; }
+  45%  { stroke-dashoffset: 0; opacity: 1; }
+  55%  { stroke-dashoffset: 0; opacity: 1; }
+  80%  { stroke-dashoffset: calc(var(--len) * -1); opacity: 0.4; }
+  95%  { stroke-dashoffset: calc(var(--len) * -1); opacity: 0; }
+  100% { stroke-dashoffset: var(--len); opacity: 0; }
+}
+
+/* Fill elements pulse in with the draw */
+@keyframes fillPulse {
+  0%, 20%  { opacity: 0; }
+  50%, 60% { opacity: 1; }
+  85%      { opacity: 0; }
+  100%     { opacity: 0; }
+}
+
+/* Smoke keeps drifting */
+@keyframes smokeDrift {
+  0%   { transform: translateY(0) scale(1);      opacity: 0.6; }
+  100% { transform: translateY(-36px) scale(1.5); opacity: 0; }
+}
+
+/* Crane load bobs */
+@keyframes craneLoad {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-22px); }
+}
+
+/* Worker bob */
+@keyframes workerBob {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-3px); }
+}
+
+/* Total cycle = 18s. Each element draws in sequentially then loops */
+/* Ground + foundation */
+.h-ground, .h-foundation {
+  animation: fillPulse 18s ease-in-out infinite;
+}
+.h-foundation { animation-delay: 0.4s; }
+
+/* Walls — longest path ~1800 */
+.h-wall {
+  --len: 1800px;
+  stroke-dasharray: 1800;
+  stroke-dashoffset: 1800;
+  animation: drawLoop 18s ease-in-out infinite 0.8s;
+}
+
+/* Door */
+.h-door {
+  --len: 380px;
+  stroke-dasharray: 380;
+  stroke-dashoffset: 380;
+  animation: drawLoop 18s ease-in-out infinite 2.5s;
+  fill: transparent;
+}
+.h-doorknob { animation: fillPulse 18s ease-in-out infinite 3s; }
+
+/* Windows */
+.h-window {
+  --len: 300px;
+  stroke-dasharray: 300;
+  stroke-dashoffset: 300;
+  fill: transparent;
+}
+.h-window:nth-of-type(1) { animation: drawLoop 18s ease-in-out infinite 3.2s; }
+.h-window:nth-of-type(2) { animation: drawLoop 18s ease-in-out infinite 3.8s; }
+.h-window-cross { animation: fillPulse 18s ease-in-out infinite 3.5s; }
+
+/* Chimney */
+.h-chimney     { animation: fillPulse 18s ease-in-out infinite 4.2s; }
+.h-chimney-cap { animation: fillPulse 18s ease-in-out infinite 4.4s; }
+
+/* Roof — ~1100 */
+.h-roof {
+  --len: 1100px;
+  stroke-dasharray: 1100;
+  stroke-dashoffset: 1100;
+  animation: drawLoop 18s ease-in-out infinite 4.8s;
+}
+.h-ridge { animation: fillPulse 18s ease-in-out infinite 5.8s; }
+
+/* Scaffolding */
+.h-scaffold    { animation: fillPulse 18s ease-in-out infinite 6.2s; }
+.h-plank       { animation: fillPulse 18s ease-in-out infinite 6.6s; }
+.h-brace       { animation: fillPulse 18s ease-in-out infinite 6.8s; }
+
+/* Crane */
+.h-crane-mast  { animation: fillPulse 18s ease-in-out infinite 7.2s; }
+.h-crane-arm   { animation: fillPulse 18s ease-in-out infinite 7.4s; }
+.h-crane-cable { animation: fillPulse 18s ease-in-out infinite 7.6s; }
+.h-load        { animation: craneLoad 4s ease-in-out infinite 7.8s; }
+
+/* Trees + materials */
+.h-tree-trunk  { animation: fillPulse 18s ease-in-out infinite 8s; }
+.h-tree-top    { animation: fillPulse 18s ease-in-out infinite 8.3s; }
+.h-material    { animation: fillPulse 18s ease-in-out infinite 8.6s; }
+.h-sand        { animation: fillPulse 18s ease-in-out infinite 8.8s; }
+
+/* Workers */
+.h-worker      { animation: workerBob 2.5s ease-in-out infinite; }
+
+/* Smoke always drifts */
+.h-smoke-1 { animation: smokeDrift 3.2s ease-in-out infinite 0s; }
+.h-smoke-2 { animation: smokeDrift 3.2s ease-in-out infinite 0.9s; }
+.h-smoke-3 { animation: smokeDrift 3.2s ease-in-out infinite 1.8s; }
+
 /* ── ANIMATIONS ── */
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(28px); }
@@ -278,8 +430,8 @@ footer { background: var(--blue-navy); color: white; padding: 64px 48px 40px; }
 .hero-left > *:nth-child(4) { animation-delay: 0.55s; }
 .hero-left > *:nth-child(5) { animation-delay: 0.65s; }
 .hero-card-wrap { animation: fadeInUp 0.7s ease 0.35s both; }
-.float-stat-1 { animation: floatA 4s ease-in-out 1s infinite; }
-.float-stat-2 { animation: floatB 4.5s ease-in-out 0.5s infinite; }
+
+
 
 /* Scroll reveal */
 .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
@@ -400,6 +552,100 @@ footer { background: var(--blue-navy); color: white; padding: 64px 48px 40px; }
   <div class="hero-bg-circle-1"></div>
   <div class="hero-bg-circle-2"></div>
   <div class="hero-bg-grid"></div>
+
+  <!-- Animated house background -->
+  <div class="hero-house-bg" aria-hidden="true">
+    <svg class="house-svg" viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+      <!-- Ground -->
+      <rect class="h-ground" x="50" y="480" width="800" height="6" rx="3"/>
+
+      <!-- ── MAIN HOUSE STRUCTURE ── -->
+      <!-- Foundation -->
+      <rect class="h-foundation" x="180" y="460" width="400" height="24" rx="3"/>
+
+      <!-- Walls -->
+      <rect class="h-wall" x="195" y="280" width="370" height="182"/>
+
+      <!-- Front door -->
+      <rect class="h-door" x="335" y="370" width="90" height="92" rx="4"/>
+      <circle class="h-doorknob" cx="415" cy="420" r="5"/>
+
+      <!-- Windows left -->
+      <rect class="h-window" x="220" y="320" width="80" height="70" rx="4"/>
+      <line class="h-window-cross" x1="260" y1="320" x2="260" y2="390"/>
+      <line class="h-window-cross" x1="220" y1="355" x2="300" y2="355"/>
+
+      <!-- Windows right -->
+      <rect class="h-window" x="460" y="320" width="80" height="70" rx="4"/>
+      <line class="h-window-cross" x1="500" y1="320" x2="500" y2="390"/>
+      <line class="h-window-cross" x1="460" y1="355" x2="540" y2="355"/>
+
+      <!-- Roof -->
+      <polygon class="h-roof" points="155,285 385,130 615,285"/>
+      <!-- Roof ridge cap -->
+      <line class="h-ridge" x1="385" y1="130" x2="385" y2="155"/>
+
+      <!-- Chimney -->
+      <rect class="h-chimney" x="480" y="155" width="42" height="80" rx="3"/>
+      <!-- Chimney top -->
+      <rect class="h-chimney-cap" x="472" y="150" width="58" height="12" rx="3"/>
+
+      <!-- Smoke puffs -->
+      <circle class="h-smoke h-smoke-1" cx="501" cy="130" r="12"/>
+      <circle class="h-smoke h-smoke-2" cx="516" cy="108" r="9"/>
+      <circle class="h-smoke h-smoke-3" cx="505" cy="88" r="6"/>
+
+      <!-- ── SCAFFOLDING (construction feel) ── -->
+      <!-- Left scaffold pole -->
+      <rect class="h-scaffold" x="140" y="220" width="6" height="264" rx="2"/>
+      <!-- Right scaffold pole -->
+      <rect class="h-scaffold" x="618" y="220" width="6" height="264" rx="2"/>
+      <!-- Scaffold planks -->
+      <rect class="h-plank h-plank-1" x="140" y="295" width="484" height="8" rx="2"/>
+      <rect class="h-plank h-plank-2" x="140" y="370" width="484" height="8" rx="2"/>
+      <!-- Scaffold cross braces -->
+      <line class="h-brace" x1="140" y1="220" x2="624" y2="303"/>
+      <line class="h-brace" x1="624" y1="220" x2="140" y2="303"/>
+
+      <!-- ── CRANE (right side) ── -->
+      <!-- Crane mast -->
+      <rect class="h-crane-mast" x="690" y="200" width="10" height="286" rx="3"/>
+      <!-- Crane arm -->
+      <rect class="h-crane-arm" x="560" y="200" width="140" height="8" rx="3"/>
+      <!-- Crane cable -->
+      <line class="h-crane-cable" x1="600" y1="208" x2="600" y2="290"/>
+      <!-- Crane hook load (animated) -->
+      <rect class="h-load" x="578" y="270" width="44" height="28" rx="4"/>
+      <!-- Hook -->
+      <path class="h-hook" d="M600 208 Q600 260 600 290"/>
+
+      <!-- ── WORKERS (tiny silhouettes) ── -->
+      <!-- Worker on scaffold left -->
+      <circle class="h-worker" cx="190" cy="285" r="6"/>
+      <rect class="h-worker" x="186" y="291" width="8" height="14" rx="2"/>
+      <!-- Worker on scaffold right -->
+      <circle class="h-worker" cx="570" cy="285" r="6"/>
+      <rect class="h-worker" x="566" y="291" width="8" height="14" rx="2"/>
+      <!-- Worker on ground -->
+      <circle class="h-worker" cx="660" cy="464" r="6"/>
+      <rect class="h-worker" x="656" y="470" width="8" height="14" rx="2"/>
+
+      <!-- ── TREES / LANDSCAPING ── -->
+      <!-- Tree left -->
+      <rect class="h-tree-trunk" x="96" y="420" width="10" height="60" rx="3"/>
+      <ellipse class="h-tree-top" cx="101" cy="405" rx="28" ry="35"/>
+      <!-- Tree right -->
+      <rect class="h-tree-trunk" x="756" y="430" width="10" height="50" rx="3"/>
+      <ellipse class="h-tree-top" cx="761" cy="415" rx="22" ry="28"/>
+
+      <!-- ── MATERIAL PILES ── -->
+      <!-- Bricks pile -->
+      <rect class="h-material" x="100" y="450" width="55" height="16" rx="3"/>
+      <rect class="h-material" x="105" y="438" width="45" height="12" rx="3"/>
+      <!-- Sand pile -->
+      <ellipse class="h-sand" cx="720" cy="472" rx="40" ry="14"/>
+    </svg>
+  </div>
   <div class="hero-inner">
     <div class="hero-left">
       <span class="hero-eyebrow">Philippines #1 Contractor Marketplace</span>
@@ -452,20 +698,6 @@ footer { background: var(--blue-navy); color: white; padding: 64px 48px 40px; }
         <button class="hero-match-btn">📋 Get matched — it's free</button>
       </div>
 
-      <div class="float-stat float-stat-1">
-        <div class="float-stat-icon">🏗️</div>
-        <div>
-          <div class="float-stat-val">200+</div>
-          <div class="float-stat-label">Verified contractors</div>
-        </div>
-      </div>
-      <div class="float-stat float-stat-2">
-        <div class="float-stat-icon">⚡</div>
-        <div>
-          <div class="float-stat-val">&lt;24h</div>
-          <div class="float-stat-label">Average match time</div>
-        </div>
-      </div>
     </div>
   </div>
 </section>
