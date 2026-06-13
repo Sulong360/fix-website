@@ -590,26 +590,28 @@ footer { background: var(--blue-navy); color: white; padding: 64px 48px 40px; }
         <div class="pricing-eyebrow">Apply to join</div>
         <div class="pricing-title">Join the FIX contractor network</div>
         <div class="pricing-desc">Fill in your details and we'll reach out to get you onboarded.</div>
-        <div class="contractor-form">
+        <form class="contractor-form" name="contractor-applications" method="POST" data-netlify="true" netlify-honeypot="bot-field" id="contractor-form">
+          <input type="hidden" name="form-name" value="contractor-applications">
+          <input type="hidden" name="bot-field" style="display:none">
           <div class="form-group">
             <label class="form-label">Company Name</label>
-            <input type="text" class="form-input form-input-dark" placeholder="e.g. Santos General Contractors" id="c-company">
+            <input type="text" name="company-name" class="form-input form-input-dark" placeholder="e.g. Santos General Contractors" id="c-company" required>
           </div>
           <div class="form-group">
             <label class="form-label">Name of Point of Contact</label>
-            <input type="text" class="form-input form-input-dark" placeholder="Your full name" id="c-poc">
+            <input type="text" name="point-of-contact" class="form-input form-input-dark" placeholder="Your full name" id="c-poc" required>
           </div>
           <div class="form-group">
             <label class="form-label">Contact Number</label>
-            <input type="tel" class="form-input form-input-dark" placeholder="+63 9XX XXX XXXX" id="c-phone">
+            <input type="tel" name="contact-number" class="form-input form-input-dark" placeholder="+63 9XX XXX XXXX" id="c-phone" required>
           </div>
           <div class="form-group">
             <label class="form-label">Company Email Address</label>
-            <input type="email" class="form-input form-input-dark" placeholder="you@company.com" id="c-email">
+            <input type="email" name="company-email" class="form-input form-input-dark" placeholder="you@company.com" id="c-email" required>
           </div>
           <div class="form-group">
             <label class="form-label">Preferred Area of Coverage</label>
-            <select class="form-input form-input-dark form-select" id="c-area">
+            <select name="area-of-coverage" class="form-input form-input-dark form-select" id="c-area" required>
               <option value="" disabled selected>Select your area</option>
               <option>Metro Manila (NCR)</option>
               <option>CALABARZON</option>
@@ -618,8 +620,8 @@ footer { background: var(--blue-navy); color: white; padding: 64px 48px 40px; }
               <option>Other</option>
             </select>
           </div>
-          <button class="form-submit-btn" id="contractor-submit-btn">Submit Application →</button>
-        </div>
+          <button type="submit" class="form-submit-btn" id="contractor-submit-btn">Submit Application →</button>
+        </form>
       </div>
     </div>
   </div>
@@ -716,27 +718,29 @@ footer { background: var(--blue-navy); color: white; padding: 64px 48px 40px; }
     <span class="eyebrow" style="color:rgba(255,255,255,0.6);">Start today</span>
     <h2 class="cta-h2">Your dream home deserves a trusted builder.</h2>
     <p class="cta-sub">Post your project in minutes. We'll find the right contractors for you — completely free.</p>
-    <div class="homeowner-form">
+    <form class="homeowner-form" name="homeowner-leads" method="POST" data-netlify="true" netlify-honeypot="bot-field" id="homeowner-form">
+      <input type="hidden" name="form-name" value="homeowner-leads">
+      <input type="hidden" name="bot-field" style="display:none">
       <div class="homeowner-form-grid">
         <div class="form-group">
           <label class="form-label form-label-light">Your Name</label>
-          <input type="text" class="cta-input" placeholder="Full name" id="h-name">
+          <input type="text" name="name" class="cta-input" placeholder="Full name" id="h-name" required>
         </div>
         <div class="form-group">
           <label class="form-label form-label-light">Mobile Number</label>
-          <input type="tel" class="cta-input" placeholder="+63 9XX XXX XXXX" id="h-phone">
+          <input type="tel" name="mobile" class="cta-input" placeholder="+63 9XX XXX XXXX" id="h-phone" required>
         </div>
         <div class="form-group">
           <label class="form-label form-label-light">Email Address</label>
-          <input type="email" class="cta-input" placeholder="you@email.com" id="h-email">
+          <input type="email" name="email" class="cta-input" placeholder="you@email.com" id="h-email" required>
         </div>
         <div class="form-group">
           <label class="form-label form-label-light">Preferred Date &amp; Time of Call</label>
-          <input type="text" class="cta-input" placeholder="e.g. Mon–Fri, 10am–12pm" id="h-schedule">
+          <input type="text" name="preferred-schedule" class="cta-input" placeholder="e.g. Mon–Fri, 10am–12pm" id="h-schedule">
         </div>
       </div>
-      <button class="cta-btn" id="homeowner-submit-btn">Get Matched — It's Free →</button>
-    </div>
+      <button type="submit" class="cta-btn" id="homeowner-submit-btn">Get Matched — It's Free →</button>
+    </form>
     <div class="cta-note">Free for homeowners · No spam · Metro Manila &amp; CALABARZON</div>
   </div>
 </section>
@@ -848,23 +852,34 @@ document.querySelectorAll('.modal-overlay').forEach(overlay => {
 });
 
 // Homeowner form submit
-document.getElementById('homeowner-submit-btn').addEventListener('click', function() {
+document.getElementById('homeowner-form').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const form = this;
   const name = document.getElementById('h-name').value.trim();
   const phone = document.getElementById('h-phone').value.trim();
   const email = document.getElementById('h-email').value.trim();
-  const schedule = document.getElementById('h-schedule').value.trim();
   if (!name || !phone || !email) {
     [document.getElementById('h-name'), document.getElementById('h-phone'), document.getElementById('h-email')].forEach(el => {
-      if (!el.value.trim()) { el.style.borderColor = 'rgba(255,120,120,0.8)'; el.focus(); }
+      if (!el.value.trim()) el.style.borderColor = 'rgba(255,120,120,0.8)';
     });
     return;
   }
-  ['h-name','h-phone','h-email','h-schedule'].forEach(id => { document.getElementById(id).value = ''; });
-  openModal('modal-homeowner');
+  const data = new FormData(form);
+  fetch('/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams(data).toString() })
+    .then(() => {
+      form.reset();
+      openModal('modal-homeowner');
+    })
+    .catch(() => {
+      form.reset();
+      openModal('modal-homeowner'); // still show confirmation
+    });
 });
 
 // Contractor form submit
-document.getElementById('contractor-submit-btn').addEventListener('click', function() {
+document.getElementById('contractor-form').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const form = this;
   const company = document.getElementById('c-company').value.trim();
   const poc = document.getElementById('c-poc').value.trim();
   const phone = document.getElementById('c-phone').value.trim();
@@ -873,13 +888,20 @@ document.getElementById('contractor-submit-btn').addEventListener('click', funct
   if (!company || !poc || !phone || !email || !area) {
     ['c-company','c-poc','c-phone','c-email'].forEach(id => {
       const el = document.getElementById(id);
-      if (!el.value.trim()) { el.style.borderColor = 'rgba(255,120,120,0.6)'; }
+      if (!el.value.trim()) el.style.borderColor = 'rgba(255,120,120,0.6)';
     });
     return;
   }
-  ['c-company','c-poc','c-phone','c-email'].forEach(id => { document.getElementById(id).value = ''; });
-  document.getElementById('c-area').value = '';
-  openModal('modal-contractor');
+  const data = new FormData(form);
+  fetch('/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams(data).toString() })
+    .then(() => {
+      form.reset();
+      openModal('modal-contractor');
+    })
+    .catch(() => {
+      form.reset();
+      openModal('modal-contractor');
+    });
 });
 
 // Reset field border on input
