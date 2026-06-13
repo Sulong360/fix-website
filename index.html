@@ -342,6 +342,27 @@ footer { background: var(--blue-navy); color: white; padding: 64px 48px 40px; }
 </head>
 <body>
 
+<!-- ══ NETLIFY FORM DETECTION (hidden) ══ -->
+<div style="display:none">
+  <form name="homeowner-leads" data-netlify="true" netlify-honeypot="bot-field">
+    <input type="hidden" name="form-name" value="homeowner-leads">
+    <input name="bot-field">
+    <input name="name">
+    <input name="mobile">
+    <input name="email">
+    <input name="preferred-schedule">
+  </form>
+  <form name="contractor-applications" data-netlify="true" netlify-honeypot="bot-field">
+    <input type="hidden" name="form-name" value="contractor-applications">
+    <input name="bot-field">
+    <input name="company-name">
+    <input name="point-of-contact">
+    <input name="contact-number">
+    <input name="company-email">
+    <input name="area-of-coverage">
+  </form>
+</div>
+
 <!-- ══════════ NAV ══════════ -->
 <nav id="main-nav">
   <a href="#" class="nav-logo">
