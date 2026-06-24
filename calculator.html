@@ -236,6 +236,7 @@ input[type=range]::-webkit-slider-thumb {
   .options-grid { grid-template-columns: 1fr; }
 }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </head>
 <body>
 
@@ -736,8 +737,32 @@ function submitLead() {
   }
 
   const est = calcEstimate();
+  const mid = est ? est.mid : 0;
 
-  // Submit to Netlify Forms
+  const templateParams = {
+    lead_name:            name,
+    lead_email:           email,
+    lead_phone:           phone || 'Not provided',
+    project_type:         TYPE_LABELS[state.type] || '',
+    floor_area:           state.area + ' sqm',
+    quality:              QUALITY_LABELS[state.quality] || '',
+    floors:               FLOORS_LABELS[state.floors] || '',
+    location:             LOCATION_LABELS[state.location] || '',
+    estimate_total:       est ? fmt(est.low) + ' – ' + fmt(est.high) : '—',
+    estimate_description: state.area + ' sqm ' + (TYPE_LABELS[state.type] || '').toLowerCase() + ', ' + (QUALITY_LABELS[state.quality] || '').toLowerCase() + ' finish',
+    b_structure:          est ? fmtFull(mid * 0.35) : '—',
+    b_finish:             est ? fmtFull(mid * 0.28) : '—',
+    b_mep:                est ? fmtFull(mid * 0.18) : '—',
+    b_labor:              est ? fmtFull(mid * 0.10) : '—',
+    b_contingency:        est ? fmtFull(mid * 0.09) : '—',
+  };
+
+  // Send branded email via EmailJS
+  emailjs.init('2erZTbQFFPOyXoJam'); // ← replace with your EmailJS public key
+  emailjs.send('service_7oqivir', 'template_24hq8qc', templateParams)
+    .catch(() => {}); // Always show results even if email fails
+
+  // Submit to Netlify Forms for your records
   const formData = new URLSearchParams({
     'form-name':    'calculator-leads',
     'lead-name':    name,
@@ -748,11 +773,10 @@ function submitLead() {
     'quality':      QUALITY_LABELS[state.quality] || '',
     'floors':       FLOORS_LABELS[state.floors] || '',
     'location':     LOCATION_LABELS[state.location] || '',
-    'estimate':     est ? `${fmt(est.low)} – ${fmt(est.high)}` : '',
+    'estimate':     est ? fmt(est.low) + ' – ' + fmt(est.high) : '',
   });
-
   fetch('/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: formData.toString() })
-    .catch(() => {}); // Show results regardless
+    .catch(() => {});
 
   showResults();
 }
