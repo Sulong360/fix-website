@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project Calculator — FIX</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --blue:      #2076C2;
+  --blue-dark: #1A5FA0;
+  --blue-navy: #0D3C6B;
+  --blue-sky:  #A8CAEA;
+  --blue-pale: #E6F1FB;
+  --off:       #F7F9FC;
+  --g100:      #F0F4F8;
+  --g200:      #D9E3EC;
+  --g400:      #8A9BB0;
+  --g700:      #374151;
+  --g900:      #111827;
+  --green:     #22C55E;
+  --font:      'DM Sans', sans-serif;
+}
+html { scroll-behavior: smooth; }
+body { font-family: var(--font); background: var(--off); color: var(--g900); min-height: 100vh; }
+
+/* ── NAV ── */
+nav {
+  background: white;
+  border-bottom: 1px solid var(--g200);
+  padding: 0 40px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.nav-logo-name { font-size: 13px; font-weight: 700; color: var(--g900); }
+.nav-logo-sub { font-size: 9px; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase; color: var(--g400); margin-top: 2px; }
+.nav-back { font-size: 13px; font-weight: 500; color: var(--g400); text-decoration: none; display: flex; align-items: center; gap: 6px; transition: color 0.2s; }
+.nav-back:hover { color: var(--blue); }
+
+/* ── LAYOUT ── */
+.page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 32px;
+  align-items: start;
+}
+
+/* ── CALCULATOR PANEL ── */
+.calc-panel {
+  background: white;
+  border-radius: 20px;
+  border: 1px solid var(--g200);
+  overflow: hidden;
+}
+.calc-header {
+  background: var(--blue-navy);
+  padding: 32px 36px 28px;
+  position: relative;
+  overflow: hidden;
+}
+.calc-header::after {
+  content: '';
+  position: absolute;
+  right: -60px; top: -60px;
+  width: 220px; height: 220px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(32,118,194,0.4) 0%, transparent 70%);
+  pointer-events: none;
+}
+.calc-eyebrow { font-size: 10px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: var(--blue-sky); margin-bottom: 8px; }
+.calc-title { font-size: 26px; font-weight: 700; color: white; letter-spacing: -0.3px; margin-bottom: 6px; }
+.calc-subtitle { font-size: 14px; color: rgba(255,255,255,0.55); }
+
+/* Progress bar */
+.progress-wrap { padding: 20px 36px 0; }
+.progress-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.progress-label { font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--g400); }
+.progress-count { font-size: 11px; font-weight: 600; color: var(--blue); }
+.progress-track { height: 4px; background: var(--g200); border-radius: 100px; overflow: hidden; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, var(--blue-dark), var(--blue-sky)); border-radius: 100px; transition: width 0.5s ease; }
+
+/* Steps container */
+.steps-wrap { padding: 32px 36px 36px; }
+
+/* ── STEP ── */
+.step { display: none; }
+.step.active { display: block; animation: stepIn 0.3s ease; }
+@keyframes stepIn { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: translateX(0); } }
+
+.step-q { font-size: 20px; font-weight: 700; color: var(--g900); letter-spacing: -0.2px; margin-bottom: 6px; }
+.step-hint { font-size: 13px; color: var(--g400); margin-bottom: 24px; line-height: 1.5; }
+
+/* Option cards */
+.options { display: flex; flex-direction: column; gap: 10px; }
+.options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.opt {
+  border: 2px solid var(--g200);
+  border-radius: 12px;
+  padding: 16px 18px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, transform 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  user-select: none;
+}
+.opt:hover { border-color: var(--blue-sky); background: var(--blue-pale); transform: translateY(-1px); }
+.opt.selected { border-color: var(--blue); background: var(--blue-pale); }
+.opt-icon { font-size: 24px; flex-shrink: 0; }
+.opt-label { font-size: 15px; font-weight: 600; color: var(--g900); }
+.opt-sub { font-size: 12px; color: var(--g400); margin-top: 2px; }
+.opt.selected .opt-label { color: var(--blue); }
+
+/* Slider input */
+.slider-wrap { margin-bottom: 8px; }
+.slider-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.slider-val { font-size: 22px; font-weight: 700; color: var(--blue); }
+.slider-unit { font-size: 13px; color: var(--g400); font-weight: 400; }
+input[type=range] {
+  width: 100%;
+  height: 6px;
+  border-radius: 100px;
+  background: var(--g200);
+  outline: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  margin-bottom: 8px;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--blue);
+  border: 3px solid white;
+  box-shadow: 0 2px 8px rgba(32,118,194,0.4);
+  cursor: pointer;
+}
+.slider-minmax { display: flex; justify-content: space-between; font-size: 11px; color: var(--g400); }
+
+/* Text input */
+.text-input {
+  width: 100%;
+  border: 2px solid var(--g200);
+  border-radius: 10px;
+  padding: 13px 16px;
+  font-family: var(--font);
+  font-size: 15px;
+  color: var(--g900);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.text-input:focus { border-color: var(--blue); }
+.text-input::placeholder { color: var(--g400); }
+
+/* Email step */
+.email-step-intro { background: var(--blue-pale); border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid var(--g200); }
+.email-step-intro p { font-size: 14px; color: var(--g700); line-height: 1.6; }
+.email-step-intro strong { color: var(--blue); }
+
+/* Nav buttons */
+.step-nav { display: flex; gap: 10px; margin-top: 28px; }
+.btn-back { flex: 0; background: var(--g100); color: var(--g700); border: none; border-radius: 10px; padding: 13px 20px; font-family: var(--font); font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+.btn-back:hover { background: var(--g200); }
+.btn-next { flex: 1; background: var(--blue); color: white; border: none; border-radius: 10px; padding: 13px 24px; font-family: var(--font); font-size: 15px; font-weight: 700; cursor: pointer; transition: background 0.2s, transform 0.15s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.btn-next:hover { background: var(--blue-dark); transform: translateY(-1px); }
+.btn-next:disabled { background: var(--g200); color: var(--g400); cursor: not-allowed; transform: none; }
+
+/* ── RESULTS (shown after email) ── */
+.results { display: none; }
+.results.active { display: block; animation: stepIn 0.4s ease; }
+.result-block { background: var(--blue-navy); border-radius: 16px; padding: 28px; margin-bottom: 16px; }
+.result-label { font-size: 10px; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase; color: rgba(255,255,255,0.45); margin-bottom: 6px; }
+.result-val { font-size: 32px; font-weight: 700; color: white; letter-spacing: -0.5px; line-height: 1; }
+.result-range { font-size: 13px; color: rgba(255,255,255,0.5); margin-top: 6px; }
+.result-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+.result-mini { background: var(--g100); border-radius: 12px; padding: 18px; border: 1px solid var(--g200); }
+.result-mini-label { font-size: 11px; color: var(--g400); margin-bottom: 4px; }
+.result-mini-val { font-size: 18px; font-weight: 700; color: var(--g900); }
+.result-breakdown { background: white; border-radius: 12px; border: 1px solid var(--g200); overflow: hidden; margin-bottom: 16px; }
+.result-breakdown-title { font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--g400); padding: 16px 20px 12px; border-bottom: 1px solid var(--g200); }
+.breakdown-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-bottom: 1px solid var(--g100); }
+.breakdown-row:last-child { border-bottom: none; }
+.breakdown-item { font-size: 14px; color: var(--g700); }
+.breakdown-cost { font-size: 14px; font-weight: 600; color: var(--g900); }
+.result-cta { background: var(--blue); color: white; border: none; border-radius: 12px; width: 100%; padding: 16px; font-family: var(--font); font-size: 15px; font-weight: 700; cursor: pointer; transition: background 0.2s; margin-top: 4px; }
+.result-cta:hover { background: var(--blue-dark); }
+.result-disclaimer { font-size: 11px; color: var(--g400); line-height: 1.5; margin-top: 14px; text-align: center; }
+
+/* ── SUMMARY PANEL (right) ── */
+.summary-panel {
+  position: sticky;
+  top: 84px;
+}
+.summary-card {
+  background: white;
+  border-radius: 20px;
+  border: 1px solid var(--g200);
+  overflow: hidden;
+}
+.summary-head {
+  background: var(--blue-pale);
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--g200);
+}
+.summary-head-label { font-size: 10px; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase; color: var(--blue); margin-bottom: 4px; }
+.summary-estimate { font-size: 28px; font-weight: 700; color: var(--blue-navy); letter-spacing: -0.5px; line-height: 1; }
+.summary-estimate-label { font-size: 12px; color: var(--g400); margin-top: 4px; }
+.summary-body { padding: 20px 24px; }
+.summary-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid var(--g100); gap: 12px; }
+.summary-row:last-child { border-bottom: none; }
+.summary-key { font-size: 12px; color: var(--g400); }
+.summary-val { font-size: 13px; font-weight: 600; color: var(--g900); text-align: right; }
+.summary-empty { font-size: 13px; color: var(--g400); text-align: center; padding: 16px 0; line-height: 1.6; }
+
+.tip-card { background: var(--blue-navy); border-radius: 16px; padding: 20px 22px; margin-top: 16px; }
+.tip-label { font-size: 10px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--blue-sky); margin-bottom: 8px; }
+.tip-text { font-size: 13px; color: rgba(255,255,255,0.7); line-height: 1.6; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 800px) {
+  .page { grid-template-columns: 1fr; }
+  .summary-panel { position: static; }
+  .steps-wrap { padding: 24px 20px 28px; }
+  .calc-header { padding: 24px 20px 20px; }
+  .progress-wrap { padding: 16px 20px 0; }
+  .options-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo">
+    <svg width="48" height="20" viewBox="0 0 210 88" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="nav-x" x1="118" y1="80" x2="184" y2="8" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stop-color="#2076C2"/>
+          <stop offset="52%" stop-color="#2076C2"/>
+          <stop offset="100%" stop-color="#A8CAEA"/>
+        </linearGradient>
+      </defs>
+      <rect x="12" y="8" width="13" height="72" rx="4" fill="#2076C2"/>
+      <rect x="12" y="8" width="54" height="13" rx="4" fill="#2076C2"/>
+      <rect x="12" y="38" width="43" height="13" rx="4" fill="#2076C2"/>
+      <rect x="82" y="8" width="13" height="72" rx="4" fill="#2076C2"/>
+      <path d="M118 80L184 8" stroke="url(#nav-x)" stroke-width="13" stroke-linecap="round"/>
+      <path d="M118 8L184 80" stroke="#2076C2" stroke-width="13" stroke-linecap="round"/>
+    </svg>
+    <div>
+      <div class="nav-logo-name">FIX</div>
+      <div class="nav-logo-sub">Verified Contractors</div>
+    </div>
+  </a>
+  <a href="index.html" class="nav-back">← Back to site</a>
+</nav>
+
+<!-- PAGE -->
+<div class="page">
+
+  <!-- LEFT: CALCULATOR -->
+  <div class="calc-panel">
+    <div class="calc-header">
+      <div class="calc-eyebrow">Free tool</div>
+      <div class="calc-title">Project Calculator</div>
+      <div class="calc-subtitle">Get a cost estimate for your project in under 2 minutes.</div>
+    </div>
+
+    <div class="progress-wrap">
+      <div class="progress-meta">
+        <span class="progress-label">Your progress</span>
+        <span class="progress-count" id="progress-text">Step 1 of 6</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill" style="width:16.6%"></div>
+      </div>
+    </div>
+
+    <div class="steps-wrap">
+
+      <!-- STEP 1: Project type -->
+      <div class="step active" data-step="1">
+        <div class="step-q">What are you trying to do?</div>
+        <div class="step-hint">Choose the option that best describes your project.</div>
+        <div class="options">
+          <div class="opt" data-key="type" data-val="build" onclick="selectOpt(this)">
+            <span class="opt-icon">🏗️</span>
+            <div>
+              <div class="opt-label">Build a new house</div>
+              <div class="opt-sub">Construct from the ground up on a lot</div>
+            </div>
+          </div>
+          <div class="opt" data-key="type" data-val="renovate" onclick="selectOpt(this)">
+            <span class="opt-icon">🔨</span>
+            <div>
+              <div class="opt-label">Renovate an existing house</div>
+              <div class="opt-sub">Improve or update your current home</div>
+            </div>
+          </div>
+          <div class="opt" data-key="type" data-val="extend" onclick="selectOpt(this)">
+            <span class="opt-icon">📐</span>
+            <div>
+              <div class="opt-label">Extend / add to a house</div>
+              <div class="opt-sub">Add rooms, floors, or space to an existing structure</div>
+            </div>
+          </div>
+        </div>
+        <div class="step-nav">
+          <button class="btn-next" id="next-1" onclick="nextStep()" disabled>Continue →</button>
+        </div>
+      </div>
+
+      <!-- STEP 2: Floor area -->
+      <div class="step" data-step="2">
+        <div class="step-q" id="step2-q">How big is the area?</div>
+        <div class="step-hint" id="step2-hint">Move the slider to your target floor area.</div>
+        <div class="slider-wrap">
+          <div class="slider-row">
+            <div><span class="slider-val" id="area-val">80</span> <span class="slider-unit">sqm</span></div>
+          </div>
+          <input type="range" id="area-slider" min="20" max="500" value="80" step="5" oninput="updateSlider('area')">
+          <div class="slider-minmax"><span>20 sqm</span><span>500 sqm</span></div>
+        </div>
+        <div class="step-nav">
+          <button class="btn-back" onclick="prevStep()">←</button>
+          <button class="btn-next" onclick="nextStep()">Continue →</button>
+        </div>
+      </div>
+
+      <!-- STEP 3: Finish quality -->
+      <div class="step" data-step="3">
+        <div class="step-q">What finish quality are you aiming for?</div>
+        <div class="step-hint">This affects materials, fixtures, and overall cost significantly.</div>
+        <div class="options">
+          <div class="opt" data-key="quality" data-val="basic" onclick="selectOpt(this)">
+            <span class="opt-icon">🧱</span>
+            <div style="flex:1">
+              <div class="opt-label">Basic / Economy</div>
+              <div class="opt-sub">Functional, no-frills finishes</div>
+            </div>
+            <div style="text-align:right;flex-shrink:0">
+              <div style="font-size:13px;font-weight:700;color:var(--blue)">₱18K–26K</div>
+              <div style="font-size:11px;color:var(--g400)">per sqm</div>
+            </div>
+          </div>
+          <div class="opt" data-key="quality" data-val="standard" onclick="selectOpt(this)">
+            <span class="opt-icon">🏠</span>
+            <div style="flex:1">
+              <div class="opt-label">Standard</div>
+              <div class="opt-sub">Good quality, mid-range materials</div>
+            </div>
+            <div style="text-align:right;flex-shrink:0">
+              <div style="font-size:13px;font-weight:700;color:var(--blue)">₱28K–42K</div>
+              <div style="font-size:11px;color:var(--g400)">per sqm</div>
+            </div>
+          </div>
+          <div class="opt" data-key="quality" data-val="premium" onclick="selectOpt(this)">
+            <span class="opt-icon">✨</span>
+            <div style="flex:1">
+              <div class="opt-label">Premium</div>
+              <div class="opt-sub">High-end finishes, imported materials</div>
+            </div>
+            <div style="text-align:right;flex-shrink:0">
+              <div style="font-size:13px;font-weight:700;color:var(--blue)">₱50K–85K</div>
+              <div style="font-size:11px;color:var(--g400)">per sqm</div>
+            </div>
+          </div>
+        </div>
+        <div class="step-nav">
+          <button class="btn-back" onclick="prevStep()">←</button>
+          <button class="btn-next" id="next-3" onclick="nextStep()" disabled>Continue →</button>
+        </div>
+      </div>
+
+      <!-- STEP 4: Storeys (only for build/extend) -->
+      <div class="step" data-step="4">
+        <div class="step-q" id="step4-q">How many floors?</div>
+        <div class="step-hint">Include all levels including ground floor.</div>
+        <div class="options options-grid">
+          <div class="opt" data-key="floors" data-val="1" onclick="selectOpt(this)">
+            <span class="opt-icon">1️⃣</span>
+            <div><div class="opt-label">Single storey</div></div>
+          </div>
+          <div class="opt" data-key="floors" data-val="2" onclick="selectOpt(this)">
+            <span class="opt-icon">2️⃣</span>
+            <div><div class="opt-label">Two storeys</div></div>
+          </div>
+          <div class="opt" data-key="floors" data-val="3" onclick="selectOpt(this)">
+            <span class="opt-icon">3️⃣</span>
+            <div><div class="opt-label">Three storeys</div></div>
+          </div>
+          <div class="opt" data-key="floors" data-val="4" onclick="selectOpt(this)">
+            <span class="opt-icon">🏢</span>
+            <div><div class="opt-label">4+ storeys</div></div>
+          </div>
+        </div>
+        <div class="step-nav">
+          <button class="btn-back" onclick="prevStep()">←</button>
+          <button class="btn-next" id="next-4" onclick="nextStep()" disabled>Continue →</button>
+        </div>
+      </div>
+
+      <!-- STEP 5: Location -->
+      <div class="step" data-step="5">
+        <div class="step-q">Where is your project located?</div>
+        <div class="step-hint">Labor and material costs vary by region.</div>
+        <div class="options">
+          <div class="opt" data-key="location" data-val="ncr" onclick="selectOpt(this)">
+            <span class="opt-icon">🏙️</span>
+            <div>
+              <div class="opt-label">Metro Manila (NCR)</div>
+              <div class="opt-sub">Quezon City, Makati, Taguig, etc.</div>
+            </div>
+          </div>
+          <div class="opt" data-key="location" data-val="calabarzon" onclick="selectOpt(this)">
+            <span class="opt-icon">🏡</span>
+            <div>
+              <div class="opt-label">CALABARZON</div>
+              <div class="opt-sub">Cavite, Laguna, Batangas, Rizal, Quezon</div>
+            </div>
+          </div>
+          <div class="opt" data-key="location" data-val="other" onclick="selectOpt(this)">
+            <span class="opt-icon">📍</span>
+            <div>
+              <div class="opt-label">Other / Outside Luzon</div>
+              <div class="opt-sub">Visayas, Mindanao, Central Luzon, etc.</div>
+            </div>
+          </div>
+        </div>
+        <div class="step-nav">
+          <button class="btn-back" onclick="prevStep()">←</button>
+          <button class="btn-next" id="next-5" onclick="nextStep()" disabled>Continue →</button>
+        </div>
+      </div>
+
+      <!-- STEP 6: Email capture (lead gate) -->
+      <div class="step" data-step="6">
+        <div class="email-step-intro">
+          <p>Your estimate is ready. Enter your details below to <strong>unlock your full cost breakdown</strong> — and we'll follow up with verified contractors who can make it happen.</p>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div>
+            <label style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--g400);display:block;margin-bottom:6px;">Full Name</label>
+            <input type="text" class="text-input" id="lead-name" placeholder="Your name">
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--g400);display:block;margin-bottom:6px;">Mobile Number</label>
+            <input type="tel" class="text-input" id="lead-phone" placeholder="+63 9XX XXX XXXX">
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--g400);display:block;margin-bottom:6px;">Email Address</label>
+            <input type="email" class="text-input" id="lead-email" placeholder="you@email.com">
+          </div>
+        </div>
+        <div class="step-nav">
+          <button class="btn-back" onclick="prevStep()">←</button>
+          <button class="btn-next" onclick="submitLead()">Show My Estimate →</button>
+        </div>
+        <p style="font-size:12px;color:var(--g400);text-align:center;margin-top:14px;line-height:1.6;">We respect your privacy. No spam — just your estimate and a follow-up from our team.</p>
+      </div>
+
+      <!-- RESULTS -->
+      <div class="results" id="results-panel">
+        <div style="font-size:12px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--blue);margin-bottom:16px;">Your project estimate</div>
+        <div class="result-block">
+          <div class="result-label">Estimated Total Cost</div>
+          <div class="result-val" id="res-total">₱0</div>
+          <div class="result-range" id="res-range">Low–high range based on your inputs</div>
+        </div>
+        <div class="result-row">
+          <div class="result-mini">
+            <div class="result-mini-label">Cost per sqm</div>
+            <div class="result-mini-val" id="res-persqm">—</div>
+          </div>
+          <div class="result-mini">
+            <div class="result-mini-label">Project type</div>
+            <div class="result-mini-val" id="res-type">—</div>
+          </div>
+        </div>
+        <div class="result-breakdown">
+          <div class="result-breakdown-title">Cost breakdown</div>
+          <div class="breakdown-row"><span class="breakdown-item">Structure & Civil Works</span><span class="breakdown-cost" id="b-structure">—</span></div>
+          <div class="breakdown-row"><span class="breakdown-item">Finishing & Interior</span><span class="breakdown-cost" id="b-finish">—</span></div>
+          <div class="breakdown-row"><span class="breakdown-item">Electrical & Plumbing</span><span class="breakdown-cost" id="b-mep">—</span></div>
+          <div class="breakdown-row"><span class="breakdown-item">Labor</span><span class="breakdown-cost" id="b-labor">—</span></div>
+          <div class="breakdown-row"><span class="breakdown-item">Contingency (10%)</span><span class="breakdown-cost" id="b-contingency">—</span></div>
+        </div>
+        <button class="result-cta" onclick="window.location='index.html#get-matched'">Get Matched with Verified Contractors →</button>
+        <p class="result-disclaimer">Estimates are indicative only. Actual costs depend on site conditions, contractor rates, and material prices at time of construction. Consult a licensed engineer before committing to a budget.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- RIGHT: SUMMARY PANEL -->
+  <div class="summary-panel">
+    <div class="summary-card">
+      <div class="summary-head">
+        <div class="summary-head-label">Live estimate</div>
+        <div class="summary-estimate" id="summary-est">—</div>
+        <div class="summary-estimate-label">Updates as you answer</div>
+      </div>
+      <div class="summary-body" id="summary-body">
+        <div class="summary-empty">Your selections will appear here as you go through the steps.</div>
+      </div>
+    </div>
+
+    <div class="tip-card">
+      <div class="tip-label">💡 FIX tip</div>
+      <div class="tip-text" id="tip-text">Getting multiple quotes from verified contractors is the best way to keep your project on budget. FIX matches you with up to 2 licensed builders — free.</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Netlify hidden form for lead capture -->
+<div style="display:none">
+  <form name="calculator-leads" data-netlify="true">
+    <input type="hidden" name="form-name" value="calculator-leads">
+    <input name="lead-name">
+    <input name="lead-phone">
+    <input name="lead-email">
+    <input name="project-type">
+    <input name="floor-area">
+    <input name="quality">
+    <input name="floors">
+    <input name="location">
+    <input name="estimate">
+  </form>
+</div>
+
+<script>
+// ── STATE ──
+const state = {
+  step: 1,
+  totalSteps: 6,
+  type: null,
+  area: 80,
+  quality: null,
+  floors: null,
+  location: null,
+};
+
+const TIPS = {
+  1: 'Getting multiple quotes from verified contractors is the best way to keep your project on budget. FIX matches you with up to 2 licensed builders — free.',
+  2: 'In the Philippines, most residential builds range from 50–300 sqm. A standard 3-bedroom home is typically 100–150 sqm.',
+  3: 'Finish quality is the biggest single cost driver. Premium finishes can cost 2–3x more than basic per sqm.',
+  4: 'Multi-storey homes cost more per sqm than single-storey due to structural requirements, but are more land-efficient.',
+  5: 'Labor costs in Metro Manila are typically 10–20% higher than CALABARZON, but material delivery is cheaper due to proximity.',
+  6: 'Your estimate is based on current Philippine construction market rates. FIX contractors will give you firm quotes.',
+};
+
+// Cost rates (₱ per sqm) — [low, mid, high]
+const RATES = {
+  build: {
+    basic:    [18000, 22000, 26000],
+    standard: [28000, 35000, 42000],
+    premium:  [50000, 65000, 85000],
+  },
+  renovate: {
+    basic:    [8000,  12000, 16000],
+    standard: [14000, 20000, 26000],
+    premium:  [28000, 38000, 50000],
+  },
+  extend: {
+    basic:    [16000, 20000, 24000],
+    standard: [24000, 32000, 40000],
+    premium:  [45000, 58000, 75000],
+  },
+};
+
+const FLOOR_MULT = { '1': 1.0, '2': 1.08, '3': 1.14, '4': 1.20 };
+const LOC_MULT   = { ncr: 1.12, calabarzon: 1.0, other: 0.95 };
+
+const TYPE_LABELS     = { build: 'New Build', renovate: 'Renovation', extend: 'Extension' };
+const QUALITY_LABELS  = { basic: 'Basic / Economy', standard: 'Standard', premium: 'Premium' };
+const FLOORS_LABELS   = { '1': '1 storey', '2': '2 storeys', '3': '3 storeys', '4': '4+ storeys' };
+const LOCATION_LABELS = { ncr: 'Metro Manila', calabarzon: 'CALABARZON', other: 'Other region' };
+
+function calcEstimate() {
+  if (!state.type || !state.quality) return null;
+  const rates = RATES[state.type][state.quality];
+  const floorMult = state.floors ? FLOOR_MULT[state.floors] : 1;
+  const locMult   = state.location ? LOC_MULT[state.location] : 1;
+  return {
+    low:  Math.round(rates[0] * state.area * floorMult * locMult),
+    mid:  Math.round(rates[1] * state.area * floorMult * locMult),
+    high: Math.round(rates[2] * state.area * floorMult * locMult),
+    perSqm: Math.round(rates[1] * floorMult * locMult),
+  };
+}
+
+function fmt(n) {
+  if (n >= 1000000) return '₱' + (n / 1000000).toFixed(1) + 'M';
+  if (n >= 1000)    return '₱' + (n / 1000).toFixed(0) + 'K';
+  return '₱' + n.toLocaleString();
+}
+function fmtFull(n) {
+  return '₱' + Math.round(n).toLocaleString();
+}
+
+function updateUI() {
+  // Progress
+  const pct = (state.step / state.totalSteps) * 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-text').textContent = `Step ${state.step} of ${state.totalSteps}`;
+
+  // Tip
+  document.getElementById('tip-text').textContent = TIPS[state.step] || TIPS[1];
+
+  // Summary body
+  const rows = [];
+  if (state.type)     rows.push(['Project',  TYPE_LABELS[state.type]]);
+  if (state.area)     rows.push(['Floor area', state.area + ' sqm']);
+  if (state.quality)  rows.push(['Finish',    QUALITY_LABELS[state.quality]]);
+  if (state.floors)   rows.push(['Floors',    FLOORS_LABELS[state.floors]]);
+  if (state.location) rows.push(['Location',  LOCATION_LABELS[state.location]]);
+
+  const body = document.getElementById('summary-body');
+  if (rows.length === 0) {
+    body.innerHTML = '<div class="summary-empty">Your selections will appear here as you go through the steps.</div>';
+  } else {
+    body.innerHTML = rows.map(([k,v]) => `
+      <div class="summary-row">
+        <span class="summary-key">${k}</span>
+        <span class="summary-val">${v}</span>
+      </div>`).join('');
+  }
+
+  // Live estimate
+  const est = calcEstimate();
+  document.getElementById('summary-est').textContent = est ? `${fmt(est.low)} – ${fmt(est.high)}` : '—';
+
+  // Step 4 label adjustment for renovate
+  if (state.type === 'renovate') {
+    document.getElementById('step4-q').textContent = 'How many floors are being renovated?';
+  }
+  if (state.type === 'build' || state.type === 'extend') {
+    document.getElementById('step4-q').textContent = 'How many floors?';
+  }
+
+  // Area slider label
+  const areaQ = { build: 'What is your target floor area?', renovate: 'What area is being renovated?', extend: 'How much area are you adding?' };
+  if (state.type) document.getElementById('step2-q').textContent = areaQ[state.type];
+}
+
+function selectOpt(el) {
+  const key = el.dataset.key;
+  const val = el.dataset.val;
+  // Deselect siblings
+  el.closest('.options, .options-grid').querySelectorAll('.opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  state[key] = val;
+
+  // Enable next button for this step
+  const nextBtn = document.getElementById(`next-${state.step}`);
+  if (nextBtn) nextBtn.disabled = false;
+
+  updateUI();
+}
+
+function updateSlider(type) {
+  if (type === 'area') {
+    const v = document.getElementById('area-slider').value;
+    state.area = parseInt(v);
+    document.getElementById('area-val').textContent = v;
+    updateUI();
+  }
+}
+
+function nextStep() {
+  const current = document.querySelector(`.step[data-step="${state.step}"]`);
+  current.classList.remove('active');
+  state.step++;
+  const next = document.querySelector(`.step[data-step="${state.step}"]`);
+  next.classList.add('active');
+  updateUI();
+}
+
+function prevStep() {
+  const current = document.querySelector(`.step[data-step="${state.step}"]`);
+  current.classList.remove('active');
+  state.step--;
+  const prev = document.querySelector(`.step[data-step="${state.step}"]`);
+  prev.classList.add('active');
+  updateUI();
+}
+
+function showResults() {
+  const est = calcEstimate();
+  if (!est) return;
+
+  // Hide all steps, show results
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  document.getElementById('results-panel').classList.add('active');
+
+  // Update progress to 100%
+  document.getElementById('progress-fill').style.width = '100%';
+  document.getElementById('progress-text').textContent = 'Estimate complete';
+
+  // Populate results
+  document.getElementById('res-total').textContent = `${fmt(est.low)} – ${fmt(est.high)}`;
+  document.getElementById('res-range').textContent = `Based on ${state.area} sqm ${TYPE_LABELS[state.type].toLowerCase()}, ${QUALITY_LABELS[state.quality].toLowerCase()} finish`;
+  document.getElementById('res-persqm').textContent = `${fmt(est.perSqm)}/sqm`;
+  document.getElementById('res-type').textContent = TYPE_LABELS[state.type];
+  document.getElementById('summary-est').textContent = `${fmt(est.low)} – ${fmt(est.high)}`;
+
+  // Breakdown
+  const mid = est.mid;
+  document.getElementById('b-structure').textContent    = fmtFull(mid * 0.35);
+  document.getElementById('b-finish').textContent       = fmtFull(mid * 0.28);
+  document.getElementById('b-mep').textContent          = fmtFull(mid * 0.18);
+  document.getElementById('b-labor').textContent        = fmtFull(mid * 0.10);
+  document.getElementById('b-contingency').textContent  = fmtFull(mid * 0.09);
+}
+
+function submitLead() {
+  const name  = document.getElementById('lead-name').value.trim();
+  const phone = document.getElementById('lead-phone').value.trim();
+  const email = document.getElementById('lead-email').value.trim();
+
+  if (!name || !email) {
+    if (!name)  { document.getElementById('lead-name').style.borderColor  = '#EF4444'; document.getElementById('lead-name').focus(); }
+    if (!email) { document.getElementById('lead-email').style.borderColor = '#EF4444'; document.getElementById('lead-email').focus(); }
+    return;
+  }
+
+  const est = calcEstimate();
+
+  // Submit to Netlify Forms
+  const formData = new URLSearchParams({
+    'form-name':    'calculator-leads',
+    'lead-name':    name,
+    'lead-phone':   phone,
+    'lead-email':   email,
+    'project-type': TYPE_LABELS[state.type] || '',
+    'floor-area':   state.area + ' sqm',
+    'quality':      QUALITY_LABELS[state.quality] || '',
+    'floors':       FLOORS_LABELS[state.floors] || '',
+    'location':     LOCATION_LABELS[state.location] || '',
+    'estimate':     est ? `${fmt(est.low)} – ${fmt(est.high)}` : '',
+  });
+
+  fetch('/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: formData.toString() })
+    .catch(() => {}); // Show results regardless
+
+  showResults();
+}
+
+// Reset input borders on typing
+document.querySelectorAll('.text-input').forEach(el => {
+  el.addEventListener('input', function() { this.style.borderColor = ''; });
+});
+
+// Init
+updateUI();
+</script>
+</body>
+</html>
