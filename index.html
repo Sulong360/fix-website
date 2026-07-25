@@ -195,6 +195,65 @@ nav.scrolled { box-shadow: 0 4px 24px rgba(13,60,107,0.08); }
 .pricing-tier-unit { font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 1px; text-align: right; }
 .pricing-note { font-size: 12px; color: rgba(255,255,255,0.35); margin-top: 16px; text-align: center; }
 
+/* ── OFW SECTION ── */
+.ofw { padding: 100px 48px; background: var(--blue-navy); position: relative; overflow: hidden; }
+.ofw-glow { position: absolute; left: -120px; bottom: -120px; width: 500px; height: 500px; border-radius: 50%; background: radial-gradient(circle, rgba(32,118,194,0.2) 0%, transparent 70%); pointer-events: none; }
+.ofw-glow-2 { position: absolute; right: -80px; top: -80px; width: 380px; height: 380px; border-radius: 50%; background: radial-gradient(circle, rgba(168,202,234,0.08) 0%, transparent 70%); pointer-events: none; }
+.ofw-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; position: relative; z-index: 1; }
+.ofw-eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: var(--blue-sky); margin-bottom: 16px; display: block; }
+.ofw-h2 { font-size: clamp(28px, 3.5vw, 40px); font-weight: 700; color: white; letter-spacing: -0.5px; line-height: 1.15; margin-bottom: 16px; }
+.ofw-sub { font-size: 16px; color: rgba(255,255,255,0.6); line-height: 1.7; margin-bottom: 36px; }
+.ofw-features { display: flex; flex-direction: column; gap: 0; }
+.ofw-feature { display: flex; gap: 16px; padding: 18px 0; border-bottom: 1px solid rgba(255,255,255,0.07); }
+.ofw-feature:last-child { border-bottom: none; }
+.ofw-feature-icon { width: 40px; height: 40px; border-radius: 10px; background: rgba(168,202,234,0.1); border: 1px solid rgba(168,202,234,0.2); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.ofw-feature-h { font-size: 15px; font-weight: 600; color: white; margin-bottom: 3px; }
+.ofw-feature-p { font-size: 13px; color: rgba(255,255,255,0.5); line-height: 1.55; }
+.ofw-ctas { display: flex; gap: 12px; margin-top: 36px; flex-wrap: wrap; }
+.btn-ofw { background: var(--blue); color: white; font-size: 14px; font-weight: 600; padding: 13px 24px; border-radius: 10px; text-decoration: none; transition: background 0.2s, transform 0.15s; box-shadow: 0 4px 20px rgba(32,118,194,0.3); }
+.btn-ofw:hover { background: var(--blue-dark); transform: translateY(-1px); }
+.btn-ofw-ghost { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.7); font-size: 14px; font-weight: 500; padding: 13px 24px; border-radius: 10px; text-decoration: none; border: 1px solid rgba(255,255,255,0.12); transition: background 0.2s; }
+.btn-ofw-ghost:hover { background: rgba(255,255,255,0.1); }
+
+/* Dashboard mock card */
+.ofw-dashboard { position: relative; }
+.ofw-coming-soon { position: absolute; top: 16px; right: -8px; background: var(--blue); color: white; font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 5px 14px; border-radius: 100px; box-shadow: 0 4px 16px rgba(13,60,107,0.4); z-index: 2; }
+.dash-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(168,202,234,0.15); border-radius: 20px; overflow: hidden; backdrop-filter: blur(8px); }
+.dash-header { background: rgba(168,202,234,0.08); padding: 18px 22px; border-bottom: 1px solid rgba(168,202,234,0.1); display: flex; align-items: center; justify-content: space-between; }
+.dash-header-title { font-size: 13px; font-weight: 700; color: white; }
+.dash-header-sub { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+.dash-live { display: flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 600; color: var(--green); letter-spacing: 1px; text-transform: uppercase; }
+.dash-live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 2s ease-in-out infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+.dash-body { padding: 20px 22px; }
+.dash-progress-label { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.dash-progress-text { font-size: 12px; color: rgba(255,255,255,0.5); }
+.dash-progress-pct { font-size: 13px; font-weight: 700; color: var(--blue-sky); }
+.dash-progress-track { height: 6px; background: rgba(255,255,255,0.1); border-radius: 100px; margin-bottom: 20px; overflow: hidden; }
+.dash-progress-fill { height: 100%; width: 65%; background: linear-gradient(90deg, var(--blue), var(--blue-sky)); border-radius: 100px; }
+.dash-stages { display: flex; flex-direction: column; gap: 0; margin-bottom: 18px; }
+.dash-stage { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.dash-stage:last-child { border-bottom: none; }
+.dash-stage-icon { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; }
+.dash-stage-done { background: rgba(34,197,94,0.15); }
+.dash-stage-active { background: rgba(32,118,194,0.2); }
+.dash-stage-pending { background: rgba(255,255,255,0.05); }
+.dash-stage-name { flex: 1; font-size: 13px; color: rgba(255,255,255,0.7); font-weight: 500; }
+.dash-stage-status { font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 100px; }
+.dash-stage-status.done { background: rgba(34,197,94,0.15); color: #4ADE80; }
+.dash-stage-status.active { background: rgba(32,118,194,0.2); color: var(--blue-sky); }
+.dash-stage-status.pending { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.3); }
+.dash-footer { background: rgba(168,202,234,0.05); border-top: 1px solid rgba(168,202,234,0.1); padding: 14px 22px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.dash-stat { text-align: center; }
+.dash-stat-val { font-size: 16px; font-weight: 700; color: white; line-height: 1; }
+.dash-stat-label { font-size: 10px; color: rgba(255,255,255,0.35); margin-top: 3px; letter-spacing: 0.5px; }
+.dash-update { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 14px; margin-top: 2px; }
+.dash-update-meta { font-size: 10px; color: rgba(255,255,255,0.35); margin-bottom: 6px; letter-spacing: 0.5px; }
+.dash-update-text { font-size: 12px; color: rgba(255,255,255,0.6); line-height: 1.55; }
+.dash-update-photos { display: flex; gap: 6px; margin-top: 10px; }
+.dash-photo { width: 40px; height: 40px; border-radius: 6px; background: rgba(168,202,234,0.12); border: 1px solid rgba(168,202,234,0.15); display: flex; align-items: center; justify-content: center; font-size: 16px; }
+.dash-photo-count { width: 40px; height: 40px; border-radius: 6px; background: rgba(32,118,194,0.2); border: 1px solid rgba(32,118,194,0.3); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--blue-sky); }
+
 /* ── REGIONS ── */
 .regions { padding: 100px 48px; background: var(--off); }
 .regions-inner { max-width: 1200px; margin: 0 auto; }
@@ -478,7 +537,8 @@ footer { background: var(--blue-navy); color: white; padding: 64px 48px 40px; }
   .hero { padding: calc(var(--nav-h) + 40px) 24px 60px; }
   .hero-inner { grid-template-columns: 1fr; gap: 48px; }
   .hero-card-wrap { display: none; }
-  .how, .why, .contractors, .regions, .testimonials, .cta-section { padding: 72px 24px; }
+  .how, .why, .contractors, .ofw, .regions, .testimonials, .cta-section { padding: 72px 24px; }
+  .ofw-inner { grid-template-columns: 1fr; gap: 48px; }
   .steps { grid-template-columns: 1fr; }
   .steps::before { display: none; }
   .why-inner, .contractors-inner { grid-template-columns: 1fr; gap: 48px; }
@@ -541,9 +601,12 @@ footer { background: var(--blue-navy); color: white; padding: 64px 48px 40px; }
   <div class="nav-links">
     <a href="#how">How it works</a>
     <a href="/calculator">Project Calculator</a>
+    <a href="/lot-planner">Lot Planner</a>
+    <a href="/lot-plotter">Lot Planner</a>
     <a href="/solar" style="color:var(--solar,#F59E0B);font-weight:600;">☀️ Solar</a>
     <a href="#why">Why FIX</a>
     <a href="#contractors">For Contractors</a>
+    <a href="#ofw">For OFWs</a>
     <a href="#regions">Coverage</a>
   </div>
   <a href="#get-matched" class="nav-cta">Post Your Project →</a>
@@ -880,6 +943,138 @@ footer { background: var(--blue-navy); color: white; padding: 64px 48px 40px; }
         </form>
       </div>
     </div>
+  </div>
+</section>
+
+<!-- ══════════ OFW SECTION ══════════ -->
+<section class="ofw" id="ofw">
+  <div class="ofw-glow"></div>
+  <div class="ofw-glow-2"></div>
+  <div class="ofw-inner">
+
+    <!-- LEFT: copy + features -->
+    <div>
+      <span class="ofw-eyebrow reveal">For OFWs &amp; Families Abroad</span>
+      <h2 class="ofw-h2 reveal">You built your career abroad to build a home here.<br>Don't lose sleep over it.</h2>
+      <p class="ofw-sub reveal">Managing a multi-million peso construction project from thousands of miles away — through scattered Viber threads and missed calls — shouldn't be the norm. With FIX, it doesn't have to be.</p>
+
+      <div class="ofw-features">
+        <div class="ofw-feature reveal">
+          <div class="ofw-feature-icon">📸</div>
+          <div>
+            <div class="ofw-feature-h">Weekly Structured Photo Updates</div>
+            <div class="ofw-feature-p">Your contractor submits organized progress photos every week — by build stage, not dumped into a group chat.</div>
+          </div>
+        </div>
+        <div class="ofw-feature reveal" style="transition-delay:0.05s">
+          <div class="ofw-feature-icon">🧾</div>
+          <div>
+            <div class="ofw-feature-h">Material &amp; Receipt Tracking</div>
+            <div class="ofw-feature-p">Every major purchase documented. Know exactly where your money is going in real time.</div>
+          </div>
+        </div>
+        <div class="ofw-feature reveal" style="transition-delay:0.1s">
+          <div class="ofw-feature-icon">📋</div>
+          <div>
+            <div class="ofw-feature-h">Permit Milestone Tracker</div>
+            <div class="ofw-feature-p">Foundation ✅ Columns ✅ Roofing 🔄 — see exactly where your build stands at every stage.</div>
+          </div>
+        </div>
+        <div class="ofw-feature reveal" style="transition-delay:0.15s">
+          <div class="ofw-feature-icon">💬</div>
+          <div>
+            <div class="ofw-feature-h">Direct Contractor Messaging</div>
+            <div class="ofw-feature-p">One dedicated thread per project. No lost messages, no miscommunication across time zones.</div>
+          </div>
+        </div>
+        <div class="ofw-feature reveal" style="transition-delay:0.2s">
+          <div class="ofw-feature-icon">🔒</div>
+          <div>
+            <div class="ofw-feature-h">FIX Backup &amp; Dispute Support</div>
+            <div class="ofw-feature-p">If something goes wrong, FIX steps in. You're never left dealing with a contractor dispute alone from abroad.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ofw-ctas reveal">
+        <a href="#get-matched" class="btn-ofw">I'm Building From Abroad →</a>
+        <a href="#why" class="btn-ofw-ghost">How FIX protects you</a>
+      </div>
+    </div>
+
+    <!-- RIGHT: dashboard mock -->
+    <div class="ofw-dashboard reveal">
+      <div class="ofw-coming-soon">✦ Coming Soon</div>
+      <div class="dash-card">
+        <div class="dash-header">
+          <div>
+            <div class="dash-header-title">🏗️ Your Project</div>
+            <div class="dash-header-sub">2-Storey Home · Dasmariñas, Cavite</div>
+          </div>
+          <div class="dash-live"><div class="dash-live-dot"></div>Live</div>
+        </div>
+
+        <div class="dash-body">
+          <div class="dash-progress-label">
+            <span class="dash-progress-text">Overall Progress — Week 12 of 24</span>
+            <span class="dash-progress-pct">65%</span>
+          </div>
+          <div class="dash-progress-track">
+            <div class="dash-progress-fill"></div>
+          </div>
+
+          <div class="dash-stages">
+            <div class="dash-stage">
+              <div class="dash-stage-icon dash-stage-done">✅</div>
+              <span class="dash-stage-name">Foundation</span>
+              <span class="dash-stage-status done">Complete</span>
+            </div>
+            <div class="dash-stage">
+              <div class="dash-stage-icon dash-stage-done">✅</div>
+              <span class="dash-stage-name">Columns &amp; Beams</span>
+              <span class="dash-stage-status done">Complete</span>
+            </div>
+            <div class="dash-stage">
+              <div class="dash-stage-icon dash-stage-active">🔄</div>
+              <span class="dash-stage-name">Roofing</span>
+              <span class="dash-stage-status active">In Progress</span>
+            </div>
+            <div class="dash-stage">
+              <div class="dash-stage-icon dash-stage-pending">░</div>
+              <span class="dash-stage-name">Finishing Works</span>
+              <span class="dash-stage-status pending">Not Started</span>
+            </div>
+          </div>
+
+          <div class="dash-update">
+            <div class="dash-update-meta">LATEST UPDATE · Week 12 · Buena General Contractors · 2 days ago</div>
+            <div class="dash-update-text">"Roofing works ongoing. 60% of rafters installed. Expect completion by Friday barring weather delays."</div>
+            <div class="dash-update-photos">
+              <div class="dash-photo">🏗️</div>
+              <div class="dash-photo">🧱</div>
+              <div class="dash-photo">📐</div>
+              <div class="dash-photo-count">+4</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dash-footer">
+          <div class="dash-stat">
+            <div class="dash-stat-val">12</div>
+            <div class="dash-stat-label">Weekly updates</div>
+          </div>
+          <div class="dash-stat">
+            <div class="dash-stat-val">38</div>
+            <div class="dash-stat-label">Photos logged</div>
+          </div>
+          <div class="dash-stat">
+            <div class="dash-stat-val">₱0</div>
+            <div class="dash-stat-label">Disputes</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </section>
 

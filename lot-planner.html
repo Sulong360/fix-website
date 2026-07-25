@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lot Planner — FIX Philippines</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --blue:      #2076C2;
+  --blue-dark: #1A5FA0;
+  --blue-navy: #0D3C6B;
+  --blue-sky:  #A8CAEA;
+  --blue-pale: #E6F1FB;
+  --off:       #F7F9FC;
+  --g100:      #F0F4F8;
+  --g200:      #D9E3EC;
+  --g400:      #8A9BB0;
+  --g700:      #374151;
+  --g900:      #111827;
+  --green:     #22C55E;
+  --green-pale:#DCFCE7;
+  --font:      'DM Sans', sans-serif;
+  --nav-h:     64px;
+}
+html { scroll-behavior: smooth; }
+body { font-family: var(--font); background: var(--off); color: var(--g900); min-height: 100vh; }
+
+/* ── NAV ── */
+nav {
+  background: white; border-bottom: 1px solid var(--g200);
+  height: var(--nav-h); display: flex; align-items: center;
+  justify-content: space-between; padding: 0 40px;
+  position: sticky; top: 0; z-index: 100;
+}
+.nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.nav-wordmark { font-size: 13px; font-weight: 700; color: var(--g900); }
+.nav-sub { font-size: 9px; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase; color: var(--g400); margin-top: 2px; }
+.nav-back { font-size: 13px; font-weight: 500; color: var(--g400); text-decoration: none; display: flex; align-items: center; gap: 5px; transition: color 0.2s; }
+.nav-back:hover { color: var(--blue); }
+
+/* ── GATE PAGE ── */
+#gate-page { min-height: calc(100vh - var(--nav-h)); display: flex; align-items: stretch; }
+.gate-left {
+  width: 52%; background: var(--blue-navy); padding: 64px 56px;
+  display: flex; flex-direction: column; justify-content: center;
+  position: relative; overflow: hidden;
+}
+.gate-left-glow { position: absolute; right: -100px; bottom: -100px; width: 400px; height: 400px; border-radius: 50%; background: radial-gradient(circle, rgba(32,118,194,0.25) 0%, transparent 70%); pointer-events: none; }
+.gate-left-grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(168,202,234,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(168,202,234,0.05) 1px, transparent 1px); background-size: 48px 48px; pointer-events: none; }
+.gate-eyebrow { font-size: 10px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: var(--blue-sky); margin-bottom: 20px; position: relative; z-index: 1; }
+.gate-h1 { font-size: clamp(32px, 3.5vw, 48px); font-weight: 700; color: white; letter-spacing: -1px; line-height: 1.1; margin-bottom: 18px; position: relative; z-index: 1; }
+.gate-h1 em { font-style: normal; color: var(--blue-sky); }
+.gate-sub { font-size: 16px; color: rgba(255,255,255,0.55); line-height: 1.7; margin-bottom: 40px; max-width: 380px; position: relative; z-index: 1; }
+
+/* Preview tiles */
+.gate-previews { display: flex; flex-direction: column; gap: 10px; position: relative; z-index: 1; }
+.gate-preview { display: flex; align-items: center; gap: 14px; background: rgba(255,255,255,0.05); border: 1px solid rgba(168,202,234,0.12); border-radius: 12px; padding: 14px 18px; }
+.gate-preview-icon { width: 40px; height: 40px; border-radius: 10px; background: rgba(168,202,234,0.1); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; position: relative; }
+.gate-preview-lock { position: absolute; bottom: -4px; right: -4px; width: 16px; height: 16px; background: var(--blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 8px; }
+.gate-preview-title { font-size: 13px; font-weight: 600; color: white; }
+.gate-preview-sub { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+.gate-preview-blur { filter: blur(3px); opacity: 0.5; pointer-events: none; }
+.gate-preview.locked { opacity: 0.6; }
+
+.gate-right { flex: 1; background: white; padding: 64px 48px; display: flex; flex-direction: column; justify-content: center; }
+.gate-form-title { font-size: 22px; font-weight: 700; color: var(--g900); letter-spacing: -0.3px; margin-bottom: 6px; }
+.gate-form-sub { font-size: 14px; color: var(--g400); margin-bottom: 32px; line-height: 1.6; }
+.gate-fields { display: flex; flex-direction: column; gap: 16px; }
+.field-group { display: flex; flex-direction: column; gap: 6px; }
+.field-label { font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--g400); }
+.field-input { border: 2px solid var(--g200); border-radius: 10px; padding: 12px 14px; font-family: var(--font); font-size: 15px; color: var(--g900); outline: none; transition: border-color 0.2s; width: 100%; background: white; }
+.field-input:focus { border-color: var(--blue); }
+.field-input::placeholder { color: var(--g400); }
+.field-select { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238A9BB0' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; cursor: pointer; }
+.gate-submit { background: var(--blue); color: white; border: none; border-radius: 10px; padding: 15px; font-family: var(--font); font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 4px; transition: background 0.2s, transform 0.15s; box-shadow: 0 4px 20px rgba(32,118,194,0.25); display: flex; align-items: center; justify-content: center; gap: 8px; }
+.gate-submit:hover { background: var(--blue-dark); transform: translateY(-1px); }
+.gate-privacy { font-size: 12px; color: var(--g400); text-align: center; margin-top: 12px; line-height: 1.6; }
+.gate-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+/* ── TOOL (hidden until gate passed) ── */
+#tool-page { display: none; }
+#tool-page.visible { display: block; }
+
+/* ── STEP PROGRESS ── */
+.tool-progress { background: white; border-bottom: 1px solid var(--g200); padding: 0 40px; }
+.tool-progress-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; gap: 0; }
+.prog-step { display: flex; align-items: center; gap: 10px; padding: 18px 20px 18px 0; flex: 1; border-bottom: 3px solid transparent; cursor: default; transition: border-color 0.3s; }
+.prog-step.done { border-color: var(--green); }
+.prog-step.active { border-color: var(--blue); }
+.prog-num { width: 28px; height: 28px; border-radius: 50%; background: var(--g200); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: var(--g400); flex-shrink: 0; transition: background 0.3s, color 0.3s; }
+.prog-step.active .prog-num { background: var(--blue); color: white; }
+.prog-step.done .prog-num { background: var(--green); color: white; }
+.prog-label { font-size: 13px; font-weight: 600; color: var(--g400); transition: color 0.3s; }
+.prog-step.active .prog-label { color: var(--g900); }
+.prog-step.done .prog-label { color: var(--g700); }
+
+/* ── TOOL LAYOUT ── */
+.tool-layout { max-width: 1100px; margin: 0 auto; padding: 36px 40px 60px; }
+
+/* ── STEP PANELS ── */
+.tool-step { display: none; }
+.tool-step.active { display: block; animation: fadeUp 0.3s ease; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+.step-header { margin-bottom: 32px; }
+.step-num-label { font-size: 10px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: var(--blue); margin-bottom: 8px; }
+.step-title { font-size: 26px; font-weight: 700; color: var(--g900); letter-spacing: -0.3px; margin-bottom: 8px; }
+.step-subtitle { font-size: 15px; color: var(--g400); line-height: 1.6; }
+
+/* Option cards */
+.opt-grid { display: grid; gap: 12px; }
+.opt-grid-2 { grid-template-columns: 1fr 1fr; }
+.opt-grid-3 { grid-template-columns: repeat(3, 1fr); }
+.opt-card { border: 2px solid var(--g200); border-radius: 14px; padding: 20px; cursor: pointer; transition: border-color 0.2s, background 0.2s, transform 0.15s; user-select: none; display: flex; align-items: flex-start; gap: 14px; }
+.opt-card:hover { border-color: var(--blue-sky); background: var(--blue-pale); transform: translateY(-1px); }
+.opt-card.selected { border-color: var(--blue); background: var(--blue-pale); }
+.opt-card-icon { font-size: 26px; flex-shrink: 0; margin-top: 2px; }
+.opt-card-title { font-size: 15px; font-weight: 700; color: var(--g900); margin-bottom: 3px; }
+.opt-card.selected .opt-card-title { color: var(--blue); }
+.opt-card-sub { font-size: 13px; color: var(--g400); line-height: 1.5; }
+
+/* Dimension inputs */
+.dim-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start; }
+.dim-inputs { display: flex; flex-direction: column; gap: 20px; }
+.dim-or { text-align: center; font-size: 13px; font-weight: 600; color: var(--g400); padding: 8px 0; position: relative; }
+.dim-or::before, .dim-or::after { content: ''; position: absolute; top: 50%; width: 42%; height: 1px; background: var(--g200); }
+.dim-or::before { left: 0; }
+.dim-or::after { right: 0; }
+.input-with-unit { display: flex; align-items: center; gap: 0; }
+.input-with-unit input { flex: 1; border: 2px solid var(--g200); border-right: none; border-radius: 10px 0 0 10px; padding: 12px 14px; font-family: var(--font); font-size: 16px; font-weight: 600; color: var(--g900); outline: none; transition: border-color 0.2s; }
+.input-with-unit input:focus { border-color: var(--blue); }
+.input-with-unit .unit { background: var(--g100); border: 2px solid var(--g200); border-left: none; border-radius: 0 10px 10px 0; padding: 12px 14px; font-size: 13px; font-weight: 600; color: var(--g400); white-space: nowrap; }
+.dim-preview { background: white; border: 1px solid var(--g200); border-radius: 16px; padding: 24px; }
+.dim-preview-title { font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--g400); margin-bottom: 16px; }
+#lot-preview-canvas { width: 100%; border-radius: 8px; display: block; }
+
+/* Preferences step */
+.pref-sections { display: flex; flex-direction: column; gap: 28px; }
+.pref-section-title { font-size: 13px; font-weight: 600; color: var(--g700); margin-bottom: 12px; letter-spacing: 0.3px; }
+
+/* Template cards */
+.template-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.tpl-card { border: 2px solid var(--g200); border-radius: 16px; overflow: hidden; cursor: pointer; transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s; background: white; }
+.tpl-card:hover { border-color: var(--blue-sky); transform: translateY(-3px); box-shadow: 0 10px 32px rgba(13,60,107,0.08); }
+.tpl-card.selected { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(32,118,194,0.12); }
+.tpl-canvas-wrap { background: var(--g100); padding: 16px; }
+.tpl-canvas-wrap canvas { width: 100%; display: block; }
+.tpl-info { padding: 16px; }
+.tpl-name { font-size: 14px; font-weight: 700; color: var(--g900); margin-bottom: 6px; }
+.tpl-card.selected .tpl-name { color: var(--blue); }
+.tpl-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
+.tpl-tag { font-size: 10px; font-weight: 600; background: var(--g100); color: var(--g400); padding: 3px 8px; border-radius: 100px; }
+.tpl-area { font-size: 12px; color: var(--g400); }
+.tpl-match { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; color: #15803D; background: var(--green-pale); padding: 3px 8px; border-radius: 100px; margin-top: 6px; }
+.tpl-no-match { font-size: 12px; color: var(--g400); font-style: italic; margin-top: 8px; }
+
+/* ── RESULT PAGE ── */
+.result-layout { display: grid; grid-template-columns: 1fr 340px; gap: 28px; align-items: start; }
+.result-canvas-wrap { background: white; border: 1px solid var(--g200); border-radius: 20px; padding: 28px; }
+.result-canvas-title { font-size: 13px; font-weight: 700; color: var(--g900); margin-bottom: 4px; }
+.result-canvas-sub { font-size: 12px; color: var(--g400); margin-bottom: 20px; }
+#result-canvas { width: 100%; border-radius: 8px; display: block; }
+.result-disclaimer { font-size: 11px; color: var(--g400); line-height: 1.6; margin-top: 16px; padding: 12px 16px; background: var(--g100); border-radius: 8px; border-left: 3px solid var(--blue-sky); }
+
+/* Summary panel */
+.summary-panel { display: flex; flex-direction: column; gap: 16px; position: sticky; top: 84px; }
+.sum-card { background: white; border: 1px solid var(--g200); border-radius: 16px; overflow: hidden; }
+.sum-card-head { background: var(--blue-navy); padding: 18px 20px; }
+.sum-card-head-label { font-size: 10px; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase; color: rgba(255,255,255,0.45); margin-bottom: 4px; }
+.sum-card-head-val { font-size: 22px; font-weight: 700; color: white; }
+.sum-card-head-sub { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+.sum-card-body { padding: 16px 20px; }
+.sum-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--g100); }
+.sum-row:last-child { border-bottom: none; }
+.sum-key { font-size: 12px; color: var(--g400); }
+.sum-val { font-size: 13px; font-weight: 600; color: var(--g900); }
+.sum-val.green { color: #15803D; }
+.sum-val.warn { color: #D97706; }
+.compliance-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--g100); }
+.compliance-row:last-child { border-bottom: none; }
+.compliance-key { font-size: 12px; color: var(--g400); }
+.compliance-badge { font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 100px; }
+.compliance-badge.ok { background: var(--green-pale); color: #15803D; }
+.compliance-badge.warn { background: #FEF3C7; color: #92400E; }
+
+.rooms-list { display: flex; flex-direction: column; gap: 4px; padding: 14px 20px; }
+.room-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--g700); }
+.room-item::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--blue-sky); flex-shrink: 0; }
+
+.result-cta-card { background: var(--blue); border-radius: 16px; padding: 24px; }
+.result-cta-title { font-size: 16px; font-weight: 700; color: white; margin-bottom: 8px; line-height: 1.3; }
+.result-cta-sub { font-size: 13px; color: rgba(255,255,255,0.7); margin-bottom: 18px; line-height: 1.55; }
+.result-cta-btn { width: 100%; background: white; color: var(--blue); border: none; border-radius: 10px; padding: 13px; font-family: var(--font); font-size: 14px; font-weight: 700; cursor: pointer; transition: transform 0.15s, box-shadow 0.2s; }
+.result-cta-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,0,0,0.2); }
+
+/* ── NAV BUTTONS ── */
+.step-nav { display: flex; gap: 10px; margin-top: 36px; }
+.btn-back { background: var(--g100); color: var(--g700); border: none; border-radius: 10px; padding: 13px 20px; font-family: var(--font); font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+.btn-back:hover { background: var(--g200); }
+.btn-next { flex: 1; background: var(--blue); color: white; border: none; border-radius: 10px; padding: 13px 24px; font-family: var(--font); font-size: 15px; font-weight: 700; cursor: pointer; transition: background 0.2s, transform 0.15s; }
+.btn-next:hover { background: var(--blue-dark); transform: translateY(-1px); }
+.btn-next:disabled { background: var(--g200); color: var(--g400); cursor: not-allowed; transform: none; }
+
+/* ── MODAL ── */
+.modal-overlay { position: fixed; inset: 0; background: rgba(13,60,107,0.75); backdrop-filter: blur(6px); z-index: 500; display: flex; align-items: center; justify-content: center; padding: 24px; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal-box { background: white; border-radius: 20px; padding: 48px 40px; max-width: 420px; width: 100%; text-align: center; transform: translateY(20px); transition: transform 0.3s; }
+.modal-overlay.open .modal-box { transform: translateY(0); }
+.modal-icon { font-size: 44px; margin-bottom: 14px; }
+.modal-title { font-size: 20px; font-weight: 700; color: var(--g900); margin-bottom: 8px; }
+.modal-body { font-size: 14px; color: var(--g400); line-height: 1.65; margin-bottom: 24px; }
+.modal-btn { background: var(--blue); color: white; font-family: var(--font); font-size: 14px; font-weight: 700; padding: 13px 32px; border-radius: 10px; border: none; cursor: pointer; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  #gate-page { flex-direction: column; }
+  .gate-left { width: 100%; padding: 40px 24px; }
+  .gate-right { padding: 36px 24px; }
+  .gate-row { grid-template-columns: 1fr; }
+  .tool-layout { padding: 24px 20px 48px; }
+  .tool-progress { padding: 0 20px; overflow-x: auto; }
+  .opt-grid-2, .opt-grid-3 { grid-template-columns: 1fr; }
+  .dim-layout { grid-template-columns: 1fr; }
+  .template-grid { grid-template-columns: 1fr 1fr; }
+  .result-layout { grid-template-columns: 1fr; }
+  .summary-panel { position: static; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="/" class="nav-logo">
+    <svg width="44" height="18" viewBox="0 0 210 88" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="nl" x1="118" y1="80" x2="184" y2="8" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stop-color="#2076C2"/><stop offset="52%" stop-color="#2076C2"/>
+          <stop offset="100%" stop-color="#A8CAEA"/>
+        </linearGradient>
+      </defs>
+      <rect x="12" y="8" width="13" height="72" rx="4" fill="#2076C2"/>
+      <rect x="12" y="8" width="54" height="13" rx="4" fill="#2076C2"/>
+      <rect x="12" y="38" width="43" height="13" rx="4" fill="#2076C2"/>
+      <rect x="82" y="8" width="13" height="72" rx="4" fill="#2076C2"/>
+      <path d="M118 80L184 8" stroke="url(#nl)" stroke-width="13" stroke-linecap="round"/>
+      <path d="M118 8L184 80" stroke="#2076C2" stroke-width="13" stroke-linecap="round"/>
+    </svg>
+    <div>
+      <div class="nav-wordmark">FIX Lot Planner</div>
+      <div class="nav-sub">Free Planning Tool</div>
+    </div>
+  </a>
+  <a href="/" class="nav-back">← Back to FIX</a>
+</nav>
+
+<!-- ══════════ GATE PAGE ══════════ -->
+<div id="gate-page">
+  <div class="gate-left">
+    <div class="gate-left-glow"></div>
+    <div class="gate-left-grid"></div>
+    <div class="gate-eyebrow">Free Planning Tool</div>
+    <h1 class="gate-h1">See what you can build on <em>your lot</em> — before you call a contractor.</h1>
+    <p class="gate-sub">Enter your details to unlock the FIX Lot Planner. Visualize your lot, pick a floor plan, and see NBCP setbacks — in under 3 minutes.</p>
+    <div class="gate-previews">
+      <div class="gate-preview">
+        <div class="gate-preview-icon">📐<div class="gate-preview-lock">🔓</div></div>
+        <div>
+          <div class="gate-preview-title">Lot Visualizer</div>
+          <div class="gate-preview-sub">Draw your lot to scale with NBCP setbacks</div>
+        </div>
+      </div>
+      <div class="gate-preview locked">
+        <div class="gate-preview-icon gate-preview-blur">🏠<div class="gate-preview-lock">🔒</div></div>
+        <div class="gate-preview-blur">
+          <div class="gate-preview-title">Floor Plan Selector</div>
+          <div class="gate-preview-sub">6 templates matched to your preferences</div>
+        </div>
+      </div>
+      <div class="gate-preview locked">
+        <div class="gate-preview-icon gate-preview-blur">📊<div class="gate-preview-lock">🔒</div></div>
+        <div class="gate-preview-blur">
+          <div class="gate-preview-title">Area & Compliance Report</div>
+          <div class="gate-preview-sub">Floor area, lot coverage, setback check</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="gate-right">
+    <div class="gate-form-title">Unlock the Lot Planner</div>
+    <div class="gate-form-sub">Takes 30 seconds. Free, no strings attached.</div>
+    <form class="gate-fields" id="gate-form" name="lot-plotter-leads" method="POST" data-netlify="true" netlify-honeypot="bot-field">
+      <input type="hidden" name="form-name" value="lot-plotter-leads">
+      <input type="hidden" name="bot-field" style="display:none">
+      <div class="gate-row">
+        <div class="field-group">
+          <label class="field-label">First Name</label>
+          <input type="text" name="first-name" class="field-input" placeholder="Juan" id="g-fname" required>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Last Name</label>
+          <input type="text" name="last-name" class="field-input" placeholder="Dela Cruz" id="g-lname" required>
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Mobile Number</label>
+        <input type="tel" name="mobile" class="field-input" placeholder="+63 9XX XXX XXXX" id="g-phone" required>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Email Address</label>
+        <input type="email" name="email" class="field-input" placeholder="you@email.com" id="g-email" required>
+      </div>
+      <div class="gate-row">
+        <div class="field-group">
+          <label class="field-label">Project Location</label>
+          <select name="location" class="field-input field-select" id="g-loc" required>
+            <option value="" disabled selected>Select area</option>
+            <option>Metro Manila (NCR)</option>
+            <option>Cavite</option><option>Laguna</option>
+            <option>Batangas</option><option>Rizal</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label class="field-label">I'm planning to…</label>
+          <select name="project-type" class="field-input field-select" id="g-type" required>
+            <option value="" disabled selected>Select</option>
+            <option>Build a new house</option>
+            <option>Renovate existing</option>
+            <option>Extend / add rooms</option>
+          </select>
+        </div>
+      </div>
+      <button type="submit" class="gate-submit">Unlock the Lot Planner →</button>
+      <p class="gate-privacy">Your details are safe. We use this to match you with verified FIX contractors — no spam.</p>
+    </form>
+  </div>
+</div>
+
+<!-- ══════════ TOOL PAGE ══════════ -->
+<div id="tool-page">
+
+  <!-- Progress bar -->
+  <div class="tool-progress">
+    <div class="tool-progress-inner">
+      <div class="prog-step active" id="prog-1">
+        <div class="prog-num">1</div>
+        <div class="prog-label">Storeys</div>
+      </div>
+      <div class="prog-step" id="prog-2">
+        <div class="prog-num">2</div>
+        <div class="prog-label">Lot Size</div>
+      </div>
+      <div class="prog-step" id="prog-3">
+        <div class="prog-num">3</div>
+        <div class="prog-label">Preferences</div>
+      </div>
+      <div class="prog-step" id="prog-4">
+        <div class="prog-num">4</div>
+        <div class="prog-label">Floor Plan</div>
+      </div>
+      <div class="prog-step" id="prog-5">
+        <div class="prog-num">5</div>
+        <div class="prog-label">Your Result</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tool-layout">
+
+    <!-- STEP 1: STOREYS -->
+    <div class="tool-step active" id="step-1">
+      <div class="step-header">
+        <div class="step-num-label">Step 1 of 4</div>
+        <div class="step-title">How many storeys are you planning?</div>
+        <div class="step-subtitle">This determines which floor plan layouts we show you.</div>
+      </div>
+      <div class="opt-grid opt-grid-2">
+        <div class="opt-card" data-key="storeys" data-val="1" onclick="selectOpt(this)">
+          <div class="opt-card-icon">🏠</div>
+          <div>
+            <div class="opt-card-title">Single Storey</div>
+            <div class="opt-card-sub">All living spaces on one level. More accessible, easier to maintain, lower structural cost.</div>
+          </div>
+        </div>
+        <div class="opt-card" data-key="storeys" data-val="2" onclick="selectOpt(this)">
+          <div class="opt-card-icon">🏘️</div>
+          <div>
+            <div class="opt-card-title">Two Storeys</div>
+            <div class="opt-card-sub">More floor area on a smaller lot footprint. Ideal when lot is compact or privacy is needed upstairs.</div>
+          </div>
+        </div>
+      </div>
+      <div class="step-nav">
+        <button class="btn-next" id="next-1" onclick="goStep(2)" disabled>Continue →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: LOT SIZE -->
+    <div class="tool-step" id="step-2">
+      <div class="step-header">
+        <div class="step-num-label">Step 2 of 4</div>
+        <div class="step-title">What is your lot size?</div>
+        <div class="step-subtitle">Enter width and depth, or just the total area. Minimum lot size: 60 sqm.</div>
+      </div>
+      <div class="dim-layout">
+        <div class="dim-inputs">
+          <div>
+            <div class="field-label" style="margin-bottom:8px;">Lot Width</div>
+            <div class="input-with-unit">
+              <input type="number" id="lot-w" placeholder="e.g. 10" min="6" max="100" oninput="updateLotPreview()">
+              <div class="unit">meters wide</div>
+            </div>
+          </div>
+          <div>
+            <div class="field-label" style="margin-bottom:8px;">Lot Depth</div>
+            <div class="input-with-unit">
+              <input type="number" id="lot-d" placeholder="e.g. 20" min="10" max="200" oninput="updateLotPreview()">
+              <div class="unit">meters deep</div>
+            </div>
+          </div>
+          <div class="dim-or">OR enter total area only</div>
+          <div>
+            <div class="field-label" style="margin-bottom:8px;">Total Lot Area</div>
+            <div class="input-with-unit">
+              <input type="number" id="lot-sqm" placeholder="e.g. 200" min="60" max="10000" oninput="sqmToWD()">
+              <div class="unit">sqm</div>
+            </div>
+          </div>
+          <div id="lot-error" style="font-size:13px;color:#EF4444;display:none;">Minimum lot size is 60 sqm (6m × 10m).</div>
+        </div>
+        <div class="dim-preview">
+          <div class="dim-preview-title">Live preview</div>
+          <canvas id="lot-preview-canvas" width="280" height="220"></canvas>
+          <div style="font-size:12px;color:var(--g400);margin-top:10px;line-height:1.6;" id="lot-preview-label">Enter your lot dimensions to see a preview.</div>
+        </div>
+      </div>
+      <div class="step-nav">
+        <button class="btn-back" onclick="goStep(1)">←</button>
+        <button class="btn-next" id="next-2" onclick="goStep(3)" disabled>Continue →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: PREFERENCES -->
+    <div class="tool-step" id="step-3">
+      <div class="step-header">
+        <div class="step-num-label">Step 3 of 4</div>
+        <div class="step-title">Tell us about your preferences</div>
+        <div class="step-subtitle">We'll use these to filter the most suitable floor plans for you.</div>
+      </div>
+      <div class="pref-sections">
+        <div>
+          <div class="pref-section-title">Kitchen</div>
+          <div class="opt-grid opt-grid-2">
+            <div class="opt-card" data-key="kitchen" data-val="simple" onclick="selectOpt(this)">
+              <div class="opt-card-icon">🍳</div>
+              <div><div class="opt-card-title">Simple Kitchen</div><div class="opt-card-sub">Compact, efficient kitchen layout</div></div>
+            </div>
+            <div class="opt-card" data-key="kitchen" data-val="large" onclick="selectOpt(this)">
+              <div class="opt-card-icon">👨‍🍳</div>
+              <div><div class="opt-card-title">Large / Open Kitchen</div><div class="opt-card-sub">Spacious kitchen, open to dining or living</div></div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="pref-section-title">Outdoor Kitchen</div>
+          <div class="opt-grid opt-grid-2">
+            <div class="opt-card" data-key="outdoor-kitchen" data-val="yes" onclick="selectOpt(this)">
+              <div class="opt-card-icon">🔥</div>
+              <div><div class="opt-card-title">Yes, include one</div><div class="opt-card-sub">Covered outdoor cooking area</div></div>
+            </div>
+            <div class="opt-card" data-key="outdoor-kitchen" data-val="no" onclick="selectOpt(this)">
+              <div class="opt-card-icon">❌</div>
+              <div><div class="opt-card-title">Not needed</div><div class="opt-card-sub">Indoor kitchen only</div></div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="pref-section-title">Patio / Outdoor Area</div>
+          <div class="opt-grid opt-grid-2">
+            <div class="opt-card" data-key="patio" data-val="yes" onclick="selectOpt(this)">
+              <div class="opt-card-icon">🌿</div>
+              <div><div class="opt-card-title">Yes, include a patio</div><div class="opt-card-sub">Covered outdoor relaxation space</div></div>
+            </div>
+            <div class="opt-card" data-key="patio" data-val="no" onclick="selectOpt(this)">
+              <div class="opt-card-icon">❌</div>
+              <div><div class="opt-card-title">Not needed</div><div class="opt-card-sub">Maximize indoor floor area</div></div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="pref-section-title">Parking / Garage</div>
+          <div class="opt-grid opt-grid-3">
+            <div class="opt-card" data-key="parking" data-val="0" onclick="selectOpt(this)">
+              <div class="opt-card-icon">🚶</div>
+              <div><div class="opt-card-title">No parking</div><div class="opt-card-sub">More indoor space</div></div>
+            </div>
+            <div class="opt-card" data-key="parking" data-val="1" onclick="selectOpt(this)">
+              <div class="opt-card-icon">🚗</div>
+              <div><div class="opt-card-title">1 car garage</div><div class="opt-card-sub">Single covered parking</div></div>
+            </div>
+            <div class="opt-card" data-key="parking" data-val="2" onclick="selectOpt(this)">
+              <div class="opt-card-icon">🚗🚗</div>
+              <div><div class="opt-card-title">2 car garage</div><div class="opt-card-sub">Double covered parking</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="step-nav">
+        <button class="btn-back" onclick="goStep(2)">←</button>
+        <button class="btn-next" id="next-3" onclick="goStep(4)" disabled>See Floor Plans →</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: FLOOR PLAN SELECTION -->
+    <div class="tool-step" id="step-4">
+      <div class="step-header">
+        <div class="step-num-label">Step 4 of 4</div>
+        <div class="step-title">Choose a floor plan</div>
+        <div class="step-subtitle" id="step4-sub">Showing layouts matched to your preferences. Click one to select it.</div>
+      </div>
+      <div class="template-grid" id="template-grid"></div>
+      <div class="step-nav">
+        <button class="btn-back" onclick="goStep(3)">←</button>
+        <button class="btn-next" id="next-4" onclick="goStep(5)" disabled>View My Result →</button>
+      </div>
+    </div>
+
+    <!-- STEP 5: RESULT -->
+    <div class="tool-step" id="step-5">
+      <div class="step-header">
+        <div class="step-num-label">Your Lot Plan</div>
+        <div class="step-title" id="result-title">Your lot, your plan.</div>
+        <div class="step-subtitle" id="result-sub">Scaled layout with NBCP setbacks and your selected floor plan overlay.</div>
+      </div>
+      <div class="result-layout">
+        <div>
+          <div class="result-canvas-wrap">
+            <div class="result-canvas-title" id="rc-title">Lot Plan</div>
+            <div class="result-canvas-sub" id="rc-sub">To scale · NBCP setbacks shown</div>
+            <canvas id="result-canvas" width="640" height="500"></canvas>
+            <div class="result-disclaimer">
+              <strong>Planning aid only.</strong> Floor plans are illustrative templates and do not constitute architectural drawings. Setbacks shown follow NBCP defaults — actual requirements vary by LGU. Consult a licensed architect before committing to a design.
+            </div>
+          </div>
+          <div class="step-nav" style="margin-top:20px;">
+            <button class="btn-back" onclick="goStep(4)">← Change floor plan</button>
+            <button class="btn-next" onclick="document.getElementById('result-modal').classList.add('open')">Get Matched with a Contractor →</button>
+          </div>
+        </div>
+
+        <div class="summary-panel">
+          <div class="sum-card">
+            <div class="sum-card-head">
+              <div class="sum-card-head-label">Your Lot</div>
+              <div class="sum-card-head-val" id="sum-lot-area">— sqm</div>
+              <div class="sum-card-head-sub" id="sum-lot-dims">— × — meters</div>
+            </div>
+            <div class="sum-card-body">
+              <div class="sum-row"><span class="sum-key">Buildable footprint</span><span class="sum-val" id="sum-buildable">—</span></div>
+              <div class="sum-row"><span class="sum-key">Floor plan footprint</span><span class="sum-val" id="sum-footprint">—</span></div>
+              <div class="sum-row"><span class="sum-key">Total floor area</span><span class="sum-val" id="sum-gfa">—</span></div>
+              <div class="sum-row"><span class="sum-key">Lot coverage</span><span class="sum-val green" id="sum-coverage">—</span></div>
+              <div class="sum-row"><span class="sum-key">Storeys</span><span class="sum-val" id="sum-storeys">—</span></div>
+            </div>
+          </div>
+
+          <div class="sum-card">
+            <div style="padding:14px 20px 4px;font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--g400);">NBCP Compliance</div>
+            <div class="sum-card-body">
+              <div class="compliance-row"><span class="compliance-key">Front setback (min 4.5m)</span><span class="compliance-badge ok" id="comp-front">✓ OK</span></div>
+              <div class="compliance-row"><span class="compliance-key">Side setbacks (min 2m)</span><span class="compliance-badge ok" id="comp-side">✓ OK</span></div>
+              <div class="compliance-row"><span class="compliance-key">Rear setback (min 2m)</span><span class="compliance-badge ok" id="comp-rear">✓ OK</span></div>
+              <div class="compliance-row"><span class="compliance-key">Max lot coverage (60%)</span><span class="compliance-badge ok" id="comp-cov">✓ OK</span></div>
+            </div>
+            <div style="padding:0 20px 14px;font-size:11px;color:var(--g400);line-height:1.5;">Verify with your LGU — local requirements may differ.</div>
+          </div>
+
+          <div class="sum-card">
+            <div style="padding:14px 20px 4px;font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--g400);">Rooms & Features</div>
+            <div class="rooms-list" id="rooms-list"></div>
+          </div>
+
+          <div class="result-cta-card">
+            <div class="result-cta-title">Love this layout? Find a verified contractor to build it.</div>
+            <div class="result-cta-sub">FIX matches you with up to 2 licensed builders who can bring this plan to life — free.</div>
+            <button class="result-cta-btn" onclick="document.getElementById('result-modal').classList.add('open')">Post My Project — Free →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ RESULT MODAL ══ -->
+<div class="modal-overlay" id="result-modal">
+  <div class="modal-box">
+    <div class="modal-icon">🏗️</div>
+    <div class="modal-title">Ready to build this?</div>
+    <div class="modal-body">We've saved your lot plan. Our team will reach out to match you with verified FIX contractors who can make it happen — usually within 24 hours.</div>
+    <button class="modal-btn" onclick="window.location.href='/#get-matched'">Post My Project on FIX →</button>
+    <div style="margin-top:12px;"><button style="background:none;border:none;font-family:var(--font);font-size:13px;color:var(--g400);cursor:pointer;" onclick="document.getElementById('result-modal').classList.remove('open')">Stay on this page</button></div>
+  </div>
+</div>
+
+<!-- Hidden Netlify detection form -->
+<div style="display:none">
+  <form name="lot-plotter-leads" data-netlify="true">
+    <input type="hidden" name="form-name" value="lot-plotter-leads">
+    <input name="first-name"><input name="last-name">
+    <input name="mobile"><input name="email">
+    <input name="location"><input name="project-type">
+    <input name="lot-width"><input name="lot-depth">
+    <input name="storeys"><input name="kitchen">
+    <input name="outdoor-kitchen"><input name="patio">
+    <input name="parking"><input name="selected-template">
+  </form>
+</div>
+
+<script>
+// ── STATE ──
+const S = {
+  name: '', email: '',
+  storeys: null, lotW: 0, lotD: 0,
+  kitchen: null, outdoorKitchen: null, patio: null, parking: null,
+  template: null, currentStep: 1,
+};
+
+// Required prefs per step
+const PREF_KEYS = ['kitchen','outdoor-kitchen','patio','parking'];
+
+// ── FLOOR PLAN TEMPLATES ──
+const TEMPLATES = [
+  {
+    id:'T1', storeys:1, name:'2BR Starter Home',
+    kitchen:'simple', outdoorKitchen:'no', patio:'no', parking:'0',
+    beds:2, baths:1, footprintPct:0.48,
+    rooms:['Living Room','Dining Room','Simple Kitchen','2 Bedrooms','1 Bathroom','Service Area'],
+    layout: drawT1,
+  },
+  {
+    id:'T2', storeys:1, name:'3BR Family Home',
+    kitchen:'simple', outdoorKitchen:'no', patio:'yes', parking:'1',
+    beds:3, baths:2, footprintPct:0.50,
+    rooms:['Living Room','Dining Room','Kitchen','3 Bedrooms','2 Bathrooms','Patio','1-Car Garage'],
+    layout: drawT2,
+  },
+  {
+    id:'T3', storeys:1, name:'3BR Open Living',
+    kitchen:'large', outdoorKitchen:'yes', patio:'yes', parking:'2',
+    beds:3, baths:2, footprintPct:0.55,
+    rooms:['Open Living & Dining','Large Kitchen','Outdoor Kitchen','3 Bedrooms','2 Bathrooms','Patio','2-Car Garage'],
+    layout: drawT3,
+  },
+  {
+    id:'T4', storeys:2, name:'3BR Two-Storey',
+    kitchen:'simple', outdoorKitchen:'no', patio:'no', parking:'1',
+    beds:3, baths:2, footprintPct:0.40,
+    rooms:['Ground: Living, Dining, Kitchen, 1BR, 1 Bath, Garage','Upper: 2 Bedrooms, 1 Bathroom, Study Nook','1-Car Garage'],
+    layout: drawT4,
+  },
+  {
+    id:'T5', storeys:2, name:'4BR Family Plus',
+    kitchen:'large', outdoorKitchen:'no', patio:'yes', parking:'1',
+    beds:4, baths:3, footprintPct:0.44,
+    rooms:['Ground: Open Living, Large Kitchen, 1BR, 2 Bath, Patio','Upper: Master BR + 2 Bedrooms, 1 Bathroom, Lounge','1-Car Garage'],
+    layout: drawT5,
+  },
+  {
+    id:'T6', storeys:2, name:'4BR Grand Home',
+    kitchen:'large', outdoorKitchen:'yes', patio:'yes', parking:'2',
+    beds:4, baths:3, footprintPct:0.46,
+    rooms:['Ground: Open Living & Dining, Large Kitchen, Outdoor Kitchen, Patio, 2-Car Garage','Upper: Master BR w/ en-suite, 3 Bedrooms, 2 Bathrooms, Family Lounge'],
+    layout: drawT6,
+  },
+];
+
+// ── GATE FORM ──
+document.getElementById('gate-form').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const fname = document.getElementById('g-fname').value.trim();
+  const email = document.getElementById('g-email').value.trim();
+  const phone = document.getElementById('g-phone').value.trim();
+  if (!fname || !email || !phone) return;
+  S.name = fname; S.email = email;
+
+  // Submit to Netlify
+  const data = new FormData(this);
+  fetch('/', { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body: new URLSearchParams(data).toString() }).catch(()=>{});
+
+  // Unlock tool
+  document.getElementById('gate-page').style.display = 'none';
+  document.getElementById('tool-page').classList.add('visible');
+  window.scrollTo(0,0);
+});
+
+// ── STEP NAVIGATION ──
+function goStep(n) {
+  document.getElementById('step-' + S.currentStep).classList.remove('active');
+  document.getElementById('prog-' + S.currentStep).classList.remove('active');
+  document.getElementById('prog-' + S.currentStep).classList.add('done');
+  S.currentStep = n;
+  document.getElementById('step-' + n).classList.add('active');
+  document.getElementById('prog-' + n).classList.remove('done');
+  document.getElementById('prog-' + n).classList.add('active');
+  window.scrollTo(0, 0);
+
+  if (n === 4) renderTemplates();
+  if (n === 5) renderResult();
+}
+
+// ── OPT SELECTION ──
+function selectOpt(el) {
+  const key = el.dataset.key;
+  const val = el.dataset.val;
+  el.closest('.opt-grid').querySelectorAll('.opt-card').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  S[key] = val;
+
+  // Enable next buttons
+  if (key === 'storeys')  document.getElementById('next-1').disabled = false;
+  if (key === 'template') {
+    S.template = TEMPLATES.find(t => t.id === val);
+    document.getElementById('next-4').disabled = false;
+  }
+
+  // Check pref step completeness
+  if (PREF_KEYS.includes(key)) {
+    const allDone = PREF_KEYS.every(k => S[k] !== null);
+    document.getElementById('next-3').disabled = !allDone;
+  }
+}
+
+// ── LOT PREVIEW ──
+function sqmToWD() {
+  const sqm = parseFloat(document.getElementById('lot-sqm').value);
+  if (!sqm || sqm < 60) return;
+  const w = Math.round(Math.sqrt(sqm * 0.5) * 10) / 10;
+  const d = Math.round((sqm / w) * 10) / 10;
+  document.getElementById('lot-w').value = w;
+  document.getElementById('lot-d').value = d;
+  updateLotPreview();
+}
+
+function updateLotPreview() {
+  const w = parseFloat(document.getElementById('lot-w').value) || 0;
+  const d = parseFloat(document.getElementById('lot-d').value) || 0;
+  const err = document.getElementById('lot-error');
+  const btn = document.getElementById('next-2');
+
+  if (w > 0 && d > 0) {
+    document.getElementById('lot-sqm').value = Math.round(w * d);
+    if (w * d < 60 || w < 6) {
+      err.style.display = 'block'; btn.disabled = true;
+    } else {
+      err.style.display = 'none'; btn.disabled = false;
+      S.lotW = w; S.lotD = d;
+      drawLotPreview(w, d);
+    }
+  }
+}
+
+function drawLotPreview(w, d) {
+  const cvs = document.getElementById('lot-preview-canvas');
+  const ctx = cvs.getContext('2d');
+  const CW = cvs.width, CH = cvs.height;
+  ctx.clearRect(0,0,CW,CH);
+
+  const pad = 24;
+  const scaleX = (CW - pad*2) / w;
+  const scaleY = (CH - pad*2) / d;
+  const sc = Math.min(scaleX, scaleY);
+  const lw = w * sc, lh = d * sc;
+  const ox = (CW - lw) / 2, oy = (CH - lh) / 2;
+
+  // Lot fill
+  ctx.fillStyle = '#F0F4F8';
+  ctx.strokeStyle = '#2076C2';
+  ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.rect(ox, oy, lw, lh); ctx.fill(); ctx.stroke();
+
+  // Setbacks
+  const fs = 4.5 * sc, ss = 2 * sc, rs = 2 * sc;
+  ctx.strokeStyle = '#A8CAEA'; ctx.lineWidth = 1; ctx.setLineDash([4,4]);
+  ctx.beginPath(); ctx.rect(ox+ss, oy+fs, lw-ss*2, lh-fs-rs); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Labels
+  ctx.fillStyle = '#8A9BB0'; ctx.font = '10px DM Sans, sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText(w + 'm', CW/2, oy - 6);
+  ctx.save(); ctx.translate(ox - 6, CH/2); ctx.rotate(-Math.PI/2);
+  ctx.fillText(d + 'm', 0, 0); ctx.restore();
+
+  // Buildable area label
+  const bw = lw - ss*2, bh = lh - fs - rs;
+  if (bw > 30 && bh > 20) {
+    ctx.fillStyle = 'rgba(32,118,194,0.08)';
+    ctx.fillRect(ox+ss, oy+fs, bw, bh);
+    ctx.fillStyle = '#2076C2'; ctx.font = 'bold 10px DM Sans, sans-serif';
+    ctx.fillText('Buildable', ox+ss+bw/2, oy+fs+bh/2 - 5);
+    ctx.fillStyle = '#8A9BB0'; ctx.font = '9px DM Sans, sans-serif';
+    const ba = Math.round((w - ss*2/sc) * (d - (fs+rs)/sc));
+    ctx.fillText('~' + ba + ' sqm', ox+ss+bw/2, oy+fs+bh/2 + 8);
+  }
+
+  document.getElementById('lot-preview-label').textContent =
+    `${w}m × ${d}m = ${Math.round(w*d)} sqm · Buildable area shown in blue`;
+}
+
+// ── TEMPLATE RENDERING ──
+function templateMatches(t) {
+  if (parseInt(t.storeys) !== parseInt(S.storeys)) return false;
+  return true; // Show all matching storeys, score by preference match
+}
+
+function matchScore(t) {
+  let score = 0;
+  if (t.kitchen === S.kitchen) score++;
+  if (t.outdoorKitchen === S['outdoor-kitchen']) score++;
+  if (t.patio === S.patio) score++;
+  if (t.parking === S.parking) score++;
+  return score;
+}
+
+function renderTemplates() {
+  const grid = document.getElementById('template-grid');
+  grid.innerHTML = '';
+  const lotArea = S.lotW * S.lotD;
+
+  const filtered = TEMPLATES
+    .filter(t => templateMatches(t))
+    .sort((a,b) => matchScore(b) - matchScore(a));
+
+  if (filtered.length === 0) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:48px;color:var(--g400);">No matching templates. Please go back and adjust your preferences.</div>';
+    return;
+  }
+
+  document.getElementById('step4-sub').textContent =
+    `Showing ${filtered.length} layout${filtered.length!==1?'s':''} for ${S.storeys === '1' ? 'single' : 'two'}-storey homes, sorted by how well they match your preferences.`;
+
+  filtered.forEach(t => {
+    const score = matchScore(t);
+    const footprint = Math.round(S.lotW * S.lotD * t.footprintPct);
+    const gfa = footprint * parseInt(S.storeys);
+    const cvs = document.createElement('canvas');
+    cvs.width = 200; cvs.height = 160;
+
+    const card = document.createElement('div');
+    card.className = 'tpl-card';
+    card.dataset.key = 'template';
+    card.dataset.val = t.id;
+    card.onclick = function() {
+      document.querySelectorAll('.tpl-card').forEach(c => c.classList.remove('selected'));
+      this.classList.add('selected');
+      S.template = t;
+      document.getElementById('next-4').disabled = false;
+    };
+
+    const tags = [];
+    if (t.kitchen === 'large') tags.push('Large Kitchen');
+    if (t.outdoorKitchen === 'yes') tags.push('Outdoor Kitchen');
+    if (t.patio === 'yes') tags.push('Patio');
+    if (t.parking !== '0') tags.push(t.parking + '-Car Garage');
+
+    card.innerHTML = `
+      <div class="tpl-canvas-wrap"><canvas width="200" height="160" id="cvs-${t.id}"></canvas></div>
+      <div class="tpl-info">
+        <div class="tpl-name">${t.name}</div>
+        <div class="tpl-tags">${tags.map(tg=>`<span class="tpl-tag">${tg}</span>`).join('')}</div>
+        <div class="tpl-area">${t.beds} beds · ${t.baths} baths · ~${gfa} sqm GFA</div>
+        ${score === 4 ? '<div class="tpl-match">✓ Perfect match</div>' : score >= 2 ? '<div class="tpl-match">✓ Good match</div>' : ''}
+      </div>`;
+    grid.appendChild(card);
+
+    // Draw mini floor plan
+    setTimeout(() => {
+      const c = document.getElementById('cvs-' + t.id);
+      if (c) t.layout(c, false);
+    }, 50);
+  });
+}
+
+// ── RESULT RENDERER ──
+function renderResult() {
+  const t = S.template;
+  if (!t) return;
+  const w = S.lotW, d = S.lotD;
+  const lotArea = Math.round(w * d);
+  const fs = 4.5, ss = 2, rs = 2;
+  const buildW = w - ss*2, buildD = d - fs - rs;
+  const buildArea = Math.round(buildW * buildD);
+  const footprint = Math.round(lotArea * t.footprintPct);
+  const gfa = footprint * parseInt(S.storeys);
+  const coverage = Math.round((footprint / lotArea) * 100);
+
+  // Update summary
+  document.getElementById('sum-lot-area').textContent = lotArea + ' sqm';
+  document.getElementById('sum-lot-dims').textContent = `${w}m × ${d}m`;
+  document.getElementById('sum-buildable').textContent = buildArea + ' sqm';
+  document.getElementById('sum-footprint').textContent = footprint + ' sqm';
+  document.getElementById('sum-gfa').textContent = gfa + ' sqm';
+  document.getElementById('sum-coverage').textContent = coverage + '%';
+  document.getElementById('sum-storeys').textContent = S.storeys === '1' ? 'Single storey' : 'Two storeys';
+  document.getElementById('result-title').textContent = `${t.name} on ${lotArea} sqm`;
+  document.getElementById('rc-title').textContent = `${w}m × ${d}m lot · ${t.name}`;
+  document.getElementById('rc-sub').textContent = `${lotArea} sqm · ${gfa} sqm GFA · ${coverage}% lot coverage · NBCP setbacks`;
+
+  // Compliance
+  const covOk = coverage <= 60;
+  document.getElementById('comp-front').textContent = '✓ 4.5m';
+  document.getElementById('comp-side').textContent = ss >= 2 ? '✓ 2.0m' : '⚠ Check LGU';
+  document.getElementById('comp-rear').textContent = '✓ 2.0m';
+  document.getElementById('comp-cov').textContent = covOk ? `✓ ${coverage}%` : `⚠ ${coverage}%`;
+  document.getElementById('comp-cov').className = 'compliance-badge ' + (covOk ? 'ok' : 'warn');
+
+  // Rooms
+  document.getElementById('rooms-list').innerHTML = t.rooms.map(r =>
+    `<div class="room-item">${r}</div>`).join('');
+
+  // Draw main canvas
+  const cvs = document.getElementById('result-canvas');
+  t.layout(cvs, true, w, d);
+}
+
+// ── FLOOR PLAN DRAW FUNCTIONS ──
+function setupCanvas(cvs, full, w, d) {
+  const ctx = cvs.getContext('2d');
+  const CW = cvs.width, CH = cvs.height;
+  ctx.clearRect(0,0,CW,CH);
+  if (!full) return { ctx, CW, CH, ox:10, oy:10, lw:CW-20, lh:CH-20, sc:1, fs:0, ss:0, rs:0 };
+
+  const pad = 48;
+  const sc = Math.min((CW-pad*2)/w, (CH-pad*2)/d);
+  const lw = w*sc, lh = d*sc;
+  const ox = (CW-lw)/2, oy = (CH-lh)/2;
+  const fs = 4.5*sc, ss = 2*sc, rs = 2*sc;
+  return { ctx, CW, CH, ox, oy, lw, lh, sc, fs, ss, rs };
+}
+
+function drawLotBase(ctx, ox, oy, lw, lh, fs, ss, rs, full) {
+  // Lot boundary
+  ctx.fillStyle = '#F7F9FC';
+  ctx.strokeStyle = '#0D3C6B'; ctx.lineWidth = full ? 2 : 1.5;
+  ctx.beginPath(); ctx.rect(ox, oy, lw, lh); ctx.fill(); ctx.stroke();
+
+  if (!full) return;
+
+  // Setback zone
+  ctx.fillStyle = 'rgba(168,202,234,0.12)';
+  ctx.fillRect(ox, oy, lw, lh);
+
+  // Buildable area
+  ctx.fillStyle = 'rgba(240,244,248,0.9)';
+  ctx.fillRect(ox+ss, oy+fs, lw-ss*2, lh-fs-rs);
+
+  // Setback lines
+  ctx.strokeStyle = '#A8CAEA'; ctx.lineWidth = 1; ctx.setLineDash([5,4]);
+  ctx.strokeRect(ox+ss, oy+fs, lw-ss*2, lh-fs-rs);
+  ctx.setLineDash([]);
+
+  // Setback labels
+  ctx.fillStyle = '#A8CAEA'; ctx.font = '10px DM Sans, sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText('FRONT SETBACK 4.5m', ox+lw/2, oy+fs/2+4);
+  ctx.fillText('REAR SETBACK 2m', ox+lw/2, oy+lh-rs/2+4);
+}
+
+function drawRoomBox(ctx, x, y, w, h, label, color, textColor, fontSize) {
+  ctx.fillStyle = color;
+  ctx.strokeStyle = 'rgba(255,255,255,0.8)'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.roundRect(x+1,y+1,w-2,h-2,3); ctx.fill(); ctx.stroke();
+  if (label && w > 20 && h > 14) {
+    ctx.fillStyle = textColor || '#374151';
+    ctx.font = `${fontSize||9}px DM Sans, sans-serif`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    const words = label.split(' ');
+    if (words.length > 1 && w < 60) {
+      ctx.fillText(words[0], x+w/2, y+h/2-5);
+      ctx.fillText(words.slice(1).join(' '), x+w/2, y+h/2+5);
+    } else {
+      ctx.fillText(label, x+w/2, y+h/2);
+    }
+  }
+}
+
+// T1: 2BR Starter, simple kitchen, no outdoor, no patio, no parking
+function drawT1(cvs, full, w, d) {
+  const { ctx, CW, CH, ox, oy, lw, lh, sc, fs, ss, rs } = setupCanvas(cvs, full, w, d);
+  if (full) drawLotBase(ctx, ox, oy, lw, lh, fs, ss, rs, true);
+  const bx = ox+(full?ss:0), by = oy+(full?fs:0);
+  const bw = lw-(full?ss*2:0), bh = lh-(full?fs+rs:0);
+  const ROOMS = [
+    [0,    0,    bw,   bh*0.28, 'Living Room', '#DBEAFE', '#1e40af'],
+    [0,    bh*0.28, bw*0.55, bh*0.22, 'Dining', '#EDE9FE', '#5b21b6'],
+    [bw*0.55,bh*0.28,bw*0.45,bh*0.22,'Kitchen','#D1FAE5','#065f46'],
+    [0,    bh*0.50, bw*0.5, bh*0.30, 'BR 1', '#FEF3C7', '#92400E'],
+    [bw*0.5,bh*0.50, bw*0.5, bh*0.30,'BR 2','#FEF3C7','#92400E'],
+    [0,    bh*0.80, bw*0.6, bh*0.20,'Service','#F3F4F6','#6B7280'],
+    [bw*0.6,bh*0.80,bw*0.4,bh*0.20,'Bath','#E0F2FE','#0369a1'],
+  ];
+  ROOMS.forEach(([rx,ry,rw,rh,lbl,fill,tc]) => drawRoomBox(ctx,bx+rx,by+ry,rw,rh,lbl,fill,tc,full?10:8));
+}
+
+// T2: 3BR, simple, no outdoor, patio, 1 car
+function drawT2(cvs, full, w, d) {
+  const { ctx, CW, CH, ox, oy, lw, lh, sc, fs, ss, rs } = setupCanvas(cvs, full, w, d);
+  if (full) drawLotBase(ctx, ox, oy, lw, lh, fs, ss, rs, true);
+  const bx = ox+(full?ss:0), by = oy+(full?fs:0);
+  const bw = lw-(full?ss*2:0), bh = lh-(full?fs+rs:0);
+  const gr = bw*0.32, bh_ = bh*0.22;
+  const ROOMS = [
+    [0,       0,    gr,   bh*0.30,'Garage','#E5E7EB','#374151'],
+    [gr,      0,    bw-gr,bh*0.30,'Living Room','#DBEAFE','#1e40af'],
+    [0,       bh*0.30,bw*0.5,bh*0.22,'Dining','#EDE9FE','#5b21b6'],
+    [bw*0.5,  bh*0.30,bw*0.5,bh*0.22,'Kitchen','#D1FAE5','#065f46'],
+    [0,       bh*0.52,bw/3, bh*0.27,'BR 1','#FEF3C7','#92400E'],
+    [bw/3,    bh*0.52,bw/3, bh*0.27,'BR 2','#FEF3C7','#92400E'],
+    [bw*2/3,  bh*0.52,bw/3, bh*0.27,'BR 3','#FEF3C7','#92400E'],
+    [0,       bh*0.79,bw*0.5,bh*0.21,'Patio','#ECFDF5','#166534'],
+    [bw*0.5,  bh*0.79,bw*0.5,bh*0.21,'Bath','#E0F2FE','#0369a1'],
+  ];
+  ROOMS.forEach(([rx,ry,rw,rh,lbl,fill,tc]) => drawRoomBox(ctx,bx+rx,by+ry,rw,rh,lbl,fill,tc,full?10:8));
+}
+
+// T3: 3BR, large kitchen, outdoor kitchen, patio, 2 car
+function drawT3(cvs, full, w, d) {
+  const { ctx, CW, CH, ox, oy, lw, lh, sc, fs, ss, rs } = setupCanvas(cvs, full, w, d);
+  if (full) drawLotBase(ctx, ox, oy, lw, lh, fs, ss, rs, true);
+  const bx = ox+(full?ss:0), by = oy+(full?fs:0);
+  const bw = lw-(full?ss*2:0), bh = lh-(full?fs+rs:0);
+  const ROOMS = [
+    [0,      0,    bw,    bh*0.26,'Open Living & Dining','#DBEAFE','#1e40af'],
+    [0,      bh*0.26,bw*0.55,bh*0.20,'Large Kitchen','#D1FAE5','#065f46'],
+    [bw*0.55,bh*0.26,bw*0.45,bh*0.20,'Outdoor Kitchen','#FEF9C3','#713F12'],
+    [0,      bh*0.46,bw/3,bh*0.27,'BR 1','#FEF3C7','#92400E'],
+    [bw/3,   bh*0.46,bw/3,bh*0.27,'BR 2','#FEF3C7','#92400E'],
+    [bw*2/3, bh*0.46,bw/3,bh*0.27,'BR 3','#FEF3C7','#92400E'],
+    [0,      bh*0.73,bw*0.5,bh*0.27,'Patio','#ECFDF5','#166534'],
+    [bw*0.5, bh*0.73,bw*0.25,bh*0.27,'2-Car Garage','#E5E7EB','#374151'],
+    [bw*0.75,bh*0.73,bw*0.25,bh*0.27,'Baths','#E0F2FE','#0369a1'],
+  ];
+  ROOMS.forEach(([rx,ry,rw,rh,lbl,fill,tc]) => drawRoomBox(ctx,bx+rx,by+ry,rw,rh,lbl,fill,tc,full?10:8));
+}
+
+// T4: 3BR 2-storey, simple, no outdoor, no patio, 1 car
+function drawT4(cvs, full, w, d) {
+  const { ctx, CW, CH, ox, oy, lw, lh, sc, fs, ss, rs } = setupCanvas(cvs, full, w, d);
+  if (full) drawLotBase(ctx, ox, oy, lw, lh, fs, ss, rs, true);
+  const bx = ox+(full?ss:0), by = oy+(full?fs:0);
+  const bw = lw-(full?ss*2:0), bh = lh-(full?fs+rs:0);
+  // Ground floor (left half of footprint)
+  const gf = bh * 0.5;
+  drawRoomBox(ctx,bx,by,bw*0.35,gf*0.45,'Garage','#E5E7EB','#374151',full?10:8);
+  drawRoomBox(ctx,bx+bw*0.35,by,bw*0.65,gf*0.45,'Living Room','#DBEAFE','#1e40af',full?10:8);
+  drawRoomBox(ctx,bx,by+gf*0.45,bw*0.5,gf*0.3,'Kitchen','#D1FAE5','#065f46',full?10:8);
+  drawRoomBox(ctx,bx+bw*0.5,by+gf*0.45,bw*0.5,gf*0.3,'Dining','#EDE9FE','#5b21b6',full?10:8);
+  drawRoomBox(ctx,bx,by+gf*0.75,bw*0.5,gf*0.25,'BR 1 (GF)','#FEF3C7','#92400E',full?10:8);
+  drawRoomBox(ctx,bx+bw*0.5,by+gf*0.75,bw*0.5,gf*0.25,'Bath','#E0F2FE','#0369a1',full?10:8);
+  // Divider
+  if (full) {
+    ctx.strokeStyle = '#2076C2'; ctx.lineWidth = 1.5; ctx.setLineDash([4,3]);
+    ctx.beginPath(); ctx.moveTo(bx,by+gf); ctx.lineTo(bx+bw,by+gf); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#2076C2'; ctx.font = '9px DM Sans, sans-serif'; ctx.textAlign = 'left';
+    ctx.fillText('▲ 2nd Floor', bx+4, by+gf-4);
+  }
+  // Upper floor
+  drawRoomBox(ctx,bx,by+gf,bw*0.5,bh*0.22,'Master BR','#FEE2E2','#991B1B',full?10:8);
+  drawRoomBox(ctx,bx+bw*0.5,by+gf,bw*0.5,bh*0.22,'BR 3','#FEF3C7','#92400E',full?10:8);
+  drawRoomBox(ctx,bx,by+gf+bh*0.22,bw*0.5,bh*0.15,'Study','#F3F4F6','#6B7280',full?10:8);
+  drawRoomBox(ctx,bx+bw*0.5,by+gf+bh*0.22,bw*0.5,bh*0.15,'Bath 2','#E0F2FE','#0369a1',full?10:8);
+}
+
+// T5: 4BR 2-storey, large, no outdoor, patio, 1 car
+function drawT5(cvs, full, w, d) {
+  const { ctx, CW, CH, ox, oy, lw, lh, sc, fs, ss, rs } = setupCanvas(cvs, full, w, d);
+  if (full) drawLotBase(ctx, ox, oy, lw, lh, fs, ss, rs, true);
+  const bx = ox+(full?ss:0), by = oy+(full?fs:0);
+  const bw = lw-(full?ss*2:0), bh = lh-(full?fs+rs:0);
+  const gf = bh*0.5;
+  drawRoomBox(ctx,bx,by,bw*0.35,gf*0.4,'Garage','#E5E7EB','#374151',full?10:8);
+  drawRoomBox(ctx,bx+bw*0.35,by,bw*0.65,gf*0.4,'Open Living','#DBEAFE','#1e40af',full?10:8);
+  drawRoomBox(ctx,bx,by+gf*0.4,bw*0.55,gf*0.3,'Large Kitchen','#D1FAE5','#065f46',full?10:8);
+  drawRoomBox(ctx,bx+bw*0.55,by+gf*0.4,bw*0.45,gf*0.3,'Dining','#EDE9FE','#5b21b6',full?10:8);
+  drawRoomBox(ctx,bx,by+gf*0.7,bw*0.5,gf*0.3,'BR 1','#FEF3C7','#92400E',full?10:8);
+  drawRoomBox(ctx,bx+bw*0.5,by+gf*0.7,bw*0.5,gf*0.3,'Patio','#ECFDF5','#166534',full?10:8);
+  if (full) {
+    ctx.strokeStyle = '#2076C2'; ctx.lineWidth = 1.5; ctx.setLineDash([4,3]);
+    ctx.beginPath(); ctx.moveTo(bx,by+gf); ctx.lineTo(bx+bw,by+gf); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+  drawRoomBox(ctx,bx,by+gf,bw*0.5,bh*0.22,'Master BR','#FEE2E2','#991B1B',full?10:8);
+  drawRoomBox(ctx,bx+bw*0.5,by+gf,bw*0.5,bh*0.22,'Lounge','#EDE9FE','#5b21b6',full?10:8);
+  drawRoomBox(ctx,bx,by+gf+bh*0.22,bw/3,bh*0.15,'BR 2','#FEF3C7','#92400E',full?10:8);
+  drawRoomBox(ctx,bx+bw/3,by+gf+bh*0.22,bw/3,bh*0.15,'BR 3','#FEF3C7','#92400E',full?10:8);
+  drawRoomBox(ctx,bx+bw*2/3,by+gf+bh*0.22,bw/3,bh*0.15,'Baths','#E0F2FE','#0369a1',full?10:8);
+}
+
+// T6: 4BR 2-storey, large, outdoor kitchen, patio, 2 car
+function drawT6(cvs, full, w, d) {
+  const { ctx, CW, CH, ox, oy, lw, lh, sc, fs, ss, rs } = setupCanvas(cvs, full, w, d);
+  if (full) drawLotBase(ctx, ox, oy, lw, lh, fs, ss, rs, true);
+  const bx = ox+(full?ss:0), by = oy+(full?fs:0);
+  const bw = lw-(full?ss*2:0), bh = lh-(full?fs+rs:0);
+  const gf = bh*0.5;
+  drawRoomBox(ctx,bx,by,bw*0.45,gf*0.35,'2-Car Garage','#E5E7EB','#374151',full?10:8);
+  drawRoomBox(ctx,bx+bw*0.45,by,bw*0.55,gf*0.35,'Open Living & Dining','#DBEAFE','#1e40af',full?9:8);
+  drawRoomBox(ctx,bx,by+gf*0.35,bw*0.5,gf*0.28,'Large Kitchen','#D1FAE5','#065f46',full?10:8);
+  drawRoomBox(ctx,bx+bw*0.5,by+gf*0.35,bw*0.5,gf*0.28,'Outdoor Kitchen','#FEF9C3','#713F12',full?9:8);
+  drawRoomBox(ctx,bx,by+gf*0.63,bw*0.5,gf*0.37,'Patio','#ECFDF5','#166534',full?10:8);
+  drawRoomBox(ctx,bx+bw*0.5,by+gf*0.63,bw*0.5,gf*0.37,'BR 1 + Bath','#FEF3C7','#92400E',full?10:8);
+  if (full) {
+    ctx.strokeStyle = '#2076C2'; ctx.lineWidth = 1.5; ctx.setLineDash([4,3]);
+    ctx.beginPath(); ctx.moveTo(bx,by+gf); ctx.lineTo(bx+bw,by+gf); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+  drawRoomBox(ctx,bx,by+gf,bw*0.5,bh*0.22,'Master BR + En-suite','#FEE2E2','#991B1B',full?9:8);
+  drawRoomBox(ctx,bx+bw*0.5,by+gf,bw*0.5,bh*0.22,'Family Lounge','#EDE9FE','#5b21b6',full?10:8);
+  drawRoomBox(ctx,bx,by+gf+bh*0.22,bw/3,bh*0.15,'BR 2','#FEF3C7','#92400E',full?10:8);
+  drawRoomBox(ctx,bx+bw/3,by+gf+bh*0.22,bw/3,bh*0.15,'BR 3','#FEF3C7','#92400E',full?10:8);
+  drawRoomBox(ctx,bx+bw*2/3,by+gf+bh*0.22,bw/3,bh*0.15,'Baths','#E0F2FE','#0369a1',full?10:8);
+}
+
+// ── MODAL CLOSE ──
+document.getElementById('result-modal').addEventListener('click', function(e) {
+  if (e.target === this) this.classList.remove('open');
+});
+
+// ── INPUT BORDER RESET ──
+document.querySelectorAll('.field-input').forEach(el => {
+  el.addEventListener('input', function() { this.style.borderColor = ''; });
+});
+</script>
+</body>
+</html>
