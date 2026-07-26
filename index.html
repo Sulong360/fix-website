@@ -57,6 +57,18 @@ nav.scrolled { box-shadow: 0 4px 24px rgba(13,60,107,0.08); }
 .nav-cta { background: var(--blue); color: white; font-size: 14px; font-weight: 600; padding: 10px 22px; border-radius: 8px; text-decoration: none; transition: background 0.2s, transform 0.15s; white-space: nowrap; }
 .nav-cta:hover { background: var(--blue-dark); transform: translateY(-1px); }
 
+/* Nav dropdown */
+.nav-dropdown { position: relative; }
+.nav-dropdown-btn { background: none; border: none; font-family: var(--font); font-size: 14px; font-weight: 500; color: var(--g700); cursor: pointer; padding: 0; display: flex; align-items: center; gap: 4px; transition: color 0.2s; }
+.nav-dropdown-btn:hover { color: var(--blue); }
+.nav-dropdown-menu { position: absolute; top: calc(100% + 16px); left: 50%; transform: translateX(-50%); background: white; border: 1px solid var(--g200); border-radius: 16px; padding: 8px; box-shadow: 0 16px 48px rgba(13,60,107,0.12); min-width: 240px; opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s; transform: translateX(-50%) translateY(-8px); z-index: 300; }
+.nav-dropdown:hover .nav-dropdown-menu { opacity: 1; pointer-events: all; transform: translateX(-50%) translateY(0); }
+.nav-dropdown-item { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 10px; text-decoration: none; transition: background 0.15s; }
+.nav-dropdown-item:hover { background: var(--off); }
+.nav-dropdown-icon { font-size: 22px; flex-shrink: 0; width: 36px; height: 36px; background: var(--g100); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+.nav-dropdown-title { font-size: 14px; font-weight: 600; color: var(--g900); margin-bottom: 2px; }
+.nav-dropdown-sub { font-size: 11px; color: var(--g400); }
+
 /* ── HERO ── */
 .hero {
   min-height: 100vh;
@@ -93,6 +105,10 @@ nav.scrolled { box-shadow: 0 4px 24px rgba(13,60,107,0.08); }
 .btn-primary:hover { background: var(--blue-dark); transform: translateY(-2px); box-shadow: 0 8px 28px rgba(32,118,194,0.45); }
 .btn-ghost { background: rgba(255,255,255,0.08); color: white; font-size: 15px; font-weight: 500; padding: 14px 28px; border-radius: 10px; text-decoration: none; border: 1px solid rgba(255,255,255,0.2); transition: background 0.2s; }
 .btn-ghost:hover { background: rgba(255,255,255,0.14); }
+.hero-tools { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+.hero-tools-label { font-size: 12px; color: rgba(255,255,255,0.35); font-weight: 500; white-space: nowrap; }
+.hero-tool-pill { display: inline-flex; align-items: center; gap: 5px; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.65); font-size: 12px; font-weight: 500; padding: 6px 12px; border-radius: 100px; text-decoration: none; transition: background 0.2s, color 0.2s; white-space: nowrap; }
+.hero-tool-pill:hover { background: rgba(255,255,255,0.13); color: white; }
 .hero-trust { display: flex; align-items: center; gap: 10px; margin-top: 32px; }
 .hero-trust-text { font-size: 13px; color: rgba(255,255,255,0.4); }
 .hero-avatars { display: flex; }
@@ -600,14 +616,37 @@ footer { background: var(--blue-navy); color: white; padding: 64px 48px 40px; }
   </a>
   <div class="nav-links">
     <a href="#how">How it works</a>
-    <a href="/calculator">Project Calculator</a>
-    <a href="/lot-planner">Lot Planner</a>
-    <a href="/lot-plotter">Lot Planner</a>
-    <a href="/solar" style="color:var(--solar,#F59E0B);font-weight:600;">☀️ Solar</a>
     <a href="#why">Why FIX</a>
     <a href="#contractors">For Contractors</a>
     <a href="#ofw">For OFWs</a>
-    <a href="#regions">Coverage</a>
+
+    <!-- Tools dropdown -->
+    <div class="nav-dropdown">
+      <button class="nav-dropdown-btn">Free Tools ▾</button>
+      <div class="nav-dropdown-menu">
+        <a href="/calculator" class="nav-dropdown-item">
+          <span class="nav-dropdown-icon">📐</span>
+          <div>
+            <div class="nav-dropdown-title">Project Calculator</div>
+            <div class="nav-dropdown-sub">Estimate your build cost</div>
+          </div>
+        </a>
+        <a href="/lot-planner" class="nav-dropdown-item">
+          <span class="nav-dropdown-icon">🏠</span>
+          <div>
+            <div class="nav-dropdown-title">Lot Planner</div>
+            <div class="nav-dropdown-sub">Visualize your lot & floor plan</div>
+          </div>
+        </a>
+        <a href="/solar" class="nav-dropdown-item">
+          <span class="nav-dropdown-icon">☀️</span>
+          <div>
+            <div class="nav-dropdown-title">FIX Solar</div>
+            <div class="nav-dropdown-sub">Cut your electricity bill</div>
+          </div>
+        </a>
+      </div>
+    </div>
   </div>
   <a href="#get-matched" class="nav-cta">Post Your Project →</a>
 </nav>
@@ -718,8 +757,12 @@ footer { background: var(--blue-navy); color: white; padding: 64px 48px 40px; }
       <p class="hero-sub">Post your project once. Get matched with verified, licensed contractors in Metro Manila and CALABARZON — for free.</p>
       <div class="hero-ctas">
         <a href="#get-matched" class="btn-primary">Post Your Project Free →</a>
-        <a href="/calculator" class="btn-ghost">📐 Project Calculator</a>
-        <a href="/solar" style="background:rgba(245,158,11,0.15);color:#F59E0B;font-size:15px;font-weight:600;padding:14px 28px;border-radius:10px;text-decoration:none;border:1px solid rgba(245,158,11,0.3);transition:background 0.2s;">☀️ Solar Inquiry</a>
+      </div>
+      <div class="hero-tools">
+        <span class="hero-tools-label">Free tools:</span>
+        <a href="/calculator" class="hero-tool-pill">📐 Project Calculator</a>
+        <a href="/lot-planner" class="hero-tool-pill">🏠 Lot Planner</a>
+        <a href="/solar" class="hero-tool-pill">☀️ Solar Inquiry</a>
       </div>
       <div class="hero-trust">
         <div class="hero-avatars">
