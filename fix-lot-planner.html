@@ -1,0 +1,1392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lot Planner — FIX Philippines</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --blue:#2076C2;--blue-dark:#1A5FA0;--blue-navy:#0D3C6B;
+  --blue-sky:#A8CAEA;--blue-pale:#E6F1FB;--off:#F7F9FC;
+  --g100:#F0F4F8;--g200:#D9E3EC;--g400:#8A9BB0;
+  --g700:#374151;--g900:#111827;--green:#22C55E;
+  --font:'DM Sans',sans-serif;--nav-h:64px;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--off);color:var(--g900);min-height:100vh}
+
+/* NAV */
+nav{background:white;border-bottom:1px solid var(--g200);height:var(--nav-h);display:flex;align-items:center;justify-content:space-between;padding:0 40px;position:sticky;top:0;z-index:100}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.nav-wm{font-size:13px;font-weight:700;color:var(--g900)}
+.nav-sub{font-size:9px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--g400);margin-top:2px}
+.nav-back{font-size:13px;font-weight:500;color:var(--g400);text-decoration:none;transition:color .2s}
+.nav-back:hover{color:var(--blue)}
+
+/* GATE */
+#gate-page{min-height:calc(100vh - var(--nav-h));display:flex;align-items:stretch}
+.gate-left{width:52%;background:var(--blue-navy);padding:64px 56px;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden}
+.gate-glow{position:absolute;right:-100px;bottom:-100px;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(32,118,194,.25) 0%,transparent 70%);pointer-events:none}
+.gate-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(168,202,234,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(168,202,234,.05) 1px,transparent 1px);background-size:48px 48px;pointer-events:none}
+.gate-ey{font-size:10px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--blue-sky);margin-bottom:20px;position:relative;z-index:1}
+.gate-h1{font-size:clamp(28px,3.5vw,44px);font-weight:700;color:white;letter-spacing:-1px;line-height:1.1;margin-bottom:16px;position:relative;z-index:1}
+.gate-h1 em{font-style:normal;color:var(--blue-sky)}
+.gate-sub{font-size:15px;color:rgba(255,255,255,.55);line-height:1.7;margin-bottom:36px;max-width:380px;position:relative;z-index:1}
+.gate-previews{display:flex;flex-direction:column;gap:10px;position:relative;z-index:1}
+.gate-prev{display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.05);border:1px solid rgba(168,202,234,.12);border-radius:12px;padding:14px 18px}
+.gate-prev-icon{width:40px;height:40px;border-radius:10px;background:rgba(168,202,234,.1);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.gate-prev-title{font-size:13px;font-weight:600;color:white}
+.gate-prev-sub{font-size:11px;color:rgba(255,255,255,.4);margin-top:2px}
+.gate-prev.locked{opacity:.5;filter:blur(1px)}
+.gate-right{flex:1;background:white;padding:56px 48px;display:flex;flex-direction:column;justify-content:center}
+.gate-ft{font-size:22px;font-weight:700;color:var(--g900);letter-spacing:-.3px;margin-bottom:6px}
+.gate-fs{font-size:14px;color:var(--g400);margin-bottom:28px}
+.gate-fields{display:flex;flex-direction:column;gap:14px}
+.fg{display:flex;flex-direction:column;gap:6px}
+.fl{font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--g400)}
+.fi{border:2px solid var(--g200);border-radius:10px;padding:12px 14px;font-family:var(--font);font-size:15px;color:var(--g900);outline:none;transition:border-color .2s;width:100%;background:white}
+.fi:focus{border-color:var(--blue)}
+.fi::placeholder{color:var(--g400)}
+.fsel{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238A9BB0' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;cursor:pointer}
+.grow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.gate-btn{background:var(--blue);color:white;border:none;border-radius:10px;padding:15px;font-family:var(--font);font-size:15px;font-weight:700;cursor:pointer;margin-top:4px;transition:background .2s,transform .15s;box-shadow:0 4px 20px rgba(32,118,194,.25);display:flex;align-items:center;justify-content:center;gap:8px}
+.gate-btn:hover{background:var(--blue-dark);transform:translateY(-1px)}
+.gate-priv{font-size:12px;color:var(--g400);text-align:center;margin-top:10px;line-height:1.6}
+
+/* TOOL */
+#tool-page{display:none}
+#tool-page.visible{display:block}
+
+/* PROGRESS */
+.tp{background:white;border-bottom:1px solid var(--g200);padding:0 40px;overflow-x:auto}
+.tp-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center}
+.ps{display:flex;align-items:center;gap:10px;padding:16px 20px 16px 0;flex:1;border-bottom:3px solid transparent;transition:border-color .3s}
+.ps.active{border-color:var(--blue)}
+.ps.done{border-color:var(--green)}
+.pn{width:26px;height:26px;border-radius:50%;background:var(--g200);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--g400);flex-shrink:0;transition:background .3s,color .3s}
+.ps.active .pn{background:var(--blue);color:white}
+.ps.done .pn{background:var(--green);color:white}
+.pl{font-size:13px;font-weight:600;color:var(--g400);transition:color .3s;white-space:nowrap}
+.ps.active .pl{color:var(--g900)}
+.ps.done .pl{color:var(--g700)}
+
+/* TOOL LAYOUT */
+.tl{max-width:1100px;margin:0 auto;padding:36px 40px 80px}
+.ts{display:none}
+.ts.active{display:block;animation:fadeUp .3s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.sh{margin-bottom:28px}
+.snl{font-size:10px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--blue);margin-bottom:8px}
+.stl{font-size:24px;font-weight:700;color:var(--g900);letter-spacing:-.3px;margin-bottom:6px}
+.sst{font-size:15px;color:var(--g400);line-height:1.6}
+
+/* OPT CARDS */
+.og{display:grid;gap:12px}
+.og2{grid-template-columns:1fr 1fr}
+.og3{grid-template-columns:repeat(3,1fr)}
+.og4{grid-template-columns:repeat(4,1fr)}
+.oc{border:2px solid var(--g200);border-radius:14px;padding:20px;cursor:pointer;transition:border-color .2s,background .2s,transform .15s;user-select:none;display:flex;align-items:flex-start;gap:12px;background:white}
+.oc:hover{border-color:var(--blue-sky);background:var(--blue-pale);transform:translateY(-1px)}
+.oc.selected{border-color:var(--blue);background:var(--blue-pale)}
+.oc-icon{font-size:24px;flex-shrink:0;margin-top:2px}
+.oc-title{font-size:15px;font-weight:700;color:var(--g900);margin-bottom:3px}
+.oc.selected .oc-title{color:var(--blue)}
+.oc-sub{font-size:12px;color:var(--g400);line-height:1.5}
+
+/* DIM INPUTS */
+.dim-layout{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start}
+.dim-inputs{display:flex;flex-direction:column;gap:18px}
+.dim-or{text-align:center;font-size:13px;font-weight:600;color:var(--g400);padding:6px 0;position:relative}
+.dim-or::before,.dim-or::after{content:'';position:absolute;top:50%;width:42%;height:1px;background:var(--g200)}
+.dim-or::before{left:0}.dim-or::after{right:0}
+.iunit{display:flex;align-items:center}
+.iunit input{flex:1;border:2px solid var(--g200);border-right:none;border-radius:10px 0 0 10px;padding:12px 14px;font-family:var(--font);font-size:16px;font-weight:600;color:var(--g900);outline:none;transition:border-color .2s}
+.iunit input:focus{border-color:var(--blue)}
+.iunit .un{background:var(--g100);border:2px solid var(--g200);border-left:none;border-radius:0 10px 10px 0;padding:12px 14px;font-size:13px;font-weight:600;color:var(--g400);white-space:nowrap}
+.dim-prev{background:var(--blue-navy);border-radius:16px;padding:24px}
+.dim-prev-title{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--blue-sky);margin-bottom:14px}
+
+/* PREF */
+.pref-secs{display:flex;flex-direction:column;gap:24px}
+.pref-sec-title{font-size:13px;font-weight:700;color:var(--g700);margin-bottom:10px}
+
+/* TEMPLATE GRID */
+.tgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.tcard{border:2px solid var(--g200);border-radius:14px;overflow:hidden;cursor:pointer;transition:border-color .2s,transform .2s,box-shadow .2s;background:white}
+.tcard:hover{border-color:var(--blue-sky);transform:translateY(-3px);box-shadow:0 10px 32px rgba(13,60,107,.1)}
+.tcard.selected{border-color:var(--blue);box-shadow:0 0 0 3px rgba(32,118,194,.15)}
+.tcard-canvas{background:var(--blue-navy);padding:12px;display:flex;align-items:center;justify-content:center}
+.tcard-canvas canvas{display:block}
+.tcard-info{padding:12px 14px}
+.tcard-type{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--blue);margin-bottom:3px}
+.tcard-name{font-size:13px;font-weight:700;color:var(--g900);margin-bottom:5px;line-height:1.3}
+.tcard.selected .tcard-name{color:var(--blue)}
+.tcard-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px}
+.tcard-tag{font-size:9px;font-weight:600;background:var(--g100);color:var(--g400);padding:2px 7px;border-radius:100px}
+.tcard-area{font-size:11px;color:var(--g400)}
+.match-badge{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:600;color:#15803D;background:#DCFCE7;padding:2px 8px;border-radius:100px;margin-top:5px}
+
+/* RESULT */
+.rl{display:grid;grid-template-columns:1fr 320px;gap:24px;align-items:start}
+.rcw{background:white;border:1px solid var(--g200);border-radius:20px;padding:24px}
+.rct{font-size:14px;font-weight:700;color:var(--g900);margin-bottom:3px}
+.rcs{font-size:12px;color:var(--g400);margin-bottom:16px}
+.rdisclaimer{font-size:11px;color:var(--g400);line-height:1.6;margin-top:14px;padding:12px 16px;background:var(--g100);border-radius:8px;border-left:3px solid var(--blue-sky)}
+.sp{display:flex;flex-direction:column;gap:14px;position:sticky;top:80px}
+.sc{background:white;border:1px solid var(--g200);border-radius:16px;overflow:hidden}
+.sch{background:var(--blue-navy);padding:16px 20px}
+.sch-lbl{font-size:10px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,.45);margin-bottom:4px}
+.sch-val{font-size:20px;font-weight:700;color:white}
+.sch-sub{font-size:11px;color:rgba(255,255,255,.4);margin-top:2px}
+.scb{padding:14px 18px}
+.sr{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--g100)}
+.sr:last-child{border-bottom:none}
+.sk{font-size:12px;color:var(--g400)}
+.sv{font-size:13px;font-weight:600;color:var(--g900)}
+.sv.ok{color:#15803D}
+.comp-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--g100)}
+.comp-row:last-child{border-bottom:none}
+.comp-k{font-size:12px;color:var(--g400)}
+.comp-b{font-size:10px;font-weight:700;padding:3px 8px;border-radius:100px}
+.comp-b.ok{background:#DCFCE7;color:#15803D}
+.comp-b.warn{background:#FEF3C7;color:#92400E}
+.rl-list{display:flex;flex-direction:column;gap:3px;padding:12px 18px}
+.rl-item{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--g700)}
+.rl-item::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--blue-sky);flex-shrink:0}
+.rcta{background:var(--blue);border-radius:14px;padding:20px}
+.rcta-t{font-size:15px;font-weight:700;color:white;margin-bottom:6px;line-height:1.3}
+.rcta-s{font-size:12px;color:rgba(255,255,255,.7);margin-bottom:14px;line-height:1.5}
+.rcta-btn{width:100%;background:white;color:var(--blue);border:none;border-radius:8px;padding:12px;font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;transition:transform .15s}
+.rcta-btn:hover{transform:translateY(-1px)}
+
+/* NAV BTNS */
+.snav{display:flex;gap:10px;margin-top:32px}
+.bbk{background:var(--g100);color:var(--g700);border:none;border-radius:10px;padding:12px 20px;font-family:var(--font);font-size:14px;font-weight:600;cursor:pointer;transition:background .2s}
+.bbk:hover{background:var(--g200)}
+.bnx{flex:1;background:var(--blue);color:white;border:none;border-radius:10px;padding:12px 24px;font-family:var(--font);font-size:15px;font-weight:700;cursor:pointer;transition:background .2s,transform .15s}
+.bnx:hover{background:var(--blue-dark);transform:translateY(-1px)}
+.bnx:disabled{background:var(--g200);color:var(--g400);cursor:not-allowed;transform:none}
+
+/* MODAL */
+.mo{position:fixed;inset:0;background:rgba(13,60,107,.75);backdrop-filter:blur(6px);z-index:500;display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .3s}
+.mo.open{opacity:1;pointer-events:all}
+.mb{background:white;border-radius:20px;padding:44px 36px;max-width:420px;width:100%;text-align:center;transform:translateY(20px);transition:transform .3s;box-shadow:0 24px 80px rgba(13,60,107,.25)}
+.mo.open .mb{transform:translateY(0)}
+.mi{font-size:44px;margin-bottom:14px}
+.mt{font-size:20px;font-weight:700;color:var(--g900);margin-bottom:8px}
+.ms{font-size:14px;color:var(--g400);line-height:1.65;margin-bottom:22px}
+.mc{background:var(--blue);color:white;font-family:var(--font);font-size:14px;font-weight:700;padding:13px 32px;border-radius:10px;border:none;cursor:pointer}
+.mclose{background:none;border:none;font-family:var(--font);font-size:13px;color:var(--g400);cursor:pointer;margin-top:10px;display:block;width:100%}
+
+/* ERR */
+.err{font-size:12px;color:#EF4444;margin-top:4px;display:none}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  #gate-page{flex-direction:column}
+  .gate-left{width:100%;padding:40px 24px}
+  .gate-right{padding:32px 24px}
+  .grow{grid-template-columns:1fr}
+  .tl{padding:24px 20px 48px}
+  .og2,.og3,.og4{grid-template-columns:1fr 1fr}
+  .dim-layout{grid-template-columns:1fr}
+  .tgrid{grid-template-columns:repeat(2,1fr)}
+  .rl{grid-template-columns:1fr}
+  .sp{position:static}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">
+    <svg width="44" height="18" viewBox="0 0 210 88" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs><linearGradient id="nl" x1="118" y1="80" x2="184" y2="8" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stop-color="#2076C2"/><stop offset="52%" stop-color="#2076C2"/>
+        <stop offset="100%" stop-color="#A8CAEA"/></linearGradient></defs>
+      <rect x="12" y="8" width="13" height="72" rx="4" fill="#2076C2"/>
+      <rect x="12" y="8" width="54" height="13" rx="4" fill="#2076C2"/>
+      <rect x="12" y="38" width="43" height="13" rx="4" fill="#2076C2"/>
+      <rect x="82" y="8" width="13" height="72" rx="4" fill="#2076C2"/>
+      <path d="M118 80L184 8" stroke="url(#nl)" stroke-width="13" stroke-linecap="round"/>
+      <path d="M118 8L184 80" stroke="#2076C2" stroke-width="13" stroke-linecap="round"/>
+    </svg>
+    <div><div class="nav-wm">FIX Lot Planner</div><div class="nav-sub">Free Planning Tool</div></div>
+  </a>
+  <a href="/" class="nav-back">← Back to FIX</a>
+</nav>
+
+<!-- GATE -->
+<div id="gate-page">
+  <div class="gate-left">
+    <div class="gate-glow"></div><div class="gate-grid"></div>
+    <div class="gate-ey">Free Planning Tool</div>
+    <h1 class="gate-h1">See what you can build on <em>your lot</em> — before you call a contractor.</h1>
+    <p class="gate-sub">Enter your details to unlock the FIX Lot Planner. Get a blueprint-style floor plan matched to your lot and preferences.</p>
+    <div class="gate-previews">
+      <div class="gate-prev"><div class="gate-prev-icon">📐</div><div><div class="gate-prev-title">Lot Visualizer</div><div class="gate-prev-sub">Draw your lot to scale with NBCP setbacks</div></div></div>
+      <div class="gate-prev locked"><div class="gate-prev-icon">🏠</div><div><div class="gate-prev-title">20 Blueprint Floor Plans</div><div class="gate-prev-sub">Bungalow, Single Detached, Attached & Duplex</div></div></div>
+      <div class="gate-prev locked"><div class="gate-prev-icon">📊</div><div><div class="gate-prev-title">Area & Compliance Report</div><div class="gate-prev-sub">Floor area, lot coverage, NBCP setback check</div></div></div>
+    </div>
+  </div>
+  <div class="gate-right">
+    <div class="gate-ft">Unlock the Lot Planner</div>
+    <div class="gate-fs">Takes 30 seconds. Free, no strings attached.</div>
+    <form class="gate-fields" id="gate-form" name="lot-plotter-leads" method="POST" data-netlify="true" netlify-honeypot="bot-field">
+      <input type="hidden" name="form-name" value="lot-plotter-leads">
+      <input type="hidden" name="bot-field" style="display:none">
+      <div class="grow">
+        <div class="fg"><label class="fl">First Name</label><input type="text" name="first-name" class="fi" placeholder="Juan" id="g-fn" required></div>
+        <div class="fg"><label class="fl">Last Name</label><input type="text" name="last-name" class="fi" placeholder="Dela Cruz" id="g-ln" required></div>
+      </div>
+      <div class="fg"><label class="fl">Mobile Number</label><input type="tel" name="mobile" class="fi" placeholder="+63 9XX XXX XXXX" id="g-ph" required></div>
+      <div class="fg"><label class="fl">Email Address</label><input type="email" name="email" class="fi" placeholder="you@email.com" id="g-em" required></div>
+      <div class="grow">
+        <div class="fg"><label class="fl">Project Location</label>
+          <select name="location" class="fi fsel" required>
+            <option value="" disabled selected>Select area</option>
+            <option>Metro Manila (NCR)</option><option>Cavite</option><option>Laguna</option>
+            <option>Batangas</option><option>Rizal</option><option>Other</option>
+          </select></div>
+        <div class="fg"><label class="fl">I'm planning to…</label>
+          <select name="project-type" class="fi fsel" required>
+            <option value="" disabled selected>Select</option>
+            <option>Build a new house</option><option>Renovate existing</option><option>Extend / add rooms</option>
+          </select></div>
+      </div>
+      <button type="submit" class="gate-btn">Unlock Free Tool →</button>
+      <p class="gate-priv">Your details help us match you with the right verified FIX contractor. No spam.</p>
+    </form>
+  </div>
+</div>
+
+<!-- TOOL -->
+<div id="tool-page">
+  <div class="tp">
+    <div class="tp-inner">
+      <div class="ps active" id="prog-1"><div class="pn">1</div><div class="pl">Home Type</div></div>
+      <div class="ps" id="prog-2"><div class="pn">2</div><div class="pl">Lot Size</div></div>
+      <div class="ps" id="prog-3"><div class="pn">3</div><div class="pl">Preferences</div></div>
+      <div class="ps" id="prog-4"><div class="pn">4</div><div class="pl">Floor Plan</div></div>
+      <div class="ps" id="prog-5"><div class="pn">5</div><div class="pl">Your Result</div></div>
+    </div>
+  </div>
+
+  <div class="tl">
+
+    <!-- STEP 1: HOME TYPE -->
+    <div class="ts active" id="step-1">
+      <div class="sh">
+        <div class="snl">Step 1 of 4</div>
+        <div class="stl">What type of home are you planning?</div>
+        <div class="sst">This determines which floor plan layouts we show you.</div>
+      </div>
+      <div class="og og2">
+        <div class="oc" data-key="htype" data-val="bungalow" onclick="selOpt(this)">
+          <div class="oc-icon">🏠</div>
+          <div><div class="oc-title">Bungalow</div><div class="oc-sub">Single storey, standalone home. All living on one level — great for accessibility and low maintenance.</div></div>
+        </div>
+        <div class="oc" data-key="htype" data-val="detached" onclick="selOpt(this)">
+          <div class="oc-icon">🏡</div>
+          <div><div class="oc-title">Single Detached</div><div class="oc-sub">Two storey, standalone home with setbacks on all four sides. Most common in subdivisions.</div></div>
+        </div>
+        <div class="oc" data-key="htype" data-val="attached" onclick="selOpt(this)">
+          <div class="oc-icon">🏘️</div>
+          <div><div class="oc-title">Single Attached</div><div class="oc-sub">Two storey home that shares one wall with a neighbor. Ideal for narrower lots in compact areas.</div></div>
+        </div>
+        <div class="oc" data-key="htype" data-val="duplex" onclick="selOpt(this)">
+          <div class="oc-icon">🏢</div>
+          <div><div class="oc-title">Duplex</div><div class="oc-sub">Two separate units on one lot — side by side. Great for rental income or housing extended family.</div></div>
+        </div>
+      </div>
+      <div class="snav"><button class="bnx" id="next-1" onclick="goStep(2)" disabled>Continue →</button></div>
+    </div>
+
+    <!-- STEP 2: LOT SIZE -->
+    <div class="ts" id="step-2">
+      <div class="sh">
+        <div class="snl">Step 2 of 4</div>
+        <div class="stl">What is your lot size?</div>
+        <div class="sst">Enter width and depth, or just total area. Minimum 60 sqm.</div>
+      </div>
+      <div class="dim-layout">
+        <div class="dim-inputs">
+          <div><div class="fl" style="margin-bottom:8px">Lot Width</div>
+            <div class="iunit"><input type="number" id="lot-w" placeholder="e.g. 10" min="6" max="100" oninput="updatePrev()"><div class="un">meters wide</div></div></div>
+          <div><div class="fl" style="margin-bottom:8px">Lot Depth</div>
+            <div class="iunit"><input type="number" id="lot-d" placeholder="e.g. 20" min="10" max="200" oninput="updatePrev()"><div class="un">meters deep</div></div></div>
+          <div class="dim-or">OR enter total area only</div>
+          <div><div class="fl" style="margin-bottom:8px">Total Lot Area</div>
+            <div class="iunit"><input type="number" id="lot-sqm" placeholder="e.g. 200" min="60" max="10000" oninput="sqmCalc()"><div class="un">sqm</div></div></div>
+          <div class="err" id="lot-err">Minimum lot size is 60 sqm (6m × 10m).</div>
+        </div>
+        <div class="dim-prev">
+          <div class="dim-prev-title">Live Preview</div>
+          <canvas id="prev-cvs" width="260" height="200" style="width:100%;display:block;border-radius:8px"></canvas>
+          <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:10px;line-height:1.6" id="prev-lbl">Enter dimensions to preview your lot.</div>
+        </div>
+      </div>
+      <div class="snav"><button class="bbk" onclick="goStep(1)">←</button><button class="bnx" id="next-2" onclick="goStep(3)" disabled>Continue →</button></div>
+    </div>
+
+    <!-- STEP 3: PREFERENCES -->
+    <div class="ts" id="step-3">
+      <div class="sh">
+        <div class="snl">Step 3 of 4</div>
+        <div class="stl">Tell us your preferences</div>
+        <div class="sst">We'll filter the best matching floor plans for you.</div>
+      </div>
+      <div class="pref-secs">
+        <div>
+          <div class="pref-sec-title">Kitchen size</div>
+          <div class="og og2">
+            <div class="oc" data-key="kitchen" data-val="simple" onclick="selOpt(this)"><div class="oc-icon">🍳</div><div><div class="oc-title">Simple Kitchen</div><div class="oc-sub">Compact and efficient</div></div></div>
+            <div class="oc" data-key="kitchen" data-val="large" onclick="selOpt(this)"><div class="oc-icon">👨‍🍳</div><div><div class="oc-title">Large / Open Kitchen</div><div class="oc-sub">Spacious, open to dining</div></div></div>
+          </div>
+        </div>
+        <div>
+          <div class="pref-sec-title">Outdoor Kitchen</div>
+          <div class="og og2">
+            <div class="oc" data-key="okitchen" data-val="yes" onclick="selOpt(this)"><div class="oc-icon">🔥</div><div><div class="oc-title">Yes, include one</div><div class="oc-sub">Covered outdoor cooking area</div></div></div>
+            <div class="oc" data-key="okitchen" data-val="no" onclick="selOpt(this)"><div class="oc-icon">❌</div><div><div class="oc-title">Not needed</div><div class="oc-sub">Indoor kitchen only</div></div></div>
+          </div>
+        </div>
+        <div>
+          <div class="pref-sec-title">Patio / Outdoor Area</div>
+          <div class="og og2">
+            <div class="oc" data-key="patio" data-val="yes" onclick="selOpt(this)"><div class="oc-icon">🌿</div><div><div class="oc-title">Yes, include a patio</div><div class="oc-sub">Covered outdoor relaxation space</div></div></div>
+            <div class="oc" data-key="patio" data-val="no" onclick="selOpt(this)"><div class="oc-icon">❌</div><div><div class="oc-title">Not needed</div><div class="oc-sub">Maximize indoor area</div></div></div>
+          </div>
+        </div>
+        <div>
+          <div class="pref-sec-title">Parking / Garage</div>
+          <div class="og og3">
+            <div class="oc" data-key="parking" data-val="0" onclick="selOpt(this)"><div class="oc-icon">🚶</div><div><div class="oc-title">No parking</div><div class="oc-sub">More indoor space</div></div></div>
+            <div class="oc" data-key="parking" data-val="1" onclick="selOpt(this)"><div class="oc-icon">🚗</div><div><div class="oc-title">1 car garage</div><div class="oc-sub">Single covered parking</div></div></div>
+            <div class="oc" data-key="parking" data-val="2" onclick="selOpt(this)"><div class="oc-icon">🚗🚗</div><div><div class="oc-title">2 car garage</div><div class="oc-sub">Double covered parking</div></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="snav"><button class="bbk" onclick="goStep(2)">←</button><button class="bnx" id="next-3" onclick="goStep(4)" disabled>See Floor Plans →</button></div>
+    </div>
+
+    <!-- STEP 4: TEMPLATES -->
+    <div class="ts" id="step-4">
+      <div class="sh">
+        <div class="snl">Step 4 of 4</div>
+        <div class="stl">Choose your floor plan</div>
+        <div class="sst" id="step4-sub">Blueprint-style layouts matched to your preferences.</div>
+      </div>
+      <div class="tgrid" id="tgrid"></div>
+      <div class="snav"><button class="bbk" onclick="goStep(3)">←</button><button class="bnx" id="next-4" onclick="goStep(5)" disabled>View My Blueprint →</button></div>
+    </div>
+
+    <!-- STEP 5: RESULT -->
+    <div class="ts" id="step-5">
+      <div class="sh">
+        <div class="snl">Your Blueprint</div>
+        <div class="stl" id="res-title">Your Lot Plan</div>
+        <div class="sst" id="res-sub">Blueprint view with NBCP setbacks and selected floor plan.</div>
+      </div>
+      <div class="rl">
+        <div>
+          <div class="rcw">
+            <div class="rct" id="rc-title">Lot Plan</div>
+            <div class="rcs" id="rc-sub">To scale · NBCP setbacks · Blueprint style</div>
+            <canvas id="res-cvs" width="680" height="520" style="width:100%;display:block;border-radius:8px;background:#0D3C6B"></canvas>
+            <div class="rdisclaimer"><strong>Planning aid only.</strong> These are illustrative templates, not architectural drawings. Setbacks follow NBCP defaults — verify with your LGU. Consult a licensed architect before finalizing any design.</div>
+          </div>
+          <div class="snav" style="margin-top:20px">
+            <button class="bbk" onclick="goStep(4)">← Change plan</button>
+            <button class="bnx" onclick="document.getElementById('res-modal').classList.add('open')">Get Matched with a Contractor →</button>
+          </div>
+        </div>
+        <div class="sp">
+          <div class="sc">
+            <div class="sch"><div class="sch-lbl">Your Lot</div><div class="sch-val" id="sum-area">— sqm</div><div class="sch-sub" id="sum-dims">— × — meters</div></div>
+            <div class="scb">
+              <div class="sr"><span class="sk">Buildable footprint</span><span class="sv" id="sum-build">—</span></div>
+              <div class="sr"><span class="sk">Floor plan footprint</span><span class="sv" id="sum-fp">—</span></div>
+              <div class="sr"><span class="sk">Total floor area</span><span class="sv" id="sum-gfa">—</span></div>
+              <div class="sr"><span class="sk">Lot coverage</span><span class="sv ok" id="sum-cov">—</span></div>
+              <div class="sr"><span class="sk">Home type</span><span class="sv" id="sum-type">—</span></div>
+            </div>
+          </div>
+          <div class="sc">
+            <div style="padding:12px 18px 4px;font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--g400)">NBCP Compliance</div>
+            <div class="scb">
+              <div class="comp-row"><span class="comp-k">Front setback (min 4.5m)</span><span class="comp-b ok" id="c-front">✓ 4.5m</span></div>
+              <div class="comp-row"><span class="comp-k">Side setbacks (min 2m)</span><span class="comp-b ok" id="c-side">✓ 2.0m</span></div>
+              <div class="comp-row"><span class="comp-k">Rear setback (min 2m)</span><span class="comp-b ok" id="c-rear">✓ 2.0m</span></div>
+              <div class="comp-row"><span class="comp-k">Max lot coverage (60%)</span><span class="comp-b ok" id="c-cov">✓ OK</span></div>
+            </div>
+            <div style="padding:0 18px 12px;font-size:10px;color:var(--g400);line-height:1.5">Verify actual requirements with your LGU.</div>
+          </div>
+          <div class="sc">
+            <div style="padding:12px 18px 4px;font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--g400)">Rooms & Features</div>
+            <div class="rl-list" id="rooms-list"></div>
+          </div>
+          <div class="rcta">
+            <div class="rcta-t">Love this layout? Find a verified contractor to build it.</div>
+            <div class="rcta-s">FIX matches you with up to 2 licensed builders who can bring this to life — free.</div>
+            <button class="rcta-btn" onclick="document.getElementById('res-modal').classList.add('open')">Post My Project — Free →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="mo" id="res-modal">
+  <div class="mb">
+    <div class="mi">🏗️</div>
+    <div class="mt">Ready to build this?</div>
+    <div class="ms">We've saved your lot plan. Our team will match you with verified FIX contractors who can build it — usually within 24 hours.</div>
+    <button class="mc" onclick="window.location.href='/#get-matched'">Post My Project on FIX →</button>
+    <button class="mclose" onclick="document.getElementById('res-modal').classList.remove('open')">Stay on this page</button>
+  </div>
+</div>
+
+<!-- Netlify hidden detection -->
+<div style="display:none">
+  <form name="lot-plotter-leads" data-netlify="true">
+    <input type="hidden" name="form-name" value="lot-plotter-leads">
+    <input name="first-name"><input name="last-name"><input name="mobile"><input name="email">
+    <input name="location"><input name="project-type"><input name="lot-width"><input name="lot-depth">
+    <input name="home-type"><input name="kitchen"><input name="outdoor-kitchen">
+    <input name="patio"><input name="parking"><input name="selected-template">
+  </form>
+</div>
+
+<script>
+// ── STATE ──
+const S = { htype:null, lotW:0, lotD:0, kitchen:null, okitchen:null, patio:null, parking:null, tpl:null, step:1 };
+const PREF_KEYS = ['kitchen','okitchen','patio','parking'];
+
+// ── BLUEPRINT DRAWING HELPERS ──
+const BG    = '#0D3C6B';  // navy background
+const WALL  = '#FFFFFF';  // wall color
+const WALL2 = 'rgba(255,255,255,0.7)'; // interior walls
+const ROOM  = 'rgba(255,255,255,0.04)'; // room fill
+const LBL   = '#FFFFFF';  // labels
+const DIM   = '#A8CAEA';  // dimensions / sky blue
+const FURN  = 'rgba(168,202,234,0.5)'; // furniture
+const STAIR = 'rgba(168,202,234,0.4)';
+const DOOR  = 'rgba(255,255,255,0.6)';
+const WIN   = '#A8CAEA';
+const DASH  = 'rgba(168,202,234,0.5)';
+
+function bp(cvs, drawFn, full, W, D) {
+  const ctx = cvs.getContext('2d');
+  const CW = cvs.width, CH = cvs.height;
+  ctx.clearRect(0,0,CW,CH);
+  ctx.fillStyle = BG; ctx.fillRect(0,0,CW,CH);
+
+  // Blueprint dot grid
+  ctx.fillStyle = 'rgba(168,202,234,0.08)';
+  for(let x=8;x<CW;x+=16) for(let y=8;y<CH;y+=16) { ctx.beginPath(); ctx.arc(x,y,1,0,Math.PI*2); ctx.fill(); }
+
+  if (!full) {
+    // Mini preview — just draw floor plan in center
+    const pad = 10;
+    drawFn(ctx, pad, pad, CW-pad*2, CH-pad*2, false);
+    return;
+  }
+
+  // Full result with lot
+  const pad = 52;
+  const sc = Math.min((CW-pad*2)/W, (CH-pad*2)/D);
+  const lw = W*sc, lh = D*sc;
+  const ox = (CW-lw)/2, oy = (CH-lh)/2;
+  const fs=4.5*sc, ss=2*sc, rs=2*sc;
+
+  // Lot fill
+  ctx.fillStyle = 'rgba(255,255,255,0.03)';
+  ctx.strokeStyle = DIM; ctx.lineWidth=1.5; ctx.setLineDash([4,4]);
+  ctx.strokeRect(ox,oy,lw,lh); ctx.setLineDash([]);
+  ctx.fillRect(ox,oy,lw,lh);
+
+  // Setback lines
+  ctx.strokeStyle = DASH; ctx.lineWidth=1; ctx.setLineDash([5,4]);
+  ctx.strokeRect(ox+ss,oy+fs,lw-ss*2,lh-fs-rs);
+  ctx.setLineDash([]);
+
+  // Setback labels
+  ctx.fillStyle = DIM; ctx.font='9px DM Sans,sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText('FRONT SETBACK 4.5m', ox+lw/2, oy+fs/2);
+  ctx.fillText('REAR SETBACK 2m', ox+lw/2, oy+lh-rs/2);
+  ctx.save(); ctx.translate(ox+ss/2,oy+lh/2); ctx.rotate(-Math.PI/2); ctx.fillText('2m',0,0); ctx.restore();
+  ctx.save(); ctx.translate(ox+lw-ss/2,oy+lh/2); ctx.rotate(Math.PI/2); ctx.fillText('2m',0,0); ctx.restore();
+
+  // Dimensions
+  ctx.fillStyle = DIM; ctx.font='bold 11px DM Sans,sans-serif'; ctx.textAlign='center';
+  ctx.fillText(W+'m', CW/2, oy-16);
+  ctx.save(); ctx.translate(ox-16,CH/2); ctx.rotate(-Math.PI/2); ctx.fillText(D+'m',0,0); ctx.restore();
+
+  // Draw floor plan in buildable area
+  const bx=ox+ss, by=oy+fs, bw=lw-ss*2, bh=lh-fs-rs;
+  drawFn(ctx, bx, by, bw, bh, true);
+
+  // North arrow
+  const nx=CW-28, ny=36;
+  ctx.strokeStyle=DIM; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(nx,ny+12); ctx.lineTo(nx,ny-12); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(nx-5,ny-6); ctx.lineTo(nx,ny-14); ctx.lineTo(nx+5,ny-6); ctx.closePath();
+  ctx.fillStyle=DIM; ctx.fill();
+  ctx.fillStyle=DIM; ctx.font='bold 10px DM Sans,sans-serif'; ctx.textAlign='center';
+  ctx.fillText('N',nx,ny+22);
+
+  // Scale bar
+  const sbLen=sc*5, sbY=CH-20, sbX=ox+4;
+  ctx.strokeStyle=DIM; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(sbX,sbY); ctx.lineTo(sbX+sbLen,sbY); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(sbX,sbY-4); ctx.lineTo(sbX,sbY+4); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(sbX+sbLen,sbY-4); ctx.lineTo(sbX+sbLen,sbY+4); ctx.stroke();
+  ctx.fillStyle=DIM; ctx.font='9px DM Sans,sans-serif'; ctx.textAlign='left';
+  ctx.fillText('5m', sbX, sbY-7);
+}
+
+// ── ROOM DRAWING HELPERS ──
+function wall(ctx,x,y,w,h){
+  ctx.fillStyle=ROOM; ctx.fillRect(x,y,w,h);
+  ctx.strokeStyle=WALL; ctx.lineWidth=2.5;
+  ctx.strokeRect(x,y,w,h);
+}
+function iwall(ctx,x1,y1,x2,y2){
+  ctx.strokeStyle=WALL2; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+}
+function lbl(ctx,x,y,w,h,text,sub){
+  ctx.fillStyle=LBL; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.font='bold 8px DM Sans,sans-serif';
+  if(w>24&&h>14){ ctx.fillText(text.toUpperCase(),x+w/2,sub?y+h/2-5:y+h/2); }
+  if(sub&&w>24&&h>22){ ctx.fillStyle=DIM; ctx.font='7px DM Sans,sans-serif'; ctx.fillText(sub,x+w/2,y+h/2+5); }
+}
+function door(ctx,x,y,r,startA,endA,flip){
+  ctx.strokeStyle=DOOR; ctx.lineWidth=1; ctx.setLineDash([]);
+  ctx.beginPath(); ctx.arc(x,y,r,startA,endA); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x,y);
+  ctx.lineTo(x+Math.cos(startA)*r, y+Math.sin(startA)*r); ctx.stroke();
+}
+function win(ctx,x,y,w,horiz){
+  ctx.strokeStyle=WIN; ctx.lineWidth=1.5;
+  if(horiz){
+    const cy=y; const h2=w/3;
+    for(let i=0;i<3;i++){ ctx.beginPath(); ctx.moveTo(x,cy-h2+i*h2); ctx.lineTo(x+w,cy-h2+i*h2); ctx.stroke(); }
+  } else {
+    for(let i=0;i<3;i++){ ctx.beginPath(); ctx.moveTo(x-w/2+i*(w/2),y); ctx.lineTo(x-w/2+i*(w/2),y+w); ctx.stroke(); }
+  }
+}
+function bed(ctx,x,y,w,h){
+  ctx.strokeStyle=FURN; ctx.lineWidth=1; ctx.strokeRect(x+1,y+1,w-2,h-2);
+  // pillow
+  ctx.beginPath(); ctx.roundRect(x+3,y+3,w-6,h*0.3,2); ctx.stroke();
+}
+function sofa(ctx,x,y,w,h){
+  ctx.strokeStyle=FURN; ctx.lineWidth=1;
+  ctx.strokeRect(x,y,w,h*0.6);
+  ctx.strokeRect(x,y,w*0.2,h);
+  ctx.strokeRect(x+w*0.8,y,w*0.2,h);
+  ctx.strokeRect(x,y+h*0.6,w,h*0.4);
+}
+function dining(ctx,x,y,r,seats){
+  ctx.strokeStyle=FURN; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.stroke();
+  for(let i=0;i<seats;i++){
+    const a=(i/seats)*Math.PI*2, sr=r+8;
+    ctx.beginPath(); ctx.arc(x+Math.cos(a)*sr,y+Math.sin(a)*sr,5,0,Math.PI*2); ctx.stroke();
+  }
+}
+function toilet(ctx,x,y,w,h){
+  ctx.strokeStyle=FURN; ctx.lineWidth=1;
+  ctx.strokeRect(x,y,w,h*0.35);
+  ctx.beginPath(); ctx.ellipse(x+w/2,y+h*0.65,w/2-2,h*0.38,0,0,Math.PI*2); ctx.stroke();
+}
+function bath(ctx,x,y,w,h){
+  ctx.strokeStyle=FURN; ctx.lineWidth=1;
+  ctx.strokeRect(x,y,w,h);
+  ctx.beginPath(); ctx.ellipse(x+w/2,y+h/2,w/2-4,h/2-4,0,0,Math.PI*2); ctx.stroke();
+}
+function kitchen_counter(ctx,x,y,w,h,orient){
+  ctx.strokeStyle=FURN; ctx.lineWidth=1;
+  if(orient==='h'){ ctx.strokeRect(x,y,w,h); ctx.beginPath(); ctx.arc(x+w-h/2,y+h/2,h/3,0,Math.PI*2); ctx.stroke(); }
+  else { ctx.strokeRect(x,y,w,h); ctx.beginPath(); ctx.arc(x+w/2,y+h-w/2,w/3,0,Math.PI*2); ctx.stroke(); }
+}
+function car(ctx,x,y,w,h){
+  ctx.strokeStyle=FURN; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.roundRect(x,y,w,h,4); ctx.stroke();
+  ctx.beginPath(); ctx.roundRect(x+w*0.1,y+h*0.2,w*0.8,h*0.45,2); ctx.stroke();
+}
+function stairs(ctx,x,y,w,h,steps){
+  ctx.strokeStyle=STAIR; ctx.lineWidth=1;
+  ctx.strokeRect(x,y,w,h);
+  const sw=h/steps;
+  for(let i=1;i<steps;i++){ ctx.beginPath(); ctx.moveTo(x,y+i*sw); ctx.lineTo(x+w,y+i*sw); ctx.stroke(); }
+  // arrow
+  ctx.strokeStyle=DIM; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(x+w/2,y+h-4); ctx.lineTo(x+w/2,y+4); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x+w/2-4,y+10); ctx.lineTo(x+w/2,y+4); ctx.lineTo(x+w/2+4,y+10); ctx.stroke();
+  ctx.fillStyle=DIM; ctx.font='7px DM Sans,sans-serif'; ctx.textAlign='center';
+  ctx.fillText('UP',x+w/2,y+h-8);
+}
+function floorLabel(ctx,x,y,text){
+  ctx.fillStyle=DIM; ctx.font='bold 8px DM Sans,sans-serif'; ctx.textAlign='left';
+  ctx.fillText(text,x+2,y+9);
+}
+function patio(ctx,x,y,w,h,label){
+  ctx.strokeStyle=DIM; ctx.lineWidth=1.5; ctx.setLineDash([3,3]);
+  ctx.strokeRect(x,y,w,h); ctx.setLineDash([]);
+  ctx.fillStyle='rgba(168,202,234,0.06)'; ctx.fillRect(x,y,w,h);
+  lbl(ctx,x,y,w,h,label||'PATIO');
+}
+function garage(ctx,x,y,w,h,cars){
+  wall(ctx,x,y,w,h);
+  lbl(ctx,x,y,w,h,(cars===2?'2-CAR ':'')+'GARAGE');
+  if(cars>=1) car(ctx,x+4,y+h*0.15,Math.min(w-8,(w-8)/Math.max(cars,1)*0.9),(h-8)*0.7);
+  if(cars===2) car(ctx,x+w/2+2,y+h*0.15,w/2-6,(h-8)*0.7);
+}
+function outKitchen(ctx,x,y,w,h){
+  ctx.strokeStyle=DIM; ctx.lineWidth=1.5; ctx.setLineDash([3,3]);
+  ctx.strokeRect(x,y,w,h); ctx.setLineDash([]);
+  lbl(ctx,x,y,w,h,'OUTDOOR','KITCHEN');
+}
+
+// ── SECTION DIVIDER for 2-storey ──
+function floorDivider(ctx,x,y,w){
+  ctx.strokeStyle=DIM; ctx.lineWidth=1.5; ctx.setLineDash([6,4]);
+  ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x+w,y); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle=DIM; ctx.font='bold 8px DM Sans,sans-serif'; ctx.textAlign='center';
+  ctx.fillText('▲ 2ND FLOOR', x+w/2, y-4);
+}
+
+// ═══════════════════════════════════════════
+// BUNGALOW TEMPLATES
+// ═══════════════════════════════════════════
+
+function drawB1(ctx,x,y,w,h,full){ // Studio
+  wall(ctx,x,y,w,h);
+  iwall(ctx,x,y+h*0.55,x+w*0.6,y+h*0.55);
+  iwall(ctx,x+w*0.6,y,x+w*0.6,y+h*0.6);
+  lbl(ctx,x,y,w*0.6,h*0.55,'LIVING / DINING');
+  lbl(ctx,x+w*0.6,y,w*0.4,h*0.55,'KITCHEN',full?'Simple':'');
+  lbl(ctx,x,y+h*0.55,w*0.5,h*0.45,'BEDROOM');
+  lbl(ctx,x+w*0.5,y+h*0.55,w*0.5,h*0.45,'BATH');
+  if(full){ bed(ctx,x+4,y+h*0.6,w*0.35,h*0.3); toilet(ctx,x+w*0.55,y+h*0.6,w*0.18,h*0.2); bath(ctx,x+w*0.75,y+h*0.6,w*0.18,h*0.25); door(ctx,x+w*0.55,y+h*0.55,10,0,-Math.PI/2); win(ctx,x+w/2,y,w*0.3,true); }
+}
+
+function drawB2(ctx,x,y,w,h,full){ // 2BR no garage
+  wall(ctx,x,y,w,h);
+  iwall(ctx,x,y+h*0.45,x+w,y+h*0.45);
+  iwall(ctx,x+w*0.55,y+h*0.45,x+w*0.55,y+h);
+  iwall(ctx,x+w*0.5,y,x+w*0.5,y+h*0.45);
+  lbl(ctx,x,y,w*0.5,h*0.45,'LIVING');
+  lbl(ctx,x+w*0.5,y,w*0.5,h*0.45,'KITCHEN / DINING');
+  lbl(ctx,x,y+h*0.45,w*0.55,h*0.55,'BEDROOM 1');
+  lbl(ctx,x+w*0.55,y+h*0.45,w*0.45,h*0.55,'BEDROOM 2');
+  if(full){ sofa(ctx,x+4,y+4,w*0.3,h*0.25); bed(ctx,x+4,y+h*0.5,w*0.35,h*0.35); bed(ctx,x+w*0.6,y+h*0.5,w*0.3,h*0.35); win(ctx,x+w/4,y,w*0.3,true); }
+}
+
+function drawB3(ctx,x,y,w,h,full){ // 2BR + 1car garage
+  wall(ctx,x,y,w,h);
+  iwall(ctx,x,y+h*0.42,x+w*0.7,y+h*0.42);
+  iwall(ctx,x+w*0.35,y,x+w*0.35,y+h*0.42);
+  iwall(ctx,x+w*0.7,y,x+w*0.7,y+h);
+  lbl(ctx,x,y,w*0.35,h*0.42,'GARAGE');
+  lbl(ctx,x+w*0.35,y,w*0.35,h*0.42,'LIVING');
+  lbl(ctx,x+w*0.7,y,w*0.3,h*0.42,'KITCHEN');
+  iwall(ctx,x,y+h*0.42,x+w*0.7,y+h*0.42);
+  iwall(ctx,x+w*0.5,y+h*0.42,x+w*0.5,y+h);
+  lbl(ctx,x,y+h*0.42,w*0.5,h*0.58,'BEDROOM 1');
+  lbl(ctx,x+w*0.5,y+h*0.42,w*0.2,h*0.58,'BATH');
+  iwall(ctx,x+w*0.7,y+h*0.42,x+w*0.7,y+h);
+  lbl(ctx,x+w*0.7,y+h*0.42,w*0.3,h*0.58,'BEDROOM 2');
+  if(full){ car(ctx,x+4,y+h*0.08,w*0.27,h*0.28); bed(ctx,x+4,y+h*0.47,w*0.35,h*0.4); bed(ctx,x+w*0.72,y+h*0.47,w*0.22,h*0.4); }
+}
+
+function drawB4(ctx,x,y,w,h,full){ // 2BR + patio
+  const ph=h*0.22;
+  wall(ctx,x,y,w,h-ph);
+  iwall(ctx,x,y+h*0.4,x+w,y+h*0.4);
+  iwall(ctx,x+w*0.5,y,x+w*0.5,y+h*0.4);
+  iwall(ctx,x+w*0.55,y+h*0.4,x+w*0.55,y+h-ph);
+  lbl(ctx,x,y,w*0.5,(h-ph)*0.4,'LIVING');
+  lbl(ctx,x+w*0.5,y,w*0.5,(h-ph)*0.4,'KITCHEN / DINING');
+  lbl(ctx,x,y+h*0.4,w*0.55,(h-ph)*0.6,'BEDROOM 1');
+  lbl(ctx,x+w*0.55,y+h*0.4,w*0.45,(h-ph)*0.6,'BEDROOM 2');
+  patio(ctx,x,y+h-ph,w,ph,'PATIO');
+  if(full){ sofa(ctx,x+4,y+4,w*0.35,h*0.22); bed(ctx,x+4,y+h*0.44,w*0.38,h*0.28); bed(ctx,x+w*0.58,y+h*0.44,w*0.35,h*0.28); }
+}
+
+function drawB5(ctx,x,y,w,h,full){ // 3BR family
+  wall(ctx,x,y,w,h);
+  const gar=w*0.32;
+  iwall(ctx,x+gar,y,x+gar,y+h*0.38);
+  iwall(ctx,x,y+h*0.38,x+w,y+h*0.38);
+  iwall(ctx,x+w*0.5,y,x+w*0.5,y+h*0.38);
+  iwall(ctx,x+w/3,y+h*0.38,x+w/3,y+h);
+  iwall(ctx,x+w*2/3,y+h*0.38,x+w*2/3,y+h);
+  lbl(ctx,x,y,gar,h*0.38,'GARAGE');
+  lbl(ctx,x+gar,y,(w-gar)*0.6,h*0.38,'LIVING');
+  lbl(ctx,x+gar+(w-gar)*0.6,y,(w-gar)*0.4,h*0.38,'KITCHEN');
+  lbl(ctx,x,y+h*0.38,w/3,h*0.62,'BEDROOM 1');
+  lbl(ctx,x+w/3,y+h*0.38,w/3,h*0.62,'BEDROOM 2');
+  lbl(ctx,x+w*2/3,y+h*0.38,w/3,h*0.62,'BEDROOM 3');
+  if(full){ car(ctx,x+3,y+h*0.05,gar-6,h*0.28); bed(ctx,x+4,y+h*0.42,w/3-8,h*0.42); bed(ctx,x+w/3+4,y+h*0.42,w/3-8,h*0.42); bed(ctx,x+w*2/3+4,y+h*0.42,w/3-8,h*0.42); sofa(ctx,x+gar+4,y+4,w*0.28,h*0.22); }
+}
+
+function drawB6(ctx,x,y,w,h,full){ // 3BR + patio
+  const ph=h*0.2;
+  wall(ctx,x,y,w,h-ph);
+  iwall(ctx,x+w*0.3,y,x+w*0.3,y+(h-ph)*0.38);
+  iwall(ctx,x,y+(h-ph)*0.38,x+w,y+(h-ph)*0.38);
+  iwall(ctx,x+w/3,y+(h-ph)*0.38,x+w/3,y+h-ph);
+  iwall(ctx,x+w*2/3,y+(h-ph)*0.38,x+w*2/3,y+h-ph);
+  lbl(ctx,x,y,w*0.3,(h-ph)*0.38,'GARAGE');
+  lbl(ctx,x+w*0.3,y,w*0.7,(h-ph)*0.38,'LIVING / DINING / KITCHEN');
+  lbl(ctx,x,y+(h-ph)*0.38,w/3,(h-ph)*0.62,'BEDROOM 1');
+  lbl(ctx,x+w/3,y+(h-ph)*0.38,w/3,(h-ph)*0.62,'BEDROOM 2');
+  lbl(ctx,x+w*2/3,y+(h-ph)*0.38,w/3,(h-ph)*0.62,'BEDROOM 3');
+  patio(ctx,x,y+h-ph,w,ph);
+  if(full){ bed(ctx,x+4,y+(h-ph)*0.42,w/3-8,(h-ph)*0.4); bed(ctx,x+w/3+4,y+(h-ph)*0.42,w/3-8,(h-ph)*0.4); bed(ctx,x+w*2/3+4,y+(h-ph)*0.42,w/3-8,(h-ph)*0.4); }
+}
+
+function drawB7(ctx,x,y,w,h,full){ // 3BR open living large kitchen + patio + 1 car
+  const ph=h*0.18;
+  wall(ctx,x,y,w,h-ph);
+  iwall(ctx,x+w*0.28,y,x+w*0.28,y+(h-ph)*0.35);
+  iwall(ctx,x,y+(h-ph)*0.35,x+w,y+(h-ph)*0.35);
+  iwall(ctx,x+w*0.6,y,x+w*0.6,y+(h-ph)*0.35);
+  iwall(ctx,x+w/3,y+(h-ph)*0.35,x+w/3,y+h-ph);
+  iwall(ctx,x+w*2/3,y+(h-ph)*0.35,x+w*2/3,y+h-ph);
+  lbl(ctx,x,y,w*0.28,(h-ph)*0.35,'GARAGE');
+  lbl(ctx,x+w*0.28,y,w*0.32,(h-ph)*0.35,'OPEN LIVING');
+  lbl(ctx,x+w*0.6,y,w*0.4,(h-ph)*0.35,'LARGE KITCHEN','& DINING');
+  lbl(ctx,x,y+(h-ph)*0.35,w/3,(h-ph)*0.65,'BEDROOM 1');
+  lbl(ctx,x+w/3,y+(h-ph)*0.35,w/3,(h-ph)*0.65,'BEDROOM 2');
+  lbl(ctx,x+w*2/3,y+(h-ph)*0.35,w/3,(h-ph)*0.65,'BEDROOM 3');
+  patio(ctx,x,y+h-ph,w,ph);
+  if(full){ kitchen_counter(ctx,x+w*0.65,y+4,(h-ph)*0.28,8,'h'); sofa(ctx,x+w*0.3,y+4,w*0.22,(h-ph)*0.2); dining(ctx,x+w*0.8,y+(h-ph)*0.18,14,4); bed(ctx,x+4,y+(h-ph)*0.38,w/3-8,(h-ph)*0.38); }
+}
+
+function drawB8(ctx,x,y,w,h,full){ // 4BR grand, large kitchen, outdoor kitchen, patio, 2car
+  const ph=h*0.18;
+  wall(ctx,x,y,w,h-ph);
+  iwall(ctx,x+w*0.4,y,x+w*0.4,y+(h-ph)*0.32);
+  iwall(ctx,x,y+(h-ph)*0.32,x+w,y+(h-ph)*0.32);
+  iwall(ctx,x+w*0.7,y,x+w*0.7,y+(h-ph)*0.32);
+  iwall(ctx,x+w*0.25,y+(h-ph)*0.32,x+w*0.25,y+h-ph);
+  iwall(ctx,x+w*0.5,y+(h-ph)*0.32,x+w*0.5,y+h-ph);
+  iwall(ctx,x+w*0.75,y+(h-ph)*0.32,x+w*0.75,y+h-ph);
+  lbl(ctx,x,y,w*0.4,(h-ph)*0.32,'2-CAR GARAGE');
+  lbl(ctx,x+w*0.4,y,w*0.3,(h-ph)*0.32,'OPEN LIVING');
+  lbl(ctx,x+w*0.7,y,w*0.3,(h-ph)*0.32,'LARGE KITCHEN');
+  lbl(ctx,x,y+(h-ph)*0.32,w*0.25,(h-ph)*0.68,'BR 1');
+  lbl(ctx,x+w*0.25,y+(h-ph)*0.32,w*0.25,(h-ph)*0.68,'BR 2');
+  lbl(ctx,x+w*0.5,y+(h-ph)*0.32,w*0.25,(h-ph)*0.68,'BR 3');
+  lbl(ctx,x+w*0.75,y+(h-ph)*0.32,w*0.25,(h-ph)*0.68,'BR 4');
+  outKitchen(ctx,x,y+h-ph,w*0.45,ph);
+  patio(ctx,x+w*0.45,y+h-ph,w*0.55,ph);
+  if(full){ bed(ctx,x+4,y+(h-ph)*0.36,w*0.2,(h-ph)*0.38); bed(ctx,x+w*0.27,y+(h-ph)*0.36,w*0.2,(h-ph)*0.38); bed(ctx,x+w*0.52,y+(h-ph)*0.36,w*0.2,(h-ph)*0.38); bed(ctx,x+w*0.77,y+(h-ph)*0.36,w*0.2,(h-ph)*0.38); }
+}
+
+// ═══════════════════════════════════════════
+// SINGLE DETACHED TEMPLATES (2-storey, standalone)
+// ═══════════════════════════════════════════
+
+function drawSD1(ctx,x,y,w,h,full){ // 2BR
+  wall(ctx,x,y,w,h);
+  const gf=h*0.5;
+  floorDivider(ctx,x,y+gf,w);
+  // GF
+  iwall(ctx,x+w*0.5,y,x+w*0.5,y+gf);
+  lbl(ctx,x,y,w*0.5,gf*0.5,'LIVING');
+  lbl(ctx,x+w*0.5,y,w*0.5,gf*0.5,'KITCHEN');
+  iwall(ctx,x,y+gf*0.5,x+w,y+gf*0.5);
+  lbl(ctx,x,y+gf*0.5,w*0.6,gf*0.5,'DINING');
+  lbl(ctx,x+w*0.6,y+gf*0.5,w*0.4,gf*0.5,'BATH');
+  // UF
+  iwall(ctx,x+w*0.5,y+gf,x+w*0.5,y+h);
+  lbl(ctx,x,y+gf,w*0.5,h-gf,'MASTER BR');
+  lbl(ctx,x+w*0.5,y+gf,w*0.5,h-gf,'BEDROOM 2');
+  if(full){ floorLabel(ctx,x,y,'GF'); floorLabel(ctx,x,y+gf+2,'2F'); bed(ctx,x+4,y+gf+6,w*0.38,(h-gf)*0.65); bed(ctx,x+w*0.54,y+gf+6,w*0.38,(h-gf)*0.65); stairs(ctx,x+w*0.8,y+gf*0.55,w*0.16,gf*0.38,7); }
+}
+
+function drawSD2(ctx,x,y,w,h,full){ // 3BR + patio + 1car
+  const ph=h*0.15;
+  wall(ctx,x,y,w,h-ph);
+  const gf=(h-ph)*0.5;
+  floorDivider(ctx,x,y+gf,w);
+  // GF
+  iwall(ctx,x+w*0.3,y,x+w*0.3,y+gf*0.5);
+  iwall(ctx,x,y+gf*0.5,x+w,y+gf*0.5);
+  iwall(ctx,x+w*0.65,y,x+w*0.65,y+gf);
+  lbl(ctx,x,y,w*0.3,gf*0.5,'GARAGE');
+  lbl(ctx,x+w*0.3,y,w*0.35,gf*0.5,'LIVING');
+  lbl(ctx,x+w*0.65,y,w*0.35,gf*0.5,'KITCHEN');
+  lbl(ctx,x,y+gf*0.5,w*0.5,gf*0.5,'DINING');
+  lbl(ctx,x+w*0.5,y+gf*0.5,w*0.3,gf*0.5,'BR 1 (GF)');
+  lbl(ctx,x+w*0.8,y+gf*0.5,w*0.2,gf*0.5,'BATH');
+  // UF
+  iwall(ctx,x+w/3,y+gf,x+w/3,y+h-ph);
+  iwall(ctx,x+w*2/3,y+gf,x+w*2/3,y+h-ph);
+  lbl(ctx,x,y+gf,w/3,(h-ph)-gf,'MASTER BR');
+  lbl(ctx,x+w/3,y+gf,w/3,(h-ph)-gf,'BEDROOM 2');
+  lbl(ctx,x+w*2/3,y+gf,w/3,(h-ph)-gf,'BEDROOM 3');
+  patio(ctx,x,y+h-ph,w,ph);
+  if(full){ floorLabel(ctx,x,y,'GF'); floorLabel(ctx,x,y+gf+2,'2F'); car(ctx,x+3,y+gf*0.05,w*0.24,gf*0.38); stairs(ctx,x+w*0.82,y+gf*0.52,w*0.14,gf*0.42,7); bed(ctx,x+4,y+gf+4,w/3-8,(h-ph-gf)*0.65); bed(ctx,x+w/3+4,y+gf+4,w/3-8,(h-ph-gf)*0.65); bed(ctx,x+w*2/3+4,y+gf+4,w/3-8,(h-ph-gf)*0.65); }
+}
+
+function drawSD3(ctx,x,y,w,h,full){ // 3BR + study + large kitchen + patio + 1car
+  const ph=h*0.15;
+  wall(ctx,x,y,w,h-ph);
+  const gf=(h-ph)*0.48;
+  floorDivider(ctx,x,y+gf,w);
+  iwall(ctx,x+w*0.28,y,x+w*0.28,y+gf*0.45);
+  iwall(ctx,x,y+gf*0.45,x+w,y+gf*0.45);
+  iwall(ctx,x+w*0.62,y,x+w*0.62,y+gf);
+  lbl(ctx,x,y,w*0.28,gf*0.45,'GARAGE');
+  lbl(ctx,x+w*0.28,y,w*0.34,gf*0.45,'OPEN LIVING');
+  lbl(ctx,x+w*0.62,y,w*0.38,gf*0.45,'LARGE KITCHEN','& DINING');
+  iwall(ctx,x+w*0.45,y+gf*0.45,x+w*0.45,y+gf);
+  lbl(ctx,x,y+gf*0.45,w*0.45,gf*0.55,'BR 1 / GUEST');
+  lbl(ctx,x+w*0.45,y+gf*0.45,w*0.3,gf*0.55,'BATH');
+  lbl(ctx,x+w*0.75,y+gf*0.45,w*0.25,gf*0.55,'SERVICE');
+  // UF
+  iwall(ctx,x+w*0.35,y+gf,x+w*0.35,y+h-ph);
+  iwall(ctx,x+w*0.68,y+gf,x+w*0.68,y+h-ph);
+  lbl(ctx,x,y+gf,w*0.35,(h-ph)-gf,'MASTER BR');
+  lbl(ctx,x+w*0.35,y+gf,w*0.33,(h-ph)-gf,'BEDROOM 2');
+  lbl(ctx,x+w*0.68,y+gf,w*0.2,(h-ph)-gf,'STUDY');
+  lbl(ctx,x+w*0.88,y+gf,w*0.12,(h-ph)-gf,'BATH');
+  patio(ctx,x,y+h-ph,w,ph);
+  if(full){ floorLabel(ctx,x,y,'GF'); floorLabel(ctx,x,y+gf+2,'2F'); bed(ctx,x+4,y+gf+4,w*0.28,(h-ph-gf)*0.6); bed(ctx,x+w*0.37,y+gf+4,w*0.27,(h-ph-gf)*0.6); stairs(ctx,x+w*0.85,y+gf*0.05,w*0.12,gf*0.36,7); }
+}
+
+function drawSD4(ctx,x,y,w,h,full){ // 4BR + large kitchen + patio + 1car
+  const ph=h*0.14;
+  wall(ctx,x,y,w,h-ph);
+  const gf=(h-ph)*0.48;
+  floorDivider(ctx,x,y+gf,w);
+  iwall(ctx,x+w*0.3,y,x+w*0.3,y+gf*0.42);
+  iwall(ctx,x,y+gf*0.42,x+w,y+gf*0.42);
+  iwall(ctx,x+w*0.62,y,x+w*0.62,y+gf);
+  lbl(ctx,x,y,w*0.3,gf*0.42,'GARAGE');
+  lbl(ctx,x+w*0.3,y,w*0.32,gf*0.42,'OPEN LIVING');
+  lbl(ctx,x+w*0.62,y,w*0.38,gf*0.42,'LARGE KITCHEN');
+  iwall(ctx,x+w*0.5,y+gf*0.42,x+w*0.5,y+gf);
+  lbl(ctx,x,y+gf*0.42,w*0.5,gf*0.58,'DINING / FAMILY');
+  lbl(ctx,x+w*0.5,y+gf*0.42,w*0.3,gf*0.58,'BR 1 (GF)');
+  lbl(ctx,x+w*0.8,y+gf*0.42,w*0.2,gf*0.58,'BATH');
+  iwall(ctx,x+w*0.25,y+gf,x+w*0.25,y+h-ph);
+  iwall(ctx,x+w*0.5,y+gf,x+w*0.5,y+h-ph);
+  iwall(ctx,x+w*0.75,y+gf,x+w*0.75,y+h-ph);
+  lbl(ctx,x,y+gf,w*0.25,(h-ph)-gf,'MASTER');
+  lbl(ctx,x+w*0.25,y+gf,w*0.25,(h-ph)-gf,'BR 2');
+  lbl(ctx,x+w*0.5,y+gf,w*0.25,(h-ph)-gf,'BR 3');
+  lbl(ctx,x+w*0.75,y+gf,w*0.25,(h-ph)-gf,'BR 4');
+  patio(ctx,x,y+h-ph,w,ph);
+  if(full){ floorLabel(ctx,x,y,'GF'); floorLabel(ctx,x,y+gf+2,'2F'); stairs(ctx,x+w*0.84,y+4,w*0.13,gf*0.35,7); bed(ctx,x+4,y+gf+4,w*0.2,(h-ph-gf)*0.65); bed(ctx,x+w*0.27,y+gf+4,w*0.2,(h-ph-gf)*0.65); bed(ctx,x+w*0.52,y+gf+4,w*0.2,(h-ph-gf)*0.65); bed(ctx,x+w*0.77,y+gf+4,w*0.2,(h-ph-gf)*0.65); }
+}
+
+function drawSD5(ctx,x,y,w,h,full){ // 4BR + large kitchen + patio + 2car
+  const ph=h*0.14;
+  wall(ctx,x,y,w,h-ph);
+  const gf=(h-ph)*0.46;
+  floorDivider(ctx,x,y+gf,w);
+  iwall(ctx,x+w*0.42,y,x+w*0.42,y+gf*0.4);
+  iwall(ctx,x,y+gf*0.4,x+w,y+gf*0.4);
+  iwall(ctx,x+w*0.65,y,x+w*0.65,y+gf);
+  lbl(ctx,x,y,w*0.42,gf*0.4,'2-CAR GARAGE');
+  lbl(ctx,x+w*0.42,y,w*0.23,gf*0.4,'LIVING');
+  lbl(ctx,x+w*0.65,y,w*0.35,gf*0.4,'LARGE KITCHEN');
+  iwall(ctx,x+w*0.55,y+gf*0.4,x+w*0.55,y+gf);
+  lbl(ctx,x,y+gf*0.4,w*0.55,gf*0.6,'OPEN DINING / FAMILY');
+  lbl(ctx,x+w*0.55,y+gf*0.4,w*0.27,gf*0.6,'BR 1');
+  lbl(ctx,x+w*0.82,y+gf*0.4,w*0.18,gf*0.6,'BATH');
+  iwall(ctx,x+w*0.25,y+gf,x+w*0.25,y+h-ph);
+  iwall(ctx,x+w*0.5,y+gf,x+w*0.5,y+h-ph);
+  iwall(ctx,x+w*0.75,y+gf,x+w*0.75,y+h-ph);
+  lbl(ctx,x,y+gf,w*0.25,(h-ph)-gf,'MASTER');
+  lbl(ctx,x+w*0.25,y+gf,w*0.25,(h-ph)-gf,'BR 2');
+  lbl(ctx,x+w*0.5,y+gf,w*0.25,(h-ph)-gf,'BR 3');
+  lbl(ctx,x+w*0.75,y+gf,w*0.25,(h-ph)-gf,'BR 4');
+  patio(ctx,x,y+h-ph,w,ph);
+  if(full){ floorLabel(ctx,x,y,'GF'); floorLabel(ctx,x,y+gf+2,'2F'); car(ctx,x+3,y+gf*0.04,w*0.19,gf*0.3); car(ctx,x+w*0.22,y+gf*0.04,w*0.19,gf*0.3); stairs(ctx,x+w*0.85,y+gf*0.42,w*0.12,gf*0.52,7); bed(ctx,x+4,y+gf+4,w*0.2,(h-ph-gf)*0.65); bed(ctx,x+w*0.27,y+gf+4,w*0.2,(h-ph-gf)*0.65); bed(ctx,x+w*0.52,y+gf+4,w*0.2,(h-ph-gf)*0.65); bed(ctx,x+w*0.77,y+gf+4,w*0.2,(h-ph-gf)*0.65); }
+}
+
+function drawSD6(ctx,x,y,w,h,full){ // 5BR + outdoor + patio + 2car
+  const ph=h*0.13;
+  wall(ctx,x,y,w,h-ph);
+  const gf=(h-ph)*0.46;
+  floorDivider(ctx,x,y+gf,w);
+  iwall(ctx,x+w*0.4,y,x+w*0.4,y+gf*0.38);
+  iwall(ctx,x,y+gf*0.38,x+w,y+gf*0.38);
+  iwall(ctx,x+w*0.68,y,x+w*0.68,y+gf);
+  lbl(ctx,x,y,w*0.4,gf*0.38,'2-CAR GARAGE');
+  lbl(ctx,x+w*0.4,y,w*0.28,gf*0.38,'OPEN LIVING');
+  lbl(ctx,x+w*0.68,y,w*0.32,gf*0.38,'LARGE KITCHEN');
+  iwall(ctx,x+w*0.5,y+gf*0.38,x+w*0.5,y+gf);
+  lbl(ctx,x,y+gf*0.38,w*0.5,gf*0.62,'DINING / FAMILY ROOM');
+  lbl(ctx,x+w*0.5,y+gf*0.38,w*0.3,gf*0.62,'BR 1 / MAID');
+  lbl(ctx,x+w*0.8,y+gf*0.38,w*0.2,gf*0.62,'BATH');
+  const ufh=(h-ph)-gf;
+  iwall(ctx,x+w*0.2,y+gf,x+w*0.2,y+h-ph);
+  iwall(ctx,x+w*0.4,y+gf,x+w*0.4,y+h-ph);
+  iwall(ctx,x+w*0.6,y+gf,x+w*0.6,y+h-ph);
+  iwall(ctx,x+w*0.8,y+gf,x+w*0.8,y+h-ph);
+  lbl(ctx,x,y+gf,w*0.2,ufh,'MASTER');
+  lbl(ctx,x+w*0.2,y+gf,w*0.2,ufh,'BR 2');
+  lbl(ctx,x+w*0.4,y+gf,w*0.2,ufh,'BR 3');
+  lbl(ctx,x+w*0.6,y+gf,w*0.2,ufh,'BR 4');
+  lbl(ctx,x+w*0.8,y+gf,w*0.2,ufh,'BR 5');
+  outKitchen(ctx,x,y+h-ph,w*0.4,ph);
+  patio(ctx,x+w*0.4,y+h-ph,w*0.6,ph);
+  if(full){ floorLabel(ctx,x,y,'GF'); floorLabel(ctx,x,y+gf+2,'2F'); car(ctx,x+3,y+gf*0.04,w*0.18,gf*0.28); car(ctx,x+w*0.21,y+gf*0.04,w*0.18,gf*0.28); stairs(ctx,x+w*0.86,y+gf*0.4,w*0.11,gf*0.55,7); bed(ctx,x+4,y+gf+4,w*0.15,ufh*0.65); bed(ctx,x+w*0.22,y+gf+4,w*0.15,ufh*0.65); bed(ctx,x+w*0.42,y+gf+4,w*0.15,ufh*0.65); bed(ctx,x+w*0.62,y+gf+4,w*0.15,ufh*0.65); bed(ctx,x+w*0.82,y+gf+4,w*0.15,ufh*0.65); }
+}
+
+// ═══════════════════════════════════════════
+// SINGLE ATTACHED (shares one wall - left side)
+// ═══════════════════════════════════════════
+
+function drawSA1(ctx,x,y,w,h,full){ // 2BR attached
+  wall(ctx,x,y,w,h);
+  // Shared wall indicator
+  ctx.strokeStyle='rgba(255,80,80,0.5)'; ctx.lineWidth=3;
+  ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x,y+h); ctx.stroke();
+  ctx.strokeStyle=WALL; ctx.lineWidth=2.5;
+  const gf=h*0.5;
+  floorDivider(ctx,x,y+gf,w);
+  iwall(ctx,x+w*0.5,y,x+w*0.5,y+gf*0.5);
+  iwall(ctx,x,y+gf*0.5,x+w,y+gf*0.5);
+  lbl(ctx,x,y,w*0.5,gf*0.5,'LIVING');
+  lbl(ctx,x+w*0.5,y,w*0.5,gf*0.5,'KITCHEN');
+  lbl(ctx,x,y+gf*0.5,w*0.6,gf*0.5,'DINING');
+  lbl(ctx,x+w*0.6,y+gf*0.5,w*0.4,gf*0.5,'BATH');
+  iwall(ctx,x+w*0.5,y+gf,x+w*0.5,y+h);
+  lbl(ctx,x,y+gf,w*0.5,h-gf,'MASTER BR');
+  lbl(ctx,x+w*0.5,y+gf,w*0.5,h-gf,'BEDROOM 2');
+  // Shared wall label
+  if(full){ ctx.fillStyle='rgba(255,80,80,0.6)'; ctx.font='7px DM Sans,sans-serif'; ctx.textAlign='left'; ctx.fillText('SHARED WALL',x+2,y+12); floorLabel(ctx,x,y+2,'GF'); floorLabel(ctx,x,y+gf+2,'2F'); bed(ctx,x+4,y+gf+6,w*0.38,(h-gf)*0.65); bed(ctx,x+w*0.54,y+gf+6,w*0.38,(h-gf)*0.65); stairs(ctx,x+w*0.78,y+gf*0.53,w*0.18,gf*0.4,7); }
+}
+
+function drawSA2(ctx,x,y,w,h,full){ // 3BR attached + 1car
+  wall(ctx,x,y,w,h);
+  ctx.strokeStyle='rgba(255,80,80,0.5)'; ctx.lineWidth=3;
+  ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x,y+h); ctx.stroke();
+  ctx.strokeStyle=WALL; ctx.lineWidth=2.5;
+  const gf=h*0.5;
+  floorDivider(ctx,x,y+gf,w);
+  iwall(ctx,x+w*0.32,y,x+w*0.32,y+gf*0.42);
+  iwall(ctx,x,y+gf*0.42,x+w,y+gf*0.42);
+  iwall(ctx,x+w*0.65,y,x+w*0.65,y+gf);
+  lbl(ctx,x,y,w*0.32,gf*0.42,'GARAGE');
+  lbl(ctx,x+w*0.32,y,w*0.33,gf*0.42,'LIVING');
+  lbl(ctx,x+w*0.65,y,w*0.35,gf*0.42,'KITCHEN');
+  lbl(ctx,x,y+gf*0.42,w*0.55,gf*0.58,'DINING');
+  lbl(ctx,x+w*0.55,y+gf*0.42,w*0.25,gf*0.58,'BR 1');
+  lbl(ctx,x+w*0.8,y+gf*0.42,w*0.2,gf*0.58,'BATH');
+  iwall(ctx,x+w/3,y+gf,x+w/3,y+h);
+  iwall(ctx,x+w*2/3,y+gf,x+w*2/3,y+h);
+  lbl(ctx,x,y+gf,w/3,h-gf,'MASTER BR');
+  lbl(ctx,x+w/3,y+gf,w/3,h-gf,'BEDROOM 2');
+  lbl(ctx,x+w*2/3,y+gf,w/3,h-gf,'BEDROOM 3');
+  if(full){ ctx.fillStyle='rgba(255,80,80,0.6)'; ctx.font='7px DM Sans,sans-serif'; ctx.textAlign='left'; ctx.fillText('SHARED WALL',x+2,y+12); floorLabel(ctx,x,y+2,'GF'); floorLabel(ctx,x,y+gf+2,'2F'); car(ctx,x+3,y+gf*0.04,w*0.26,gf*0.32); bed(ctx,x+4,y+gf+4,w/3-8,(h-gf)*0.65); bed(ctx,x+w/3+4,y+gf+4,w/3-8,(h-gf)*0.65); bed(ctx,x+w*2/3+4,y+gf+4,w/3-8,(h-gf)*0.65); stairs(ctx,x+w*0.84,y+gf*0.44,w*0.13,gf*0.5,7); }
+}
+
+function drawSA3(ctx,x,y,w,h,full){ // 3BR attached + large + patio + 1car
+  const ph=h*0.16;
+  wall(ctx,x,y,w,h-ph);
+  ctx.strokeStyle='rgba(255,80,80,0.5)'; ctx.lineWidth=3;
+  ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x,y+h-ph); ctx.stroke();
+  ctx.strokeStyle=WALL; ctx.lineWidth=2.5;
+  const gf=(h-ph)*0.48;
+  floorDivider(ctx,x,y+gf,w);
+  iwall(ctx,x+w*0.3,y,x+w*0.3,y+gf*0.4);
+  iwall(ctx,x,y+gf*0.4,x+w,y+gf*0.4);
+  iwall(ctx,x+w*0.62,y,x+w*0.62,y+gf);
+  lbl(ctx,x,y,w*0.3,gf*0.4,'GARAGE');
+  lbl(ctx,x+w*0.3,y,w*0.32,gf*0.4,'OPEN LIVING');
+  lbl(ctx,x+w*0.62,y,w*0.38,gf*0.4,'LARGE KITCHEN','& DINING');
+  iwall(ctx,x+w*0.5,y+gf*0.4,x+w*0.5,y+gf);
+  lbl(ctx,x,y+gf*0.4,w*0.5,gf*0.6,'FAMILY ROOM');
+  lbl(ctx,x+w*0.5,y+gf*0.4,w*0.3,gf*0.6,'BR 1 (GF)');
+  lbl(ctx,x+w*0.8,y+gf*0.4,w*0.2,gf*0.6,'BATH');
+  iwall(ctx,x+w/3,y+gf,x+w/3,y+h-ph);
+  iwall(ctx,x+w*2/3,y+gf,x+w*2/3,y+h-ph);
+  lbl(ctx,x,y+gf,w/3,(h-ph)-gf,'MASTER BR');
+  lbl(ctx,x+w/3,y+gf,w/3,(h-ph)-gf,'BEDROOM 2');
+  lbl(ctx,x+w*2/3,y+gf,w/3,(h-ph)-gf,'BEDROOM 3');
+  patio(ctx,x,y+h-ph,w,ph);
+  if(full){ ctx.fillStyle='rgba(255,80,80,0.6)'; ctx.font='7px DM Sans,sans-serif'; ctx.textAlign='left'; ctx.fillText('SHARED WALL',x+2,y+12); floorLabel(ctx,x,y+2,'GF'); floorLabel(ctx,x,y+gf+2,'2F'); car(ctx,x+3,y+gf*0.04,w*0.24,gf*0.3); stairs(ctx,x+w*0.85,y+gf*0.42,w*0.12,gf*0.52,7); bed(ctx,x+4,y+gf+4,w/3-8,(h-ph-gf)*0.65); bed(ctx,x+w/3+4,y+gf+4,w/3-8,(h-ph-gf)*0.65); bed(ctx,x+w*2/3+4,y+gf+4,w/3-8,(h-ph-gf)*0.65); }
+}
+
+// ═══════════════════════════════════════════
+// DUPLEX TEMPLATES
+// ═══════════════════════════════════════════
+
+function drawDX1(ctx,x,y,w,h,full){ // 2BR each
+  wall(ctx,x,y,w,h);
+  // Center party wall
+  ctx.strokeStyle='rgba(255,200,0,0.6)'; ctx.lineWidth=3;
+  ctx.beginPath(); ctx.moveTo(x+w/2,y); ctx.lineTo(x+w/2,y+h); ctx.stroke();
+  ctx.strokeStyle=WALL; ctx.lineWidth=2.5;
+  // Unit A (left)
+  const ux=w/2, gf=h*0.5;
+  floorDivider(ctx,x,y+gf,ux);
+  iwall(ctx,x+ux*0.5,y,x+ux*0.5,y+gf*0.48);
+  iwall(ctx,x,y+gf*0.48,x+ux,y+gf*0.48);
+  lbl(ctx,x,y,ux*0.5,gf*0.48,'LIVING');
+  lbl(ctx,x+ux*0.5,y,ux*0.5,gf*0.48,'KITCHEN');
+  lbl(ctx,x,y+gf*0.48,ux*0.6,gf*0.52,'DINING');
+  lbl(ctx,x+ux*0.6,y+gf*0.48,ux*0.4,gf*0.52,'BATH');
+  iwall(ctx,x+ux*0.5,y+gf,x+ux*0.5,y+h);
+  lbl(ctx,x,y+gf,ux*0.5,h-gf,'MASTER BR');
+  lbl(ctx,x+ux*0.5,y+gf,ux*0.5,h-gf,'BR 2');
+  // Unit B (right)
+  floorDivider(ctx,x+ux,y+gf,ux);
+  iwall(ctx,x+ux+ux*0.5,y,x+ux+ux*0.5,y+gf*0.48);
+  iwall(ctx,x+ux,y+gf*0.48,x+w,y+gf*0.48);
+  lbl(ctx,x+ux,y,ux*0.5,gf*0.48,'LIVING');
+  lbl(ctx,x+ux+ux*0.5,y,ux*0.5,gf*0.48,'KITCHEN');
+  lbl(ctx,x+ux,y+gf*0.48,ux*0.6,gf*0.52,'DINING');
+  lbl(ctx,x+ux+ux*0.6,y+gf*0.48,ux*0.4,gf*0.52,'BATH');
+  iwall(ctx,x+ux+ux*0.5,y+gf,x+ux+ux*0.5,y+h);
+  lbl(ctx,x+ux,y+gf,ux*0.5,h-gf,'MASTER BR');
+  lbl(ctx,x+ux+ux*0.5,y+gf,ux*0.5,h-gf,'BR 2');
+  if(full){
+    ctx.fillStyle='rgba(255,200,0,0.7)'; ctx.font='7px DM Sans,sans-serif'; ctx.textAlign='center';
+    ctx.fillText('UNIT A',x+ux/2,y+10); ctx.fillText('UNIT B',x+ux+ux/2,y+10);
+    ctx.fillText('PARTY WALL',x+ux,y+h/2);
+    floorLabel(ctx,x,y+2,'GF'); floorLabel(ctx,x,y+gf+2,'2F');
+    floorLabel(ctx,x+ux+2,y+2,'GF'); floorLabel(ctx,x+ux+2,y+gf+2,'2F');
+    bed(ctx,x+4,y+gf+6,ux*0.38,(h-gf)*0.6); bed(ctx,x+ux*0.54,y+gf+6,ux*0.38,(h-gf)*0.6);
+    bed(ctx,x+ux+4,y+gf+6,ux*0.38,(h-gf)*0.6); bed(ctx,x+ux+ux*0.54,y+gf+6,ux*0.38,(h-gf)*0.6);
+    stairs(ctx,x+ux*0.82,y+gf*0.52,ux*0.15,gf*0.4,6);
+    stairs(ctx,x+ux+ux*0.82,y+gf*0.52,ux*0.15,gf*0.4,6);
+  }
+}
+
+function drawDX2(ctx,x,y,w,h,full){ // 3BR each + patio
+  const ph=h*0.14;
+  wall(ctx,x,y,w,h-ph);
+  ctx.strokeStyle='rgba(255,200,0,0.6)'; ctx.lineWidth=3;
+  ctx.beginPath(); ctx.moveTo(x+w/2,y); ctx.lineTo(x+w/2,y+h-ph); ctx.stroke();
+  ctx.strokeStyle=WALL; ctx.lineWidth=2.5;
+  const ux=w/2, gf=(h-ph)*0.48;
+  // Unit A
+  floorDivider(ctx,x,y+gf,ux);
+  iwall(ctx,x+ux*0.3,y,x+ux*0.3,y+gf*0.42);
+  iwall(ctx,x,y+gf*0.42,x+ux,y+gf*0.42);
+  iwall(ctx,x+ux*0.65,y,x+ux*0.65,y+gf);
+  lbl(ctx,x,y,ux*0.3,gf*0.42,'GAR');
+  lbl(ctx,x+ux*0.3,y,ux*0.35,gf*0.42,'LIVING');
+  lbl(ctx,x+ux*0.65,y,ux*0.35,gf*0.42,'KITCHEN');
+  lbl(ctx,x,y+gf*0.42,ux*0.55,gf*0.58,'DINING');
+  lbl(ctx,x+ux*0.55,y+gf*0.42,ux*0.25,gf*0.58,'BR1');
+  lbl(ctx,x+ux*0.8,y+gf*0.42,ux*0.2,gf*0.58,'BATH');
+  iwall(ctx,x+ux/3,y+gf,x+ux/3,y+h-ph);
+  iwall(ctx,x+ux*2/3,y+gf,x+ux*2/3,y+h-ph);
+  lbl(ctx,x,y+gf,ux/3,(h-ph)-gf,'MASTER');
+  lbl(ctx,x+ux/3,y+gf,ux/3,(h-ph)-gf,'BR 2');
+  lbl(ctx,x+ux*2/3,y+gf,ux/3,(h-ph)-gf,'BR 3');
+  // Unit B (mirror)
+  floorDivider(ctx,x+ux,y+gf,ux);
+  iwall(ctx,x+ux+ux*0.7,y,x+ux+ux*0.7,y+gf*0.42);
+  iwall(ctx,x+ux,y+gf*0.42,x+w,y+gf*0.42);
+  iwall(ctx,x+ux+ux*0.35,y,x+ux+ux*0.35,y+gf);
+  lbl(ctx,x+ux,y,ux*0.35,gf*0.42,'KITCHEN');
+  lbl(ctx,x+ux+ux*0.35,y,ux*0.35,gf*0.42,'LIVING');
+  lbl(ctx,x+ux+ux*0.7,y,ux*0.3,gf*0.42,'GAR');
+  lbl(ctx,x+ux,y+gf*0.42,ux*0.2,gf*0.58,'BATH');
+  lbl(ctx,x+ux+ux*0.2,y+gf*0.42,ux*0.25,gf*0.58,'BR1');
+  lbl(ctx,x+ux+ux*0.45,y+gf*0.42,ux*0.55,gf*0.58,'DINING');
+  iwall(ctx,x+ux+ux/3,y+gf,x+ux+ux/3,y+h-ph);
+  iwall(ctx,x+ux+ux*2/3,y+gf,x+ux+ux*2/3,y+h-ph);
+  lbl(ctx,x+ux,y+gf,ux/3,(h-ph)-gf,'MASTER');
+  lbl(ctx,x+ux+ux/3,y+gf,ux/3,(h-ph)-gf,'BR 2');
+  lbl(ctx,x+ux+ux*2/3,y+gf,ux/3,(h-ph)-gf,'BR 3');
+  patio(ctx,x,y+h-ph,w,ph,'PATIO A         PATIO B');
+  if(full){
+    ctx.fillStyle='rgba(255,200,0,0.7)'; ctx.font='7px DM Sans,sans-serif'; ctx.textAlign='center';
+    ctx.fillText('UNIT A',x+ux/2,y+10); ctx.fillText('UNIT B',x+ux+ux/2,y+10);
+    floorLabel(ctx,x,y+2,'GF'); floorLabel(ctx,x,y+gf+2,'2F');
+    floorLabel(ctx,x+ux+2,y+2,'GF'); floorLabel(ctx,x+ux+2,y+gf+2,'2F');
+    bed(ctx,x+4,y+gf+4,ux/3-8,(h-ph-gf)*0.65); bed(ctx,x+ux/3+4,y+gf+4,ux/3-8,(h-ph-gf)*0.65); bed(ctx,x+ux*2/3+4,y+gf+4,ux/3-8,(h-ph-gf)*0.65);
+    bed(ctx,x+ux+4,y+gf+4,ux/3-8,(h-ph-gf)*0.65); bed(ctx,x+ux+ux/3+4,y+gf+4,ux/3-8,(h-ph-gf)*0.65); bed(ctx,x+ux+ux*2/3+4,y+gf+4,ux/3-8,(h-ph-gf)*0.65);
+    stairs(ctx,x+ux*0.82,y+gf*0.44,ux*0.14,gf*0.5,6); stairs(ctx,x+ux+ux*0.04,y+gf*0.44,ux*0.14,gf*0.5,6);
+  }
+}
+
+function drawDX3(ctx,x,y,w,h,full){ // 3BR + outdoor + patio + 2car total
+  const ph=h*0.14;
+  wall(ctx,x,y,w,h-ph);
+  ctx.strokeStyle='rgba(255,200,0,0.6)'; ctx.lineWidth=3;
+  ctx.beginPath(); ctx.moveTo(x+w/2,y); ctx.lineTo(x+w/2,y+h-ph); ctx.stroke();
+  ctx.strokeStyle=WALL; ctx.lineWidth=2.5;
+  const ux=w/2, gf=(h-ph)*0.46;
+  // Unit A
+  floorDivider(ctx,x,y+gf,ux);
+  iwall(ctx,x+ux*0.38,y,x+ux*0.38,y+gf*0.38);
+  iwall(ctx,x,y+gf*0.38,x+ux,y+gf*0.38);
+  iwall(ctx,x+ux*0.65,y,x+ux*0.65,y+gf);
+  lbl(ctx,x,y,ux*0.38,gf*0.38,'2-CAR GAR');
+  lbl(ctx,x+ux*0.38,y,ux*0.27,gf*0.38,'LIVING');
+  lbl(ctx,x+ux*0.65,y,ux*0.35,gf*0.38,'LG KITCHEN');
+  iwall(ctx,x+ux*0.5,y+gf*0.38,x+ux*0.5,y+gf);
+  lbl(ctx,x,y+gf*0.38,ux*0.5,gf*0.62,'OPEN DINING');
+  lbl(ctx,x+ux*0.5,y+gf*0.38,ux*0.3,gf*0.62,'BR1');
+  lbl(ctx,x+ux*0.8,y+gf*0.38,ux*0.2,gf*0.62,'BATH');
+  iwall(ctx,x+ux/3,y+gf,x+ux/3,y+h-ph);
+  iwall(ctx,x+ux*2/3,y+gf,x+ux*2/3,y+h-ph);
+  lbl(ctx,x,y+gf,ux/3,(h-ph)-gf,'MASTER');
+  lbl(ctx,x+ux/3,y+gf,ux/3,(h-ph)-gf,'BR 2');
+  lbl(ctx,x+ux*2/3,y+gf,ux/3,(h-ph)-gf,'BR 3');
+  // Unit B (mirror)
+  floorDivider(ctx,x+ux,y+gf,ux);
+  iwall(ctx,x+ux+ux*0.62,y,x+ux+ux*0.62,y+gf*0.38);
+  iwall(ctx,x+ux,y+gf*0.38,x+w,y+gf*0.38);
+  iwall(ctx,x+ux+ux*0.35,y,x+ux+ux*0.35,y+gf);
+  lbl(ctx,x+ux,y,ux*0.35,gf*0.38,'LG KITCHEN');
+  lbl(ctx,x+ux+ux*0.35,y,ux*0.27,gf*0.38,'LIVING');
+  lbl(ctx,x+ux+ux*0.62,y,ux*0.38,gf*0.38,'2-CAR GAR');
+  iwall(ctx,x+ux+ux*0.5,y+gf*0.38,x+ux+ux*0.5,y+gf);
+  lbl(ctx,x+ux,y+gf*0.38,ux*0.2,gf*0.62,'BATH');
+  lbl(ctx,x+ux+ux*0.2,y+gf*0.38,ux*0.3,gf*0.62,'BR1');
+  lbl(ctx,x+ux+ux*0.5,y+gf*0.38,ux*0.5,gf*0.62,'OPEN DINING');
+  iwall(ctx,x+ux+ux/3,y+gf,x+ux+ux/3,y+h-ph);
+  iwall(ctx,x+ux+ux*2/3,y+gf,x+ux+ux*2/3,y+h-ph);
+  lbl(ctx,x+ux,y+gf,ux/3,(h-ph)-gf,'MASTER');
+  lbl(ctx,x+ux+ux/3,y+gf,ux/3,(h-ph)-gf,'BR 2');
+  lbl(ctx,x+ux+ux*2/3,y+gf,ux/3,(h-ph)-gf,'BR 3');
+  outKitchen(ctx,x,y+h-ph,ux*0.5,ph);
+  patio(ctx,x+ux*0.5,y+h-ph,ux*0.5,ph,'PATIO A');
+  patio(ctx,x+ux,y+h-ph,ux*0.5,ph,'PATIO B');
+  outKitchen(ctx,x+ux+ux*0.5,y+h-ph,ux*0.5,ph);
+  if(full){
+    ctx.fillStyle='rgba(255,200,0,0.7)'; ctx.font='7px DM Sans,sans-serif'; ctx.textAlign='center';
+    ctx.fillText('UNIT A',x+ux/2,y+10); ctx.fillText('UNIT B',x+ux+ux/2,y+10);
+    floorLabel(ctx,x,y+2,'GF'); floorLabel(ctx,x,y+gf+2,'2F');
+    floorLabel(ctx,x+ux+2,y+2,'GF'); floorLabel(ctx,x+ux+2,y+gf+2,'2F');
+    bed(ctx,x+4,y+gf+4,ux/3-8,(h-ph-gf)*0.65); bed(ctx,x+ux/3+4,y+gf+4,ux/3-8,(h-ph-gf)*0.65); bed(ctx,x+ux*2/3+4,y+gf+4,ux/3-8,(h-ph-gf)*0.65);
+    bed(ctx,x+ux+4,y+gf+4,ux/3-8,(h-ph-gf)*0.65); bed(ctx,x+ux+ux/3+4,y+gf+4,ux/3-8,(h-ph-gf)*0.65); bed(ctx,x+ux+ux*2/3+4,y+gf+4,ux/3-8,(h-ph-gf)*0.65);
+    stairs(ctx,x+ux*0.83,y+gf*0.4,ux*0.13,gf*0.54,6); stairs(ctx,x+ux+ux*0.04,y+gf*0.4,ux*0.13,gf*0.54,6);
+  }
+}
+
+// ═══════════════════════════════════════════
+// TEMPLATE REGISTRY
+// ═══════════════════════════════════════════
+const TEMPLATES = [
+  { id:'B1', htype:'bungalow', name:'Bungalow Studio', beds:1, baths:1, kitchen:'simple', okitchen:'no', patio:'no', parking:'0', gfa:35, fp:0.50, rooms:['Studio / Bedroom','Bathroom','Living / Dining','Simple Kitchen','Service Area'], fn:drawB1 },
+  { id:'B2', htype:'bungalow', name:'Bungalow 2-Bedroom', beds:2, baths:1, kitchen:'simple', okitchen:'no', patio:'no', parking:'0', gfa:55, fp:0.52, rooms:['2 Bedrooms','1 Bathroom','Living Room','Kitchen / Dining'], fn:drawB2 },
+  { id:'B3', htype:'bungalow', name:'Bungalow 2BR + Garage', beds:2, baths:1, kitchen:'simple', okitchen:'no', patio:'no', parking:'1', gfa:65, fp:0.54, rooms:['2 Bedrooms','1 Bathroom','Living Room','Kitchen / Dining','1-Car Garage'], fn:drawB3 },
+  { id:'B4', htype:'bungalow', name:'Bungalow 2BR + Patio', beds:2, baths:1, kitchen:'simple', okitchen:'no', patio:'yes', parking:'0', gfa:60, fp:0.52, rooms:['2 Bedrooms','1 Bathroom','Living Room','Kitchen / Dining','Patio'], fn:drawB4 },
+  { id:'B5', htype:'bungalow', name:'Bungalow 3-Bedroom', beds:3, baths:2, kitchen:'simple', okitchen:'no', patio:'no', parking:'1', gfa:90, fp:0.55, rooms:['3 Bedrooms','2 Bathrooms','Living Room','Kitchen','Dining','1-Car Garage'], fn:drawB5 },
+  { id:'B6', htype:'bungalow', name:'Bungalow 3BR + Patio', beds:3, baths:2, kitchen:'simple', okitchen:'no', patio:'yes', parking:'1', gfa:95, fp:0.56, rooms:['3 Bedrooms','2 Bathrooms','Living / Dining / Kitchen','Patio','1-Car Garage'], fn:drawB6 },
+  { id:'B7', htype:'bungalow', name:'Bungalow 3BR Open Living', beds:3, baths:2, kitchen:'large', okitchen:'no', patio:'yes', parking:'1', gfa:105, fp:0.58, rooms:['3 Bedrooms','2 Bathrooms','Open Living Room','Large Kitchen & Dining','Patio','1-Car Garage'], fn:drawB7 },
+  { id:'B8', htype:'bungalow', name:'Bungalow 4BR Grand', beds:4, baths:3, kitchen:'large', okitchen:'yes', patio:'yes', parking:'2', gfa:150, fp:0.60, rooms:['4 Bedrooms','3 Bathrooms','Open Living Room','Large Kitchen','Outdoor Kitchen','Patio','2-Car Garage'], fn:drawB8 },
+  { id:'SD1', htype:'detached', name:'Single Detached 2BR', beds:2, baths:2, kitchen:'simple', okitchen:'no', patio:'no', parking:'0', gfa:80, fp:0.42, rooms:['2 Bedrooms','2 Bathrooms','Living Room','Kitchen','Dining Room','Ground + 2nd Floor'], fn:drawSD1 },
+  { id:'SD2', htype:'detached', name:'Single Detached 3BR', beds:3, baths:2, kitchen:'simple', okitchen:'no', patio:'yes', parking:'1', gfa:130, fp:0.44, rooms:['3 Bedrooms','2 Bathrooms','Living Room','Kitchen','Dining','Patio','1-Car Garage'], fn:drawSD2 },
+  { id:'SD3', htype:'detached', name:'Single Detached 3BR + Study', beds:3, baths:3, kitchen:'large', okitchen:'no', patio:'yes', parking:'1', gfa:145, fp:0.46, rooms:['3 Bedrooms','3 Bathrooms','Open Living Room','Large Kitchen & Dining','Study / Office','Patio','1-Car Garage'], fn:drawSD3 },
+  { id:'SD4', htype:'detached', name:'Single Detached 4-Bedroom', beds:4, baths:3, kitchen:'large', okitchen:'no', patio:'yes', parking:'1', gfa:160, fp:0.47, rooms:['4 Bedrooms','3 Bathrooms','Open Living Room','Large Kitchen','Dining / Family Room','Patio','1-Car Garage'], fn:drawSD4 },
+  { id:'SD5', htype:'detached', name:'Single Detached 4BR Grand', beds:4, baths:3, kitchen:'large', okitchen:'no', patio:'yes', parking:'2', gfa:175, fp:0.48, rooms:['4 Bedrooms','3 Bathrooms','Open Living Room','Large Kitchen','Open Dining / Family Room','Patio','2-Car Garage'], fn:drawSD5 },
+  { id:'SD6', htype:'detached', name:'Single Detached 5BR Estate', beds:5, baths:4, kitchen:'large', okitchen:'yes', patio:'yes', parking:'2', gfa:240, fp:0.50, rooms:['5 Bedrooms','4 Bathrooms','Open Living Room','Large Kitchen','Dining / Family Room','Outdoor Kitchen','Patio','2-Car Garage','Maid\'s Room'], fn:drawSD6 },
+  { id:'SA1', htype:'attached', name:'Single Attached 2-Bedroom', beds:2, baths:2, kitchen:'simple', okitchen:'no', patio:'no', parking:'0', gfa:80, fp:0.55, rooms:['2 Bedrooms','2 Bathrooms','Living Room','Kitchen','Dining Room','Shared Party Wall','Ground + 2nd Floor'], fn:drawSA1 },
+  { id:'SA2', htype:'attached', name:'Single Attached 3-Bedroom', beds:3, baths:2, kitchen:'simple', okitchen:'no', patio:'no', parking:'1', gfa:110, fp:0.58, rooms:['3 Bedrooms','2 Bathrooms','Living Room','Kitchen','Dining','Shared Party Wall','1-Car Garage'], fn:drawSA2 },
+  { id:'SA3', htype:'attached', name:'Single Attached 3BR + Patio', beds:3, baths:2, kitchen:'large', okitchen:'no', patio:'yes', parking:'1', gfa:130, fp:0.58, rooms:['3 Bedrooms','2 Bathrooms','Open Living Room','Large Kitchen & Dining','Patio','Shared Party Wall','1-Car Garage'], fn:drawSA3 },
+  { id:'DX1', htype:'duplex', name:'Duplex 2BR Each', beds:4, baths:4, kitchen:'simple', okitchen:'no', patio:'no', parking:'0', gfa:140, fp:0.60, rooms:['Unit A: 2BR, 1 Bath, Living, Kitchen, Dining','Unit B: 2BR, 1 Bath, Living, Kitchen, Dining','Party Wall (shared)','Ground + 2nd Floor per unit'], fn:drawDX1 },
+  { id:'DX2', htype:'duplex', name:'Duplex 3BR Each + Patio', beds:6, baths:4, kitchen:'simple', okitchen:'no', patio:'yes', parking:'1', gfa:200, fp:0.60, rooms:['Unit A: 3BR, 2 Bath, Living, Kitchen, Dining, Patio','Unit B: 3BR, 2 Bath, Living, Kitchen, Dining, Patio','1-Car Garage per unit','Party Wall (shared)'], fn:drawDX2 },
+  { id:'DX3', htype:'duplex', name:'Duplex 3BR + Outdoor Living', beds:6, baths:6, kitchen:'large', okitchen:'yes', patio:'yes', parking:'2', gfa:220, fp:0.60, rooms:['Unit A: 3BR, 3 Bath, Large Kitchen, Outdoor Kitchen, Patio, 2-Car Garage','Unit B: 3BR, 3 Bath, Large Kitchen, Outdoor Kitchen, Patio, 2-Car Garage','Party Wall (shared)'], fn:drawDX3 },
+];
+
+// ── MATCH SCORE ──
+function matchScore(t){
+  let s=0;
+  if(t.kitchen===S.kitchen) s++;
+  if(t.okitchen===S.okitchen) s++;
+  if(t.patio===S.patio) s++;
+  if(t.parking===S.parking) s++;
+  return s;
+}
+
+// ── GATE SUBMIT ──
+document.getElementById('gate-form').addEventListener('submit',function(e){
+  e.preventDefault();
+  const fn=document.getElementById('g-fn').value.trim();
+  const em=document.getElementById('g-em').value.trim();
+  const ph=document.getElementById('g-ph').value.trim();
+  if(!fn||!em||!ph) return;
+  S.name=fn; S.email=em;
+  const d=new FormData(this);
+  fetch('/',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams(d).toString()}).catch(()=>{});
+  document.getElementById('gate-page').style.display='none';
+  document.getElementById('tool-page').classList.add('visible');
+  window.scrollTo(0,0);
+});
+
+// ── OPT SELECT ──
+function selOpt(el){
+  const key=el.dataset.key, val=el.dataset.val;
+  el.closest('.og').querySelectorAll('.oc').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+  S[key]=val;
+  if(key==='htype') document.getElementById('next-1').disabled=false;
+  if(PREF_KEYS.includes(key)){
+    const done=PREF_KEYS.every(k=>S[k]!==null);
+    document.getElementById('next-3').disabled=!done;
+  }
+}
+
+// ── LOT PREVIEW ──
+function sqmCalc(){
+  const sqm=parseFloat(document.getElementById('lot-sqm').value);
+  if(!sqm||sqm<60) return;
+  const w=Math.round(Math.sqrt(sqm*0.5)*10)/10;
+  const d=Math.round((sqm/w)*10)/10;
+  document.getElementById('lot-w').value=w;
+  document.getElementById('lot-d').value=d;
+  updatePrev();
+}
+
+function updatePrev(){
+  const w=parseFloat(document.getElementById('lot-w').value)||0;
+  const d=parseFloat(document.getElementById('lot-d').value)||0;
+  const err=document.getElementById('lot-err');
+  const btn=document.getElementById('next-2');
+  if(w>0&&d>0){
+    document.getElementById('lot-sqm').value=Math.round(w*d);
+    if(w*d<60||w<6){ err.style.display='block'; btn.disabled=true; }
+    else { err.style.display='none'; btn.disabled=false; S.lotW=w; S.lotD=d; drawLotPrev(w,d); }
+  }
+}
+
+function drawLotPrev(W,D){
+  const cvs=document.getElementById('prev-cvs');
+  const ctx=cvs.getContext('2d');
+  const CW=cvs.width, CH=cvs.height;
+  ctx.clearRect(0,0,CW,CH);
+  ctx.fillStyle=BG; ctx.fillRect(0,0,CW,CH);
+  // grid dots
+  ctx.fillStyle='rgba(168,202,234,0.1)';
+  for(let x=8;x<CW;x+=14) for(let y=8;y<CH;y+=14){ ctx.beginPath(); ctx.arc(x,y,1,0,Math.PI*2); ctx.fill(); }
+  const pad=28;
+  const sc=Math.min((CW-pad*2)/W,(CH-pad*2)/D);
+  const lw=W*sc, lh=D*sc;
+  const ox=(CW-lw)/2, oy=(CH-lh)/2;
+  const fs=4.5*sc, ss=2*sc, rs=2*sc;
+  // lot
+  ctx.fillStyle='rgba(255,255,255,0.04)';
+  ctx.strokeStyle=DIM; ctx.lineWidth=1.5; ctx.setLineDash([3,3]);
+  ctx.strokeRect(ox,oy,lw,lh); ctx.setLineDash([]); ctx.fillRect(ox,oy,lw,lh);
+  // setbacks
+  ctx.strokeStyle='rgba(168,202,234,0.4)'; ctx.lineWidth=1; ctx.setLineDash([4,3]);
+  ctx.strokeRect(ox+ss,oy+fs,lw-ss*2,lh-fs-rs); ctx.setLineDash([]);
+  // buildable
+  ctx.fillStyle='rgba(32,118,194,0.15)'; ctx.fillRect(ox+ss,oy+fs,lw-ss*2,lh-fs-rs);
+  // labels
+  ctx.fillStyle=DIM; ctx.font='9px DM Sans,sans-serif'; ctx.textAlign='center';
+  ctx.fillText(W+'m',CW/2,oy-8);
+  ctx.save(); ctx.translate(ox-10,CH/2); ctx.rotate(-Math.PI/2); ctx.fillText(D+'m',0,0); ctx.restore();
+  ctx.fillText('BUILDABLE',CW/2,oy+fs+(lh-fs-rs)/2-4);
+  const ba=Math.round((W-ss*2/sc)*(D-(fs+rs)/sc));
+  ctx.fillText('~'+ba+' sqm',CW/2,oy+fs+(lh-fs-rs)/2+8);
+  document.getElementById('prev-lbl').textContent=W+'m × '+D+'m = '+Math.round(W*D)+' sqm · Buildable: ~'+ba+' sqm';
+}
+
+// ── STEP NAV ──
+function goStep(n){
+  document.getElementById('step-'+S.step).classList.remove('active');
+  document.getElementById('prog-'+S.step).classList.remove('active');
+  document.getElementById('prog-'+S.step).classList.add('done');
+  S.step=n;
+  document.getElementById('step-'+n).classList.add('active');
+  document.getElementById('prog-'+n).classList.remove('done');
+  document.getElementById('prog-'+n).classList.add('active');
+  window.scrollTo(0,0);
+  if(n===4) renderTemplates();
+  if(n===5) renderResult();
+}
+
+// ── RENDER TEMPLATES ──
+function renderTemplates(){
+  const grid=document.getElementById('tgrid');
+  grid.innerHTML='';
+  const lotArea=S.lotW*S.lotD;
+  const filtered=TEMPLATES.filter(t=>t.htype===S.htype).sort((a,b)=>matchScore(b)-matchScore(a));
+  if(!filtered.length){ grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:48px;color:var(--g400)">No templates found. Please go back and adjust your preferences.</div>'; return; }
+  const htLabels={bungalow:'Bungalow',detached:'Single Detached',attached:'Single Attached',duplex:'Duplex'};
+  document.getElementById('step4-sub').textContent='Showing '+filtered.length+' '+htLabels[S.htype]+' blueprints, sorted by best match to your preferences.';
+  filtered.forEach(t=>{
+    const footprint=Math.round(lotArea*t.fp);
+    const gfa=footprint*(t.htype==='bungalow'?1:2);
+    const score=matchScore(t);
+    const tags=[];
+    if(t.kitchen==='large') tags.push('Large Kitchen');
+    if(t.okitchen==='yes') tags.push('Outdoor Kitchen');
+    if(t.patio==='yes') tags.push('Patio');
+    if(t.parking!=='0') tags.push(t.parking+'-Car Garage');
+    const card=document.createElement('div');
+    card.className='tcard';
+    card.innerHTML=`
+      <div class="tcard-canvas"><canvas id="tc-${t.id}" width="180" height="130"></canvas></div>
+      <div class="tcard-info">
+        <div class="tcard-type">${htLabels[t.htype]}</div>
+        <div class="tcard-name">${t.name}</div>
+        <div class="tcard-tags">${tags.map(tg=>`<span class="tcard-tag">${tg}</span>`).join('')}</div>
+        <div class="tcard-area">${t.beds} beds · ${t.baths} baths · ~${gfa} sqm GFA</div>
+        ${score>=3?'<div class="match-badge">✓ Best match</div>':score>=2?'<div class="match-badge">✓ Good match</div>':''}
+      </div>`;
+    card.onclick=function(){
+      document.querySelectorAll('.tcard').forEach(c=>c.classList.remove('selected'));
+      this.classList.add('selected');
+      S.tpl=t;
+      document.getElementById('next-4').disabled=false;
+    };
+    grid.appendChild(card);
+    setTimeout(()=>{ const c=document.getElementById('tc-'+t.id); if(c) bp(c,t.fn,false); },50);
+  });
+}
+
+// ── RENDER RESULT ──
+function renderResult(){
+  const t=S.tpl; if(!t) return;
+  const W=S.lotW, D=S.lotD;
+  const lotArea=Math.round(W*D);
+  const fs=4.5,ss=2,rs=2;
+  const buildW=W-ss*2, buildD=D-fs-rs;
+  const buildArea=Math.round(buildW*buildD);
+  const footprint=Math.round(lotArea*t.fp);
+  const gfa=footprint*(t.htype==='bungalow'?1:2);
+  const cov=Math.round((footprint/lotArea)*100);
+  const htLabels={bungalow:'Bungalow',detached:'Single Detached',attached:'Single Attached',duplex:'Duplex'};
+  document.getElementById('sum-area').textContent=lotArea+' sqm';
+  document.getElementById('sum-dims').textContent=W+'m × '+D+'m';
+  document.getElementById('sum-build').textContent=buildArea+' sqm';
+  document.getElementById('sum-fp').textContent=footprint+' sqm';
+  document.getElementById('sum-gfa').textContent=gfa+' sqm';
+  document.getElementById('sum-cov').textContent=cov+'%';
+  document.getElementById('sum-type').textContent=htLabels[t.htype];
+  document.getElementById('res-title').textContent=t.name+' on '+lotArea+' sqm';
+  document.getElementById('rc-title').textContent=W+'m × '+D+'m · '+t.name;
+  document.getElementById('rc-sub').textContent=lotArea+' sqm · '+gfa+' sqm GFA · '+cov+'% lot coverage · NBCP setbacks';
+  const covOk=cov<=60;
+  document.getElementById('c-front').textContent='✓ 4.5m';
+  document.getElementById('c-side').textContent='✓ 2.0m';
+  document.getElementById('c-rear').textContent='✓ 2.0m';
+  document.getElementById('c-cov').textContent=(covOk?'✓ ':'⚠ ')+cov+'%';
+  document.getElementById('c-cov').className='comp-b '+(covOk?'ok':'warn');
+  document.getElementById('rooms-list').innerHTML=t.rooms.map(r=>`<div class="rl-item">${r}</div>`).join('');
+  const cvs=document.getElementById('res-cvs');
+  bp(cvs,t.fn,true,W,D);
+}
+
+// modal close
+document.getElementById('res-modal').addEventListener('click',function(e){ if(e.target===this) this.classList.remove('open'); });
+</script>
+</body>
+</html>
