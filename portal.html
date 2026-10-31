@@ -49,9 +49,16 @@ input:focus,select:focus,textarea:focus{border-color:var(--b)}
 </div><p class="err" id="req-err"></p><button class="btn" style="width:100%;margin-top:16px">Submit project</button></form>
 <div id="req-done" class="card" hidden style="text-align:center"><h1>Thank you for your request</h1><p class="sub" style="margin:0 auto 10px;max-width:520px">To monitor your project, you will need to complete your registration. We have sent the registration link to <b id="done-email"></b>.</p><p class="sub" style="margin:0;font-size:13px">Can't find it? Check your spam folder, or message us on WhatsApp at +63 992 812 2086.</p></div></section>
 
-<section id="v-login" hidden><h1>Log in</h1><p class="sub">Enter your email and we'll send you a login link.</p>
-<form id="lg" class="card"><label>Email</label><input type="email" id="lg-email" required><button class="btn" style="width:100%;margin-top:16px">Send login link</button><p class="sub" id="lg-msg" style="margin:12px 0 0"></p></form>
+<section id="v-login" hidden><h1>Log in</h1><p class="sub">Welcome back. Log in to see your projects.</p>
+<form id="lg" class="card"><div class="grid"><div class="full"><label>Email</label><input type="email" id="lg-email" autocomplete="email" required></div>
+<div class="full"><label>Password</label><input type="password" id="lg-pw" autocomplete="current-password" required></div></div>
+<p class="err" id="lg-err"></p><button class="btn" style="width:100%;margin-top:16px">Log in</button>
+<p style="text-align:center;margin-top:14px"><button type="button" class="lnk" id="forgot" style="margin:0;font-size:14px">Forgot password?</button></p><p class="sub" id="lg-msg" style="margin:8px 0 0;text-align:center;font-size:14px"></p></form>
 <p class="sub" style="margin-top:16px">No account yet? <a href="#">Post a project</a> to get started.</p></section>
+<section id="v-pw" hidden><h1 id="pw-h">Create your password</h1><p class="sub" id="pw-s"></p>
+<form id="pwf" class="card"><div class="grid"><div class="full"><label>New password</label><input type="password" id="pw1" autocomplete="new-password" minlength="8" required></div>
+<div class="full"><label>Confirm password</label><input type="password" id="pw2" autocomplete="new-password" minlength="8" required></div></div>
+<p class="sub" style="margin:10px 0 0;font-size:13px">At least 8 characters.</p><p class="err" id="pw-err"></p><button class="btn" style="width:100%;margin-top:16px">Save password</button></form></section>
 
 <section id="v-dash" hidden><div class="row"><h1>My projects</h1><button class="btn s" id="new">New project</button></div><p class="sub">Status of everything you've posted.</p><div id="plist"></div></section>
 <section id="v-proj" hidden><a class="lnk" href="#" style="margin:0">&larr; All projects</a><div id="pdetail"></div></section>
@@ -62,10 +69,11 @@ const sb=supabase.createClient(CFG.url,CFG.key),$=id=>document.getElementById(id
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const php=n=>'₱'+Number(n||0).toLocaleString('en-PH');
 const chip=s=>`<span class="chip ${['Offer Accepted','In Progress','Completed','Done','Accepted'].includes(s)?'g':['Cancelled','Declined','Withdrawn','Expired','Not started'].includes(s)?'x':''}">${esc(s)}</span>`;
-const show=v=>['request','login','dash','proj'].forEach(x=>$('v-'+x).hidden=x!==v);
-let user=null;
-sb.auth.onAuthStateChange((_e,s)=>{user=s?.user||null;$('who').hidden=!user;$('login-link').hidden=!!user;$('who-email').textContent=user?.email||'';route()});
-function route(){const h=location.hash;if(!user)return show(h==='#login'?'login':'request');if(h.startsWith('#project/'))return openProject(h.slice(9));loadDash()}
+const show=v=>['request','login','dash','proj','pw'].forEach(x=>$('v-'+x).hidden=x!==v);
+let user=null,recovering=false;
+sb.auth.onAuthStateChange((e,s)=>{if(e==='PASSWORD_RECOVERY')recovering=true;user=s?.user||null;$('who').hidden=!user;$('login-link').hidden=!!user;$('who-email').textContent=user?.email||'';route()});
+function showPw(){show('pw');$('pw-h').textContent=recovering?'Reset your password':'Create your password';$('pw-s').textContent=recovering?'Enter a new password for your account.':"Choose a password to finish your registration. You'll use it with your email to log in next time."}
+function route(){const h=location.hash;if(!user)return show(h==='#login'?'login':'request');if(recovering||!user.user_metadata?.pw_set)return showPw();if(h.startsWith('#project/'))return openProject(h.slice(9));loadDash()}
 addEventListener('hashchange',route);
 $('out').onclick=()=>sb.auth.signOut();$('new').onclick=()=>show('request');
 
@@ -76,8 +84,20 @@ $('req').onsubmit=async e=>{e.preventDefault();const f=e.target,btn=f.querySelec
  catch(x){$('req-err').textContent=x instanceof TypeError||!x.message?"We couldn't send your request. Please try again, or message us on WhatsApp at +63 992 812 2086.":x.message}
  btn.disabled=false};
 
-$('lg').onsubmit=async e=>{e.preventDefault();await sb.auth.signInWithOtp({email:$('lg-email').value.trim(),options:{shouldCreateUser:false,emailRedirectTo:location.origin+'/portal.html'}});
- $('lg-msg').textContent='If an account exists for this email, a login link is on its way.'};
+$('lg').onsubmit=async e=>{e.preventDefault();$('lg-err').textContent='';$('lg-msg').textContent='';
+ const {error}=await sb.auth.signInWithPassword({email:$('lg-email').value.trim(),password:$('lg-pw').value});
+ if(error)$('lg-err').textContent='Incorrect email or password.'};
+$('forgot').onclick=async()=>{const em=$('lg-email').value.trim();$('lg-msg').textContent='';
+ if(!em){$('lg-err').textContent='Enter your email above first.';return}
+ $('lg-err').textContent='';await sb.auth.resetPasswordForEmail(em,{redirectTo:location.origin+'/portal.html'});
+ $('lg-msg').textContent='If an account exists for this email, a password reset link is on its way.'};
+$('pwf').onsubmit=async e=>{e.preventDefault();const a=$('pw1').value;$('pw-err').textContent='';
+ if(a.length<8){$('pw-err').textContent='Use at least 8 characters.';return}
+ if(a!==$('pw2').value){$('pw-err').textContent='Passwords do not match.';return}
+ const was=recovering;recovering=false;
+ const {error}=await sb.auth.updateUser({password:a,data:{pw_set:true}});
+ if(error){recovering=was;$('pw-err').textContent=error.message;return}
+ e.target.reset();route()};
 
 async function loadDash(){show('dash');
  const {data,error}=await sb.from('projects').select('id,title,location,status,offers(id)').order('created_at',{ascending:false});
