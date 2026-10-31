@@ -1,0 +1,90 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>FIX Client Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<style>
+:root{--b:#2076C2;--bd:#1A5FA0;--n:#0D3C6B;--s:#A8CAEA;--p:#E6F1FB;--o:#F7F9FC;--l:#D9E3EC;--m:#8A9BB0;--t:#111827}
+*{box-sizing:border-box;margin:0;padding:0}[hidden]{display:none!important}
+body{font-family:'DM Sans',sans-serif;background:var(--o);color:var(--t)}
+nav{background:#fff;border-bottom:1px solid var(--l);height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 32px;position:sticky;top:0;z-index:5}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--t);font-size:13px;font-weight:700}.logo small{display:block;font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(--m);font-weight:600}
+.lnk{background:none;border:0;font:500 14px 'DM Sans';color:var(--m);cursor:pointer;text-decoration:none;margin-left:14px}.lnk:hover{color:var(--b)}
+main{max-width:900px;margin:0 auto;padding:40px 24px 80px}
+h1{font-size:28px;letter-spacing:-.5px;margin-bottom:6px}.sub{color:var(--m);margin-bottom:24px;line-height:1.6;font-size:15px}
+.card{background:#fff;border:1px solid var(--l);border-radius:16px;padding:28px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.full{grid-column:1/-1}
+label{display:block;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--m);margin-bottom:6px}
+input,select,textarea{width:100%;border:2px solid var(--l);border-radius:10px;padding:12px 14px;font:15px 'DM Sans';outline:0;background:#fff}input:focus,select:focus,textarea:focus{border-color:var(--b)}
+.btn{background:var(--b);color:#fff;border:0;border-radius:10px;padding:13px 24px;font:700 15px 'DM Sans';cursor:pointer}.btn:hover{background:var(--bd)}.btn:disabled{opacity:.6}
+.btn.o{background:#fff;color:var(--b);border:2px solid var(--b)}.btn.s{padding:9px 16px;font-size:13px}
+.chip{display:inline-block;font-size:11px;font-weight:700;padding:4px 10px;border-radius:100px;background:var(--p);color:var(--bd);white-space:nowrap}.chip.g{background:#DCFCE7;color:#15803D}.chip.x{background:#F0F4F8;color:var(--m)}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.pc{display:block;text-decoration:none;color:inherit;margin-bottom:12px;transition:border-color .2s}.pc:hover{border-color:var(--s)}
+.tl{list-style:none}.tl li{display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid #F0F4F8;font-size:14px}.tl .chip{margin-left:auto}
+.dot{width:12px;height:12px;border-radius:50%;background:var(--l)}.dot.d{background:#22C55E}.dot.i{background:var(--b)}
+.err{color:#DC2626;font-size:13px;margin-top:10px}
+@media(max-width:640px){.grid{grid-template-columns:1fr}nav{padding:0 16px}}
+</style></head><body>
+<nav><a class="logo" href="#">
+<svg width="44" height="18" viewBox="0 0 210 88" fill="none"><defs><linearGradient id="g" x1="118" y1="80" x2="184" y2="8" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#2076C2"/><stop offset=".52" stop-color="#2076C2"/><stop offset="1" stop-color="#A8CAEA"/></linearGradient></defs><rect x="12" y="8" width="13" height="72" rx="4" fill="#2076C2"/><rect x="12" y="8" width="54" height="13" rx="4" fill="#2076C2"/><rect x="12" y="38" width="43" height="13" rx="4" fill="#2076C2"/><rect x="82" y="8" width="13" height="72" rx="4" fill="#2076C2"/><path d="M118 80L184 8" stroke="url(#g)" stroke-width="13" stroke-linecap="round"/><path d="M118 8L184 80" stroke="#2076C2" stroke-width="13" stroke-linecap="round"/></svg>
+<div>FIX<small>Client Portal</small></div></a>
+<div><span id="who" hidden><span id="who-email" class="sub" style="margin:0;font-size:13px"></span><button class="lnk" id="out">Log out</button></span><a id="login-link" class="lnk" href="#login">Log in</a></div></nav>
+<main>
+<section id="v-request"><h1>Post your project, free</h1><p class="sub">Tell us what you're building. We'll email you a link to finish registration so you can track offers and progress.</p>
+<form id="req" class="card"><div class="grid">
+<div><label>Full name</label><input name="name" required></div>
+<div><label>Mobile</label><input name="mobile" type="tel" placeholder="+63 9XX XXX XXXX" required></div>
+<div class="full"><label>Email</label><input name="email" type="email" required></div>
+<div><label>Project</label><select name="project_type" required><option value="">Select</option><option>New build</option><option>Renovation</option><option>Extension</option></select></div>
+<div><label>Home type</label><select name="home_type"><option>Bungalow</option><option>Single Detached</option><option>Single Attached</option><option>Duplex</option><option>Other</option></select></div>
+<div><label>Location</label><select name="location" required><option value="">Select</option><option>Metro Manila (NCR)</option><option>Cavite</option><option>Laguna</option><option>Batangas</option><option>Rizal</option><option>Other</option></select></div>
+<div><label>Lot size (sqm, optional)</label><input name="lot_size" type="number" min="0"></div>
+<div class="full"><label>Budget</label><select name="budget"><option>Not sure yet</option><option>Under ₱1M</option><option>₱1M–₱3M</option><option>₱3M–₱6M</option><option>₱6M–₱10M</option><option>Above ₱10M</option></select></div>
+<div class="full"><label>Notes (optional)</label><textarea name="notes" rows="3"></textarea></div>
+<input name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px">
+<label class="full" style="text-transform:none;letter-spacing:0;font-size:13px;font-weight:400"><input type="checkbox" name="consent" value="1" required style="width:auto;margin-right:8px">I agree to FIX processing my details under the Data Privacy Act (RA 10173).</label>
+</div><p class="err" id="req-err"></p><button class="btn" style="width:100%;margin-top:16px">Submit project</button></form>
+<div id="req-done" class="card" hidden><h1>Check your email</h1><p class="sub" style="margin:0">We sent a link to complete your registration. Open it to see your project dashboard. If it's not in your inbox, check spam.</p></div></section>
+
+<section id="v-login" hidden><h1>Log in</h1><p class="sub">Enter your email and we'll send you a login link.</p>
+<form id="lg" class="card"><label>Email</label><input type="email" id="lg-email" required><button class="btn" style="width:100%;margin-top:16px">Send login link</button><p class="sub" id="lg-msg" style="margin:12px 0 0"></p></form>
+<p class="sub" style="margin-top:16px">No account yet? <a href="#">Post a project</a> to get started.</p></section>
+
+<section id="v-dash" hidden><div class="row"><h1>My projects</h1><button class="btn s" id="new">New project</button></div><p class="sub">Status of everything you've posted.</p><div id="plist"></div></section>
+<section id="v-proj" hidden><a class="lnk" href="#" style="margin:0">&larr; All projects</a><div id="pdetail"></div></section>
+</main>
+<script>
+const CFG={url:'https://sjqarzyueqnjkjbcdcbk.supabase.co',key:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqcWFyenl1ZXFuamtqYmNkY2JrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM0MTM1MDAsImV4cCI6MjEwODk4OTUwMH0.dzpacbvXn-kwVrBVe9u9gA_6egDLjNhYHKprq0wNguo'};
+const sb=supabase.createClient(CFG.url,CFG.key),$=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const php=n=>'₱'+Number(n||0).toLocaleString('en-PH');
+const chip=s=>`<span class="chip ${['Offer Accepted','In Progress','Completed','Done','Accepted'].includes(s)?'g':['Cancelled','Declined','Withdrawn','Expired','Not started'].includes(s)?'x':''}">${esc(s)}</span>`;
+const show=v=>['request','login','dash','proj'].forEach(x=>$('v-'+x).hidden=x!==v);
+let user=null;
+sb.auth.onAuthStateChange((_e,s)=>{user=s?.user||null;$('who').hidden=!user;$('login-link').hidden=!!user;$('who-email').textContent=user?.email||'';route()});
+function route(){const h=location.hash;if(!user)return show(h==='#login'?'login':'request');if(h.startsWith('#project/'))return openProject(h.slice(9));loadDash()}
+addEventListener('hashchange',route);
+$('out').onclick=()=>sb.auth.signOut();$('new').onclick=()=>show('request');
+
+$('req').onsubmit=async e=>{e.preventDefault();const f=e.target,btn=f.querySelector('.btn');btn.disabled=true;$('req-err').textContent='';
+ try{const r=await fetch(CFG.url+'/functions/v1/submit-project',{method:'POST',headers:{'Content-Type':'application/json',apikey:CFG.key,Authorization:'Bearer '+CFG.key},body:JSON.stringify(Object.fromEntries(new FormData(f)))});
+  if(!r.ok)throw new Error((await r.json().catch(()=>({}))).error);
+  f.hidden=true;$('req-done').hidden=false}
+ catch(x){$('req-err').textContent=x.message||'Something went wrong. Please try again.'}
+ btn.disabled=false};
+
+$('lg').onsubmit=async e=>{e.preventDefault();await sb.auth.signInWithOtp({email:$('lg-email').value.trim(),options:{shouldCreateUser:false,emailRedirectTo:location.origin+'/portal.html'}});
+ $('lg-msg').textContent='If an account exists for this email, a login link is on its way.'};
+
+async function loadDash(){show('dash');
+ const {data,error}=await sb.from('projects').select('id,title,location,status,offers(id)').order('created_at',{ascending:false});
+ $('plist').innerHTML=error?'<p class="err">Could not load your projects. Refresh to try again.</p>':data.length?data.map(p=>`<a class="card pc" href="#project/${p.id}"><div class="row"><div><b>${esc(p.title)}</b><div class="sub" style="margin:2px 0 0">${esc(p.location)} · ${p.offers.length} offer${p.offers.length==1?'':'s'}</div></div>${chip(p.status)}</div></a>`).join(''):'<p class="sub">No projects yet. Post your first project to get matched.</p>'}
+
+async function openProject(id){show('proj');
+ const [p,m,o]=await Promise.all([sb.from('projects').select('*').eq('id',id).single(),sb.from('milestones').select('*').eq('project_id',id).order('sort'),sb.from('offers').select('*').eq('project_id',id).order('price')]);
+ if(p.error){$('pdetail').innerHTML='<p class="sub" style="margin-top:16px">Project not found.</p>';return}
+ const P=p.data,O=o.data||[];
+ $('pdetail').innerHTML=`<div class="row" style="margin:16px 0 6px"><h1>${esc(P.title)}</h1>${chip(P.status)}</div><p class="sub">${esc(P.location)} · ${esc(P.budget_range||'Budget not set')}</p>
+ <div class="card" style="margin-bottom:16px"><label>Progress</label><ul class="tl">${(m.data||[]).map(x=>`<li><span class="dot ${x.status==='Done'?'d':x.status==='In progress'?'i':''}"></span>${esc(x.stage)}${chip(x.status)}</li>`).join('')}</ul></div>
+ <div class="card"><label>Offers</label>${O.length?O.map(x=>`<div class="row" style="padding:14px 0;border-bottom:1px solid #F0F4F8"><div><b>${esc(x.contractor_name||'Verified contractor')}</b><div class="sub" style="margin:2px 0 0">${php(x.price)} · ${esc(x.weeks)} weeks<br>${esc(x.inclusions||'')}</div></div><div style="text-align:right">${chip(x.status)}${['Submitted','Viewed'].includes(x.status)?`<div style="margin-top:8px"><button class="btn s" data-a="1" data-id="${x.id}">Accept</button> <button class="btn o s" data-a="0" data-id="${x.id}">Decline</button></div>`:''}</div></div>`).join(''):'<p class="sub" style="margin:8px 0 0">No offers yet. FIX is reviewing your project and will match you with verified contractors.</p>'}</div>`;
+ $('pdetail').querySelectorAll('[data-a]').forEach(b=>b.onclick=async()=>{b.disabled=true;await sb.rpc('respond_offer',{p_offer:b.dataset.id,p_accept:b.dataset.a==='1'});openProject(id)})}
+</script></body></html>
