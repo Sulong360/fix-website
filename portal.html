@@ -13,7 +13,11 @@ h1{font-size:28px;letter-spacing:-.5px;margin-bottom:6px}.sub{color:var(--m);mar
 .card{background:#fff;border:1px solid var(--l);border-radius:16px;padding:28px}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.full{grid-column:1/-1}
 label{display:block;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--m);margin-bottom:6px}
-input,select,textarea{width:100%;border:2px solid var(--l);border-radius:10px;padding:12px 14px;font:15px 'DM Sans';outline:0;background:#fff}input:focus,select:focus,textarea:focus{border-color:var(--b)}
+input:not([type=checkbox]),select,textarea{width:100%;height:48px;border:2px solid var(--l);border-radius:10px;padding:0 14px;font:15px 'DM Sans';color:var(--t);outline:0;background:#fff}
+textarea{height:auto;padding:12px 14px;resize:vertical}
+select{appearance:none;-webkit-appearance:none;padding-right:36px;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238A9BB0' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 14px center}
+input[type=number]{-moz-appearance:textfield}input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+input:focus,select:focus,textarea:focus{border-color:var(--b)}
 .btn{background:var(--b);color:#fff;border:0;border-radius:10px;padding:13px 24px;font:700 15px 'DM Sans';cursor:pointer}.btn:hover{background:var(--bd)}.btn:disabled{opacity:.6}
 .btn.o{background:#fff;color:var(--b);border:2px solid var(--b)}.btn.s{padding:9px 16px;font-size:13px}
 .chip{display:inline-block;font-size:11px;font-weight:700;padding:4px 10px;border-radius:100px;background:var(--p);color:var(--bd);white-space:nowrap}.chip.g{background:#DCFCE7;color:#15803D}.chip.x{background:#F0F4F8;color:var(--m)}
@@ -27,7 +31,7 @@ input,select,textarea{width:100%;border:2px solid var(--l);border-radius:10px;pa
 <nav><a class="logo" href="#">
 <svg width="44" height="18" viewBox="0 0 210 88" fill="none"><defs><linearGradient id="g" x1="118" y1="80" x2="184" y2="8" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#2076C2"/><stop offset=".52" stop-color="#2076C2"/><stop offset="1" stop-color="#A8CAEA"/></linearGradient></defs><rect x="12" y="8" width="13" height="72" rx="4" fill="#2076C2"/><rect x="12" y="8" width="54" height="13" rx="4" fill="#2076C2"/><rect x="12" y="38" width="43" height="13" rx="4" fill="#2076C2"/><rect x="82" y="8" width="13" height="72" rx="4" fill="#2076C2"/><path d="M118 80L184 8" stroke="url(#g)" stroke-width="13" stroke-linecap="round"/><path d="M118 8L184 80" stroke="#2076C2" stroke-width="13" stroke-linecap="round"/></svg>
 <div>FIX<small>Client Portal</small></div></a>
-<div><span id="who" hidden><span id="who-email" class="sub" style="margin:0;font-size:13px"></span><button class="lnk" id="out">Log out</button></span><a id="login-link" class="lnk" href="#login">Log in</a></div></nav>
+<div><span id="who" hidden><span id="who-email" class="sub" style="margin:0;font-size:13px"></span><button class="lnk" id="out">Log out</button></span><a class="lnk" href="/">Back to FIX</a><a id="login-link" class="lnk" href="#login">Log in</a></div></nav>
 <main>
 <section id="v-request"><h1>Post your project, free</h1><p class="sub">Tell us what you're building. We'll email you a link to finish registration so you can track offers and progress.</p>
 <form id="req" class="card"><div class="grid">
@@ -41,9 +45,9 @@ input,select,textarea{width:100%;border:2px solid var(--l);border-radius:10px;pa
 <div class="full"><label>Budget</label><select name="budget"><option>Not sure yet</option><option>Under ₱1M</option><option>₱1M–₱3M</option><option>₱3M–₱6M</option><option>₱6M–₱10M</option><option>Above ₱10M</option></select></div>
 <div class="full"><label>Notes (optional)</label><textarea name="notes" rows="3"></textarea></div>
 <input name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px">
-<label class="full" style="text-transform:none;letter-spacing:0;font-size:13px;font-weight:400"><input type="checkbox" name="consent" value="1" required style="width:auto;margin-right:8px">I agree to FIX processing my details under the Data Privacy Act (RA 10173).</label>
+<label class="full" style="text-transform:none;letter-spacing:0;font-size:13px;font-weight:400"><input type="checkbox" name="consent" value="1" required style="width:auto;margin-right:8px">I have read the <a href="/privacy" target="_blank" rel="noopener" style="color:var(--b)">Data Privacy Notice</a> and consent to FIX processing my details under the Data Privacy Act of 2012 (RA 10173).</label>
 </div><p class="err" id="req-err"></p><button class="btn" style="width:100%;margin-top:16px">Submit project</button></form>
-<div id="req-done" class="card" hidden><h1>Check your email</h1><p class="sub" style="margin:0">We sent a link to complete your registration. Open it to see your project dashboard. If it's not in your inbox, check spam.</p></div></section>
+<div id="req-done" class="card" hidden style="text-align:center"><h1>Thank you for your request</h1><p class="sub" style="margin:0 auto 10px;max-width:520px">To monitor your project, you will need to complete your registration. We have sent the registration link to <b id="done-email"></b>.</p><p class="sub" style="margin:0;font-size:13px">Can't find it? Check your spam folder, or message us on WhatsApp at +63 992 812 2086.</p></div></section>
 
 <section id="v-login" hidden><h1>Log in</h1><p class="sub">Enter your email and we'll send you a login link.</p>
 <form id="lg" class="card"><label>Email</label><input type="email" id="lg-email" required><button class="btn" style="width:100%;margin-top:16px">Send login link</button><p class="sub" id="lg-msg" style="margin:12px 0 0"></p></form>
@@ -65,11 +69,11 @@ function route(){const h=location.hash;if(!user)return show(h==='#login'?'login'
 addEventListener('hashchange',route);
 $('out').onclick=()=>sb.auth.signOut();$('new').onclick=()=>show('request');
 
-$('req').onsubmit=async e=>{e.preventDefault();const f=e.target,btn=f.querySelector('.btn');btn.disabled=true;$('req-err').textContent='';
- try{const r=await fetch(CFG.url+'/functions/v1/submit-project',{method:'POST',headers:{'Content-Type':'application/json',apikey:CFG.key,Authorization:'Bearer '+CFG.key},body:JSON.stringify(Object.fromEntries(new FormData(f)))});
+$('req').onsubmit=async e=>{e.preventDefault();const f=e.target,btn=f.querySelector('.btn'),d=Object.fromEntries(new FormData(f));btn.disabled=true;$('req-err').textContent='';
+ try{const r=await fetch(CFG.url+'/functions/v1/submit-project',{method:'POST',headers:{'Content-Type':'application/json',apikey:CFG.key,Authorization:'Bearer '+CFG.key},body:JSON.stringify(d)});
   if(!r.ok)throw new Error((await r.json().catch(()=>({}))).error);
-  f.hidden=true;$('req-done').hidden=false}
- catch(x){$('req-err').textContent=x.message||'Something went wrong. Please try again.'}
+  $('done-email').textContent=d.email;f.hidden=true;$('req-done').hidden=false;scrollTo(0,0)}
+ catch(x){$('req-err').textContent=x instanceof TypeError||!x.message?"We couldn't send your request. Please try again, or message us on WhatsApp at +63 992 812 2086.":x.message}
  btn.disabled=false};
 
 $('lg').onsubmit=async e=>{e.preventDefault();await sb.auth.signInWithOtp({email:$('lg-email').value.trim(),options:{shouldCreateUser:false,emailRedirectTo:location.origin+'/portal.html'}});
