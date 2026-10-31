@@ -642,7 +642,7 @@ footer { background: var(--blue-navy); color: white; padding: 64px 48px 40px; }
       </div>
     </div>
   </div>
-  <a href="#get-matched" class="nav-cta">Post Your Project →</a>
+  <a href="/portal" class="nav-cta">Post Your Project →</a>
 </nav>
 
 <!-- ══════════ HERO ══════════ -->
@@ -750,7 +750,7 @@ footer { background: var(--blue-navy); color: white; padding: 64px 48px 40px; }
       <h1 class="hero-h1">Build confidently.<br><em>No guesswork.</em><br>No cold calls.</h1>
       <p class="hero-sub">Post your project once. Get matched with verified, licensed contractors in Metro Manila and CALABARZON — for free.</p>
       <div class="hero-ctas">
-        <a href="#get-matched" class="btn-primary">Post Your Project Free →</a>
+        <a href="/portal" class="btn-primary">Post Your Project Free →</a>
       </div>
       <div class="hero-tools">
         <span class="hero-tools-label">Free tools:</span>
@@ -1033,7 +1033,7 @@ footer { background: var(--blue-navy); color: white; padding: 64px 48px 40px; }
       </div>
 
       <div class="ofw-ctas reveal">
-        <a href="#get-matched" class="btn-ofw">I'm Building From Abroad →</a>
+        <a href="/portal" class="btn-ofw">I'm Building From Abroad →</a>
         <a href="#why" class="btn-ofw-ghost">How FIX protects you</a>
       </div>
     </div>
@@ -1205,29 +1205,7 @@ footer { background: var(--blue-navy); color: white; padding: 64px 48px 40px; }
     <span class="eyebrow" style="color:rgba(255,255,255,0.6);">Start today</span>
     <h2 class="cta-h2">Your dream home deserves a trusted builder.</h2>
     <p class="cta-sub">Post your project in minutes. We'll find the right contractors for you — completely free.</p>
-    <form class="homeowner-form" name="homeowner-leads" method="POST" data-netlify="true" netlify-honeypot="bot-field" id="homeowner-form">
-      <input type="hidden" name="form-name" value="homeowner-leads">
-      <input type="hidden" name="bot-field" style="display:none">
-      <div class="homeowner-form-grid">
-        <div class="form-group">
-          <label class="form-label form-label-light">Your Name</label>
-          <input type="text" name="name" class="cta-input" placeholder="Full name" id="h-name" required>
-        </div>
-        <div class="form-group">
-          <label class="form-label form-label-light">Mobile Number</label>
-          <input type="tel" name="mobile" class="cta-input" placeholder="+63 9XX XXX XXXX" id="h-phone" required>
-        </div>
-        <div class="form-group">
-          <label class="form-label form-label-light">Email Address</label>
-          <input type="email" name="email" class="cta-input" placeholder="you@email.com" id="h-email" required>
-        </div>
-        <div class="form-group">
-          <label class="form-label form-label-light">Preferred Date &amp; Time of Call</label>
-          <input type="text" name="preferred-schedule" class="cta-input" placeholder="e.g. Mon–Fri, 10am–12pm" id="h-schedule">
-        </div>
-      </div>
-      <button type="submit" class="cta-btn" id="homeowner-submit-btn">Get Matched — It's Free →</button>
-    </form>
+    <a href="/portal" class="btn-white">Get Matched — It's Free →</a>
     <div class="cta-note">Free for homeowners · No spam · Metro Manila &amp; CALABARZON</div>
   </div>
 </section>
@@ -1338,31 +1316,6 @@ document.querySelectorAll('.modal-overlay').forEach(overlay => {
   });
 });
 
-// Homeowner form submit
-document.getElementById('homeowner-form').addEventListener('submit', function(e) {
-  e.preventDefault();
-  const form = this;
-  const name = document.getElementById('h-name').value.trim();
-  const phone = document.getElementById('h-phone').value.trim();
-  const email = document.getElementById('h-email').value.trim();
-  if (!name || !phone || !email) {
-    [document.getElementById('h-name'), document.getElementById('h-phone'), document.getElementById('h-email')].forEach(el => {
-      if (!el.value.trim()) el.style.borderColor = 'rgba(255,120,120,0.8)';
-    });
-    return;
-  }
-  const data = new FormData(form);
-  fetch('/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams(data).toString() })
-    .then(() => {
-      form.reset();
-      openModal('modal-homeowner');
-    })
-    .catch(() => {
-      form.reset();
-      openModal('modal-homeowner'); // still show confirmation
-    });
-});
-
 // Contractor form submit
 document.getElementById('contractor-form').addEventListener('submit', function(e) {
   e.preventDefault();
@@ -1398,7 +1351,7 @@ document.querySelectorAll('.form-input, .cta-input').forEach(el => {
 
 // Hero match button
 document.querySelector('.hero-match-btn').addEventListener('click', function() {
-  document.querySelector('#get-matched').scrollIntoView({ behavior: 'smooth' });
+  location.href='/portal';
 });
 
 // Smooth scroll for anchor links
