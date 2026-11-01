@@ -1,38 +1,12 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>FIX Client Portal</title>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Homeowner Project Management Portal | FIX</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4.4.1/dist/email.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<style>
-:root{--b:#2076C2;--bd:#1A5FA0;--n:#0D3C6B;--s:#A8CAEA;--p:#E6F1FB;--o:#F7F9FC;--l:#D9E3EC;--m:#8A9BB0;--t:#111827}
-*{box-sizing:border-box;margin:0;padding:0}[hidden]{display:none!important}
-body{font-family:'DM Sans',sans-serif;background:var(--o);color:var(--t)}
-nav{background:#fff;border-bottom:1px solid var(--l);height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 32px;position:sticky;top:0;z-index:5}
-.logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--t);font-size:13px;font-weight:700}.logo small{display:block;font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(--m);font-weight:600}
-.lnk{background:none;border:0;font:500 14px 'DM Sans';color:var(--m);cursor:pointer;text-decoration:none;margin-left:14px}.lnk:hover{color:var(--b)}
-main{max-width:900px;margin:0 auto;padding:40px 24px 80px}
-h1{font-size:28px;letter-spacing:-.5px;margin-bottom:6px}.sub{color:var(--m);margin-bottom:24px;line-height:1.6;font-size:15px}
-.card{background:#fff;border:1px solid var(--l);border-radius:16px;padding:28px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.full{grid-column:1/-1}
-label{display:block;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--m);margin-bottom:6px}
-input:not([type=checkbox]),select,textarea{width:100%;height:48px;border:2px solid var(--l);border-radius:10px;padding:0 14px;font:15px 'DM Sans';color:var(--t);outline:0;background:#fff}
-textarea{height:auto;padding:12px 14px;resize:vertical}
-select{appearance:none;-webkit-appearance:none;padding-right:36px;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238A9BB0' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 14px center}
-input[type=number]{-moz-appearance:textfield}input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-input:focus,select:focus,textarea:focus{border-color:var(--b)}
-.btn{background:var(--b);color:#fff;border:0;border-radius:10px;padding:13px 24px;font:700 15px 'DM Sans';cursor:pointer}.btn:hover{background:var(--bd)}.btn:disabled{opacity:.6}
-.btn.o{background:#fff;color:var(--b);border:2px solid var(--b)}.btn.s{padding:9px 16px;font-size:13px}
-.chip{display:inline-block;font-size:11px;font-weight:700;padding:4px 10px;border-radius:100px;background:var(--p);color:var(--bd);white-space:nowrap}.chip.g{background:#DCFCE7;color:#15803D}.chip.x{background:#F0F4F8;color:var(--m)}
-.row{display:flex;justify-content:space-between;align-items:center;gap:12px}
-.pc{display:block;text-decoration:none;color:inherit;margin-bottom:12px;transition:border-color .2s}.pc:hover{border-color:var(--s)}
-.tl{list-style:none}.tl li{display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid #F0F4F8;font-size:14px}.tl .chip{margin-left:auto}
-.dot{width:12px;height:12px;border-radius:50%;background:var(--l)}.dot.d{background:#22C55E}.dot.i{background:var(--b)}
-.err{color:#DC2626;font-size:13px;margin-top:10px}
-@media(max-width:640px){.grid{grid-template-columns:1fr}nav{padding:0 16px}}
-</style></head><body>
+<link rel="stylesheet" href="portal-app/portal.css"></head><body>
 <nav><a class="logo" href="#">
 <svg width="44" height="18" viewBox="0 0 210 88" fill="none"><defs><linearGradient id="g" x1="118" y1="80" x2="184" y2="8" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#2076C2"/><stop offset=".52" stop-color="#2076C2"/><stop offset="1" stop-color="#A8CAEA"/></linearGradient></defs><rect x="12" y="8" width="13" height="72" rx="4" fill="#2076C2"/><rect x="12" y="8" width="54" height="13" rx="4" fill="#2076C2"/><rect x="12" y="38" width="43" height="13" rx="4" fill="#2076C2"/><rect x="82" y="8" width="13" height="72" rx="4" fill="#2076C2"/><path d="M118 80L184 8" stroke="url(#g)" stroke-width="13" stroke-linecap="round"/><path d="M118 8L184 80" stroke="#2076C2" stroke-width="13" stroke-linecap="round"/></svg>
-<div>FIX<small>Client Portal</small></div></a>
-<div><span id="who" hidden><span id="who-email" class="sub" style="margin:0;font-size:13px"></span><button class="lnk" id="out">Log out</button></span><a class="lnk" href="/">Back to FIX</a><a id="login-link" class="lnk" href="#login">Log in</a></div></nav>
+<div>FIX<small>Homeowner Project Management Portal</small></div></a>
+<div><span id="who" hidden><a class="lnk" href="#">Dashboard</a><a class="lnk" href="#profile">My profile</a><span id="who-email" class="sub" style="margin:0;font-size:13px"></span><button class="lnk" id="out">Log out</button></span><a class="lnk" href="/">Back to FIX</a><a id="login-link" class="lnk" href="#login">Log in</a></div></nav>
 <main>
 <section id="v-request"><h1>Post your project, free</h1><p class="sub">Tell us what you're building. We'll review your request and email your login details so you can track offers and progress.</p>
 <form id="req" class="card"><div class="grid">
@@ -61,75 +35,13 @@ input:focus,select:focus,textarea:focus{border-color:var(--b)}
 <div class="full"><label>Confirm password</label><input type="password" id="pw2" autocomplete="new-password" minlength="8" required></div></div>
 <p class="sub" style="margin:10px 0 0;font-size:13px">At least 8 characters.</p><p class="err" id="pw-err"></p><button class="btn" style="width:100%;margin-top:16px">Save password</button></form></section>
 
-<section id="v-dash" hidden><div class="row"><h1>My projects</h1><button class="btn s" id="new">New project</button></div><p class="sub">Status of everything you've posted.</p><div id="plist"></div></section>
+<section id="v-dash" hidden><div class="row"><h1>My projects</h1><div><button class="btn o s" id="demo-btn">Preview sample project</button> <button class="btn s" id="new">New project</button></div></div><p class="sub">Status of everything you've posted.</p><div id="plist"></div></section>
 <section id="v-proj" hidden><a class="lnk" href="#" style="margin:0">&larr; All projects</a><div id="pdetail"></div></section>
+<section id="v-profile" hidden><h1>My profile</h1><p class="sub">FIX and your contractor use these details to reach you.</p>
+<form id="pf" class="card"><div class="grid"><div class="full"><label>Email (your username)</label><input id="pf-email" disabled></div><div><label>Full name</label><input id="pf-name" required maxlength="120"></div><div><label>Mobile</label><input id="pf-mobile" type="tel" required maxlength="30"></div></div>
+<p class="err" id="pf-err"></p><div style="margin-top:16px"><button class="btn">Save changes</button><span class="sub" id="pf-ok" style="margin-left:12px"></span></div></form></section>
 <section id="v-admin" hidden><div class="row"><h1>All requests</h1><button class="btn o s" id="adm-ref">Refresh</button></div><p class="sub" id="adm-sum"></p><div id="adm-list"></div></section>
 </main>
-<script>
-const CFG={url:'https://sjqarzyueqnjkjbcdcbk.supabase.co',key:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqcWFyenl1ZXFuamtqYmNkY2JrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM0MTM1MDAsImV4cCI6MjEwODk4OTUwMH0.dzpacbvXn-kwVrBVe9u9gA_6egDLjNhYHKprq0wNguo',adminEmail:'darrel.sulong360@gmail.com',ejsKey:'2erZTbQFFPOyXoJam',ejsService:'service_7oqivir',ejsTemplate:'template_tlh1mez'};
-window.emailjs&&emailjs.init(CFG.ejsKey);
-const sb=supabase.createClient(CFG.url,CFG.key),$=id=>document.getElementById(id);
-const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const php=n=>'₱'+Number(n||0).toLocaleString('en-PH');
-const chip=s=>`<span class="chip ${['Offer Accepted','In Progress','Completed','Done','Accepted'].includes(s)?'g':['Cancelled','Declined','Withdrawn','Expired','Not started'].includes(s)?'x':''}">${esc(s)}</span>`;
-const show=v=>['request','login','dash','proj','pw','admin'].forEach(x=>$('v-'+x).hidden=x!==v);
-let user=null;
-sb.auth.onAuthStateChange((e,s)=>{if(e==='TOKEN_REFRESHED')return;user=s?.user||null;$('who').hidden=!user;$('login-link').hidden=!!user;$('who-email').textContent=user?.email||'';route()});
-function showPw(){show('pw');$('pw-h').textContent='Create your new password';$('pw-s').textContent='For your security, please replace your temporary password before continuing.'}
-async function expiredOut(){await sb.auth.signOut();location.hash='#login';show('login');$('lg-err').textContent='Your temporary password has expired. Please message FIX on WhatsApp (+63 992 812 2086) for a new one.'}
-async function route(){const h=location.hash;if(!user)return show(h==='#login'?'login':'request');
- const {data:pr}=await sb.from('profiles').select('role,must_change,temp_expires_at').eq('id',user.id).maybeSingle();
- if(pr?.must_change){if(pr.temp_expires_at&&new Date(pr.temp_expires_at)<new Date())return expiredOut();return showPw()}
- if(pr?.role==='admin')return loadAdmin();
- if(h.startsWith('#project/'))return openProject(h.slice(9));loadDash()}
-addEventListener('hashchange',route);
-$('out').onclick=()=>sb.auth.signOut();$('new').onclick=()=>show('request');
-
-$('req').onsubmit=async e=>{e.preventDefault();const f=e.target,btn=f.querySelector('.btn'),d=Object.fromEntries(new FormData(f));btn.disabled=true;$('req-err').textContent='';
- try{const r=await fetch(CFG.url+'/functions/v1/submit-project',{method:'POST',headers:{'Content-Type':'application/json',apikey:CFG.key,Authorization:'Bearer '+CFG.key},body:JSON.stringify(d)});
-  if(!r.ok)throw new Error((await r.json().catch(()=>({}))).error);
-  $('done-email').textContent=d.email;f.hidden=true;$('req-done').hidden=false;scrollTo(0,0)}
- catch(x){$('req-err').textContent=x instanceof TypeError||!x.message?"We couldn't send your request. Please try again, or message us on WhatsApp at +63 992 812 2086.":x.message}
- btn.disabled=false};
-
-$('lg').onsubmit=async e=>{e.preventDefault();$('lg-err').textContent='';const id=$('lg-email').value.trim();
- const {error}=await sb.auth.signInWithPassword({email:id.toLowerCase()==='fixadmin'?CFG.adminEmail:id,password:$('lg-pw').value});
- if(error)$('lg-err').textContent='Incorrect username or password.'};
-$('pwf').onsubmit=async e=>{e.preventDefault();const a=$('pw1').value;$('pw-err').textContent='';
- if(a.length<8){$('pw-err').textContent='Use at least 8 characters.';return}
- if(a!==$('pw2').value){$('pw-err').textContent='Passwords do not match.';return}
- const {error}=await sb.auth.updateUser({password:a});
- if(error){$('pw-err').textContent=error.message;return}
- if((await sb.rpc('password_changed')).error){$('pw-err').textContent='Your temporary password has expired. Please contact FIX.';return}
- e.target.reset();route()};
-$('adm-ref').onclick=()=>loadAdmin();
-async function loadAdmin(){show('admin');
- const {data,error}=await sb.from('projects').select('id,title,location,budget_range,lot_sqm,notes,status,approved_at,profiles(full_name,email,mobile)').order('created_at',{ascending:false});
- if(error){$('adm-list').innerHTML='<p class="err">Could not load requests.</p>';return}
- const open=p=>!p.approved_at&&p.status!=='Cancelled';
- $('adm-sum').textContent=data.length+' projects · '+data.filter(open).length+' awaiting review';
- $('adm-list').innerHTML=data.map(p=>`<div class="card" style="margin-bottom:12px"><div class="row" style="align-items:flex-start"><div><b>${esc(p.title)}</b><div class="sub" style="margin:2px 0 0">${esc(p.profiles?.full_name)} · ${esc(p.profiles?.email)} · ${esc(p.profiles?.mobile)}<br>${esc(p.location)} · ${esc(p.budget_range)}${p.lot_sqm?' · '+esc(p.lot_sqm)+' sqm':''}</div>${p.notes?`<div class="sub" style="margin:6px 0 0;font-size:13px">${esc(p.notes)}</div>`:''}</div>${chip(p.status)}</div>${p.status==='Cancelled'?'':`<div style="margin-top:12px"><button class="btn s" data-i="${p.id}">${p.approved_at?'Reissue login':'Approve &amp; send login'}</button>${open(p)?` <button class="btn o s" data-r="${p.id}">Reject</button>`:''}</div>`}</div>`).join('')||'<p class="sub">No requests yet.</p>';
- $('adm-list').querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>issue(b.dataset.i,b));
- $('adm-list').querySelectorAll('[data-r]').forEach(b=>b.onclick=async()=>{if(confirm('Reject this request?')){await sb.from('projects').update({status:'Cancelled'}).eq('id',b.dataset.r);loadAdmin()}})}
-async function issue(id,btn){if(!confirm('Send login details to this client now?'))return;btn.disabled=true;btn.textContent='Sending...';
- const {data:{session}}=await sb.auth.getSession();
- const r=await fetch(CFG.url+'/functions/v1/issue-credentials',{method:'POST',headers:{'Content-Type':'application/json',apikey:CFG.key,Authorization:'Bearer '+session.access_token},body:JSON.stringify({project_id:id})});
- const d=await r.json().catch(()=>({}));
- if(!r.ok){alert(d.error||'Could not issue login.');return loadAdmin()}
- try{await emailjs.send(CFG.ejsService,CFG.ejsTemplate,{to_email:d.email,to_name:d.name,temp_password:d.temp_password,expires:d.expires,login_url:location.origin+'/portal#login'});alert('Login details sent to '+d.email)}
- catch(x){alert('Login created but the email failed. Send this manually.\nUsername: '+d.email+'\nTemporary password: '+d.temp_password+'\nExpires: '+d.expires)}
- loadAdmin()}
-
-async function loadDash(){show('dash');
- const {data,error}=await sb.from('projects').select('id,title,location,status,offers(id)').order('created_at',{ascending:false});
- $('plist').innerHTML=error?'<p class="err">Could not load your projects. Refresh to try again.</p>':data.length?data.map(p=>`<a class="card pc" href="#project/${p.id}"><div class="row"><div><b>${esc(p.title)}</b><div class="sub" style="margin:2px 0 0">${esc(p.location)} · ${p.offers.length} offer${p.offers.length==1?'':'s'}</div></div>${chip(p.status)}</div></a>`).join(''):'<p class="sub">No projects yet. Post your first project to get matched.</p>'}
-
-async function openProject(id){show('proj');
- const [p,m,o]=await Promise.all([sb.from('projects').select('*').eq('id',id).single(),sb.from('milestones').select('*').eq('project_id',id).order('sort'),sb.from('offers').select('*').eq('project_id',id).order('price')]);
- if(p.error){$('pdetail').innerHTML='<p class="sub" style="margin-top:16px">Project not found.</p>';return}
- const P=p.data,O=o.data||[];
- $('pdetail').innerHTML=`<div class="row" style="margin:16px 0 6px"><h1>${esc(P.title)}</h1>${chip(P.status)}</div><p class="sub">${esc(P.location)} · ${esc(P.budget_range||'Budget not set')}</p>
- <div class="card" style="margin-bottom:16px"><label>Progress</label><ul class="tl">${(m.data||[]).map(x=>`<li><span class="dot ${x.status==='Done'?'d':x.status==='In progress'?'i':''}"></span>${esc(x.stage)}${chip(x.status)}</li>`).join('')}</ul></div>
- <div class="card"><label>Offers</label>${O.length?O.map(x=>`<div class="row" style="padding:14px 0;border-bottom:1px solid #F0F4F8"><div><b>${esc(x.contractor_name||'Verified contractor')}</b><div class="sub" style="margin:2px 0 0">${php(x.price)} · ${esc(x.weeks)} weeks<br>${esc(x.inclusions||'')}</div></div><div style="text-align:right">${chip(x.status)}${['Submitted','Viewed'].includes(x.status)?`<div style="margin-top:8px"><button class="btn s" data-a="1" data-id="${x.id}">Accept</button> <button class="btn o s" data-a="0" data-id="${x.id}">Decline</button></div>`:''}</div></div>`).join(''):'<p class="sub" style="margin:8px 0 0">No offers yet. FIX is reviewing your project and will match you with verified contractors.</p>'}</div>`;
- $('pdetail').querySelectorAll('[data-a]').forEach(b=>b.onclick=async()=>{b.disabled=true;await sb.rpc('respond_offer',{p_offer:b.dataset.id,p_accept:b.dataset.a==='1'});openProject(id)})}
-</script></body></html>
+<script src="portal-app/format.js"></script>
+<script src="portal-app/demo-data.js"></script>
+<script src="portal-app/app.js"></script></body></html>
