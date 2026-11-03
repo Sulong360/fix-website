@@ -33,11 +33,20 @@ input:focus,select:focus,textarea:focus{border-color:var(--b)}
 .bar{height:8px;background:#F0F4F8;border-radius:100px;overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--bd),var(--s));border-radius:100px}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:18px;padding-top:16px;border-top:1px solid #F0F4F8}.stats label{margin-bottom:3px;font-size:10px}.stats b{font-size:14px}
 @media(max-width:640px){.stats{grid-template-columns:1fr 1fr}.logo small{display:none}#who-email{display:none}}
+
+.hero{padding:34px}.hero .stats b{font-size:18px}
+.jr{display:flex;margin:16px 0 4px}.jr span{flex:1;font-size:11px;font-weight:600;color:var(--m);text-align:center;padding-top:14px;position:relative}
+.jr span:before{content:'';position:absolute;top:0;left:2px;right:2px;height:5px;background:var(--l);border-radius:5px}.jr span.on:before{background:var(--b)}.jr span.on{color:var(--n)}
+.attn{background:#FFFBEB;border:1px solid #FDE68A;border-radius:14px;padding:14px 18px}.attn>b{color:#92400E;font-size:12px;letter-spacing:1px;text-transform:uppercase}.attn .row{padding:8px 0;border-top:1px solid #FDE68A;margin-top:8px}
+.muted{opacity:.65}.note{background:var(--p);border-radius:10px;padding:12px 14px;font-size:14px;color:var(--bd);margin-top:16px}
+.c{text-transform:none!important;letter-spacing:0!important;font-size:14px!important;font-weight:400!important;display:inline-flex!important;align-items:center;gap:6px;margin:0 14px 8px 0!important;color:var(--t)!important}
+.edit{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;padding-top:12px;border-top:1px solid #F0F4F8}
+@media(max-width:640px){.edit{grid-template-columns:1fr}.hero{padding:22px}.jr span{font-size:10px}}
 </style></head><body>
 <nav><a class="logo" href="#">
 <svg width="44" height="18" viewBox="0 0 210 88" fill="none"><defs><linearGradient id="g" x1="118" y1="80" x2="184" y2="8" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#2076C2"/><stop offset=".52" stop-color="#2076C2"/><stop offset="1" stop-color="#A8CAEA"/></linearGradient></defs><rect x="12" y="8" width="13" height="72" rx="4" fill="#2076C2"/><rect x="12" y="8" width="54" height="13" rx="4" fill="#2076C2"/><rect x="12" y="38" width="43" height="13" rx="4" fill="#2076C2"/><rect x="82" y="8" width="13" height="72" rx="4" fill="#2076C2"/><path d="M118 80L184 8" stroke="url(#g)" stroke-width="13" stroke-linecap="round"/><path d="M118 8L184 80" stroke="#2076C2" stroke-width="13" stroke-linecap="round"/></svg>
 <div>FIX<small>Homeowner Project Management Portal</small></div></a>
-<div><span id="who" hidden><a class="lnk" href="#">Dashboard</a><a class="lnk" href="#profile">My profile</a><span id="who-email" class="sub" style="margin:0;font-size:13px"></span><button class="lnk" id="out">Log out</button></span><a class="lnk" href="/">Back to FIX</a><a id="login-link" class="lnk" href="#login">Log in</a></div></nav>
+<div><span id="who" hidden><a class="lnk" href="#">Dashboard</a><a class="lnk" href="#profile">My profile</a><a class="lnk" href="https://wa.me/639928122086" target="_blank" rel="noopener">Help</a><span id="who-email" class="sub" style="margin:0;font-size:13px"></span><button class="lnk" id="out">Log out</button></span><a class="lnk" href="/">Back to FIX</a><a id="login-link" class="lnk" href="#login">Log in</a></div></nav>
 <main>
 <section id="v-request"><h1>Post your project, free</h1><p class="sub">Tell us what you're building. We'll review your request and email your login details so you can track offers and progress.</p>
 <form id="req" class="card"><div class="grid">
@@ -48,6 +57,9 @@ input:focus,select:focus,textarea:focus{border-color:var(--b)}
 <div><label>Home type</label><select name="home_type"><option>Bungalow</option><option>Single Detached</option><option>Single Attached</option><option>Duplex</option><option>Other</option></select></div>
 <div><label>Location</label><select name="location" required><option value="">Select</option><option>Metro Manila (NCR)</option><option>Cavite</option><option>Laguna</option><option>Batangas</option><option>Rizal</option><option>Other</option></select></div>
 <div><label>Lot size (sqm, optional)</label><input name="lot_size" type="number" min="0"></div>
+<div id="f-new" class="full grid" hidden style="padding:0"><div><label>Lot ownership</label><select data-d="lot_ownership"><option value="">Select</option><option>Owned, with title</option><option>Owned, title in process</option><option>Still looking for a lot</option></select></div><div><label>Plans ready?</label><select data-d="has_plans"><option value="">Select</option><option>Yes</option><option>No</option><option>Not sure</option></select></div><div><label>Floors</label><select data-d="floors"><option value="">Select</option><option>1</option><option>2</option><option>3 or more</option></select></div><div><label>Bedrooms</label><input type="number" min="1" max="20" data-d="bedrooms"></div><div><label>Bathrooms</label><input type="number" min="1" max="20" data-d="bathrooms"></div></div>
+<div id="f-reno" class="full grid" hidden style="padding:0"><div class="full"><label>Areas involved</label><div><label class="c"><input type="checkbox" data-d="areas" value="Kitchen">Kitchen</label><label class="c"><input type="checkbox" data-d="areas" value="Bathrooms">Bathrooms</label><label class="c"><input type="checkbox" data-d="areas" value="Bedrooms">Bedrooms</label><label class="c"><input type="checkbox" data-d="areas" value="Living areas">Living areas</label><label class="c"><input type="checkbox" data-d="areas" value="Roof">Roof</label><label class="c"><input type="checkbox" data-d="areas" value="Facade / exterior">Facade / exterior</label><label class="c"><input type="checkbox" data-d="areas" value="Added room">Added room</label><label class="c"><input type="checkbox" data-d="areas" value="Added floor">Added floor</label></div></div><div><label>Approx. floor area (sqm)</label><input type="number" min="1" data-d="floor_area"></div></div>
+<div class="full"><label>Target start (optional)</label><select data-d="target_start"><option value="">Not sure yet</option><option>Within 3 months</option><option>3 to 6 months</option><option>6 to 12 months</option></select></div>
 <div class="full"><label>Budget</label><select name="budget"><option>Not sure yet</option><option>Under ₱1M</option><option>₱1M–₱3M</option><option>₱3M–₱6M</option><option>₱6M–₱10M</option><option>Above ₱10M</option></select></div>
 <div class="full"><label>Notes (optional)</label><textarea name="notes" rows="3"></textarea></div>
 <input name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px">
@@ -66,7 +78,9 @@ input:focus,select:focus,textarea:focus{border-color:var(--b)}
 <div class="full"><label>Confirm password</label><input type="password" id="pw2" autocomplete="new-password" minlength="8" required></div></div>
 <p class="sub" style="margin:10px 0 0;font-size:13px">At least 8 characters.</p><p class="err" id="pw-err"></p><button class="btn" style="width:100%;margin-top:16px">Save password</button></form></section>
 
-<section id="v-dash" hidden><div class="row"><h1>My projects</h1><div><button class="btn o s" id="demo-btn">Preview sample project</button> <button class="btn s" id="new">New project</button></div></div><p class="sub">Status of everything you've posted.</p><div id="plist"></div></section>
+<section id="v-dash" hidden><div class="row"><div><h1 id="greet">My projects</h1><p class="sub" style="margin:0">Here is where your projects stand.</p></div><div><button class="btn o s" id="demo-btn">Preview sample project</button> <button class="btn s" id="new">New project</button></div></div>
+<div id="attn" style="margin-top:20px"></div><div id="plist" style="margin-top:20px"></div>
+<p class="sub" style="text-align:center;font-size:13px">Need help? <a href="https://wa.me/639928122086" target="_blank" rel="noopener">Message FIX on WhatsApp</a></p></section>
 <section id="v-proj" hidden><a class="lnk" href="#" style="margin:0">&larr; All projects</a><div id="pdetail"></div></section>
 <section id="v-profile" hidden><h1>My profile</h1><p class="sub">FIX and your contractor use these details to reach you.</p>
 <form id="pf" class="card"><div class="grid"><div class="full"><label>Email (your username)</label><input id="pf-email" disabled></div><div><label>Full name</label><input id="pf-name" required maxlength="120"></div><div><label>Mobile</label><input id="pf-mobile" type="tel" required maxlength="30"></div></div>
@@ -80,7 +94,19 @@ input:focus,select:focus,textarea:focus{border-color:var(--b)}
   const kind = (t) => (/new/i.test(t || '') ? 'new' : 'renovation');
   const kindLabel = (t) => (kind(t) === 'new' ? 'New Construction' : /ext/i.test(t || '') ? 'Extension' : 'Renovation');
   const balance = (budget, paid) => Math.max(0, Number(budget || 0) - Number(paid || 0));
-  return { php, pct, kind, kindLabel, balance };
+  const JOURNEY = ['Submitted', 'In review', 'Matched', 'Building', 'Completed'];
+  const STEP = { 'Pending verification': 1, Submitted: 1, 'FIX Reviewing': 2, Matched: 3, 'Offers In': 3, 'Offer Accepted': 3, 'In Progress': 4, Completed: 5 };
+  const journeyStep = (s) => STEP[s] || 0;
+  const pending = (projects, profile) => {
+    const out = [];
+    (projects || []).forEach((p) => {
+      const n = (p.offers || []).filter((o) => ['Submitted', 'Viewed'].includes(o.status)).length;
+      if (n && p.status !== 'Cancelled') out.push({ text: 'Review ' + n + ' offer' + (n > 1 ? 's' : '') + ' for ' + p.title, to: '#project/' + p.id, cta: 'View' });
+    });
+    if (profile && (!profile.full_name || !profile.mobile)) out.push({ text: 'Complete your profile so your contractor can reach you', to: '#profile', cta: 'Update' });
+    return out;
+  };
+  return { php, pct, kind, kindLabel, balance, JOURNEY, journeyStep, pending };
 });
 
 // SAMPLE DATA ONLY. Shown when the homeowner taps "Preview sample project". Never stored or mixed with real projects.
@@ -112,7 +138,7 @@ addEventListener('hashchange',route);
 $('out').onclick=()=>sb.auth.signOut();$('new').onclick=()=>show('request');
 
 $('req').onsubmit=async e=>{e.preventDefault();const f=e.target,btn=f.querySelector('.btn'),d=Object.fromEntries(new FormData(f));btn.disabled=true;$('req-err').textContent='';
- try{const r=await fetch(CFG.url+'/functions/v1/submit-project',{method:'POST',headers:{'Content-Type':'application/json',apikey:CFG.key,Authorization:'Bearer '+CFG.key},body:JSON.stringify(d)});
+ try{const r=await fetch(CFG.url+'/functions/v1/submit-project',{method:'POST',headers:{'Content-Type':'application/json',apikey:CFG.key,Authorization:'Bearer '+CFG.key},body:JSON.stringify({...d,details:collectDetails(f)})});
   if(!r.ok)throw new Error((await r.json().catch(()=>({}))).error);
   $('done-email').textContent=d.email;f.hidden=true;$('req-done').hidden=false;scrollTo(0,0)}
  catch(x){$('req-err').textContent=x instanceof TypeError||!x.message?"We couldn't send your request. Please try again, or message us on WhatsApp at +63 992 812 2086.":x.message}
@@ -129,14 +155,22 @@ $('pwf').onsubmit=async e=>{e.preventDefault();const a=$('pw1').value;$('pw-err'
  if((await sb.rpc('password_changed')).error){$('pw-err').textContent='Your temporary password has expired. Please contact FIX.';return}
  e.target.reset();route()};
 $('adm-ref').onclick=()=>loadAdmin();
+const ST=['Submitted','FIX Reviewing','Matched','Offers In','Offer Accepted','In Progress','Completed','Cancelled'];
 async function loadAdmin(){show('admin');
- const {data,error}=await sb.from('projects').select('id,title,location,budget_range,lot_sqm,notes,status,approved_at,profiles(full_name,email,mobile)').order('created_at',{ascending:false});
+ const {data,error}=await sb.from('projects').select('id,title,location,budget_range,lot_sqm,notes,status,approved_at,contractor_name,approved_budget,amount_paid,progress_pct,next_milestone,profiles(full_name,email,mobile)').order('created_at',{ascending:false});
  if(error){$('adm-list').innerHTML='<p class="err">Could not load requests.</p>';return}
- const open=p=>!p.approved_at&&p.status!=='Cancelled';
+ const open=p=>!p.approved_at&&p.status!=='Cancelled',inp=(k,id,v,t='text')=>`<div><label>${k}</label><input id="${id}" type="${t}" value="${esc(v??'')}"></div>`;
  $('adm-sum').textContent=data.length+' projects · '+data.filter(open).length+' awaiting review';
- $('adm-list').innerHTML=data.map(p=>`<div class="card" style="margin-bottom:12px"><div class="row" style="align-items:flex-start"><div><b>${esc(p.title)}</b><div class="sub" style="margin:2px 0 0">${esc(p.profiles?.full_name)} · ${esc(p.profiles?.email)} · ${esc(p.profiles?.mobile)}<br>${esc(p.location)} · ${esc(p.budget_range)}${p.lot_sqm?' · '+esc(p.lot_sqm)+' sqm':''}</div>${p.notes?`<div class="sub" style="margin:6px 0 0;font-size:13px">${esc(p.notes)}</div>`:''}</div>${chip(p.status)}</div>${p.status==='Cancelled'?'':`<div style="margin-top:12px"><button class="btn s" data-i="${p.id}">${p.approved_at?'Reissue login':'Approve &amp; send login'}</button>${open(p)?` <button class="btn o s" data-r="${p.id}">Reject</button>`:''}</div>`}</div>`).join('')||'<p class="sub">No requests yet.</p>';
- $('adm-list').querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>issue(b.dataset.i,b));
- $('adm-list').querySelectorAll('[data-r]').forEach(b=>b.onclick=async()=>{if(confirm('Reject this request?')){await sb.from('projects').update({status:'Cancelled'}).eq('id',b.dataset.r);loadAdmin()}})}
+ $('adm-list').innerHTML=data.map(p=>`<div class="card" style="margin-bottom:12px"><div class="row" style="align-items:flex-start"><div><b>${esc(p.title)}</b><div class="sub" style="margin:2px 0 0">${esc(p.profiles?.full_name)} · ${esc(p.profiles?.email)} · ${esc(p.profiles?.mobile)}<br>${esc(p.location)} · ${esc(p.budget_range)}${p.lot_sqm?' · '+esc(p.lot_sqm)+' sqm':''}</div>${p.notes?`<div class="sub" style="margin:6px 0 0;font-size:13px">${esc(p.notes)}</div>`:''}</div>${chip(p.status)}</div>
+ <div style="margin-top:12px">${p.status==='Cancelled'?'':`<button class="btn s" data-i="${p.id}">${p.approved_at?'Reissue login':'Approve &amp; send login'}</button>`}${open(p)?` <button class="btn o s" data-r="${p.id}">Reject</button>`:''} <button class="btn o s" data-e="${p.id}">Edit details</button></div>
+ <div class="edit" id="ed-${p.id}" hidden>${inp('Contractor','ec-'+p.id,p.contractor_name)}${inp('Approved budget (PHP)','eb-'+p.id,p.approved_budget,'number')}${inp('Amount paid (PHP)','ep-'+p.id,p.amount_paid,'number')}${inp('Progress (0-100)','eg-'+p.id,p.progress_pct,'number')}${inp('Next milestone','em-'+p.id,p.next_milestone)}<div><label>Status</label><select id="es-${p.id}">${[...new Set([p.status,...ST])].map(s=>`<option${s===p.status?' selected':''}>${s}</option>`).join('')}</select></div><div class="full"><button class="btn s" data-s="${p.id}">Save details</button></div></div></div>`).join('')||'<p class="sub">No requests yet.</p>';
+ const L=$('adm-list');L.querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>issue(b.dataset.i,b));
+ L.querySelectorAll('[data-e]').forEach(b=>b.onclick=()=>{const e=$('ed-'+b.dataset.e);e.hidden=!e.hidden});
+ L.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>saveEdit(b.dataset.s));
+ L.querySelectorAll('[data-r]').forEach(b=>b.onclick=async()=>{if(confirm('Reject this request?')){await sb.from('projects').update({status:'Cancelled'}).eq('id',b.dataset.r);loadAdmin()}})}
+async function saveEdit(id){const g=k=>$(k+'-'+id).value.trim(),n=k=>g(k)===''?null:Number(g(k));
+ const {error}=await sb.from('projects').update({contractor_name:g('ec')||null,approved_budget:n('eb'),amount_paid:n('ep')??0,progress_pct:Math.max(0,Math.min(100,Math.round(n('eg')||0))),next_milestone:g('em')||null,status:g('es')}).eq('id',id);
+ if(error)alert('Could not save: '+error.message);loadAdmin()}
 async function issue(id,btn){if(!confirm('Send login details to this client now?'))return;btn.disabled=true;btn.textContent='Sending...';
  const {data:{session}}=await sb.auth.getSession();
  const r=await fetch(CFG.url+'/functions/v1/issue-credentials',{method:'POST',headers:{'Content-Type':'application/json',apikey:CFG.key,Authorization:'Bearer '+session.access_token},body:JSON.stringify({project_id:id})});
@@ -146,32 +180,41 @@ async function issue(id,btn){if(!confirm('Send login details to this client now?
  catch(x){alert('Login created but the email failed. Send this manually.\nUsername: '+d.email+'\nTemporary password: '+d.temp_password+'\nExpires: '+d.expires)}
  loadAdmin()}
 
-async function loadDash(){show('dash');
- $('demo-btn').textContent=showDemo?'Back to my projects':'Preview sample project';
- if(showDemo){$('plist').innerHTML=window.FIX_DEMO.map(projectCard).join('');return}
- const {data,error}=await sb.from('projects').select('id,title,project_type,location,status,contractor_name,progress_pct,approved_budget,amount_paid,next_milestone,pending_actions').order('created_at',{ascending:false});
- if(error){$('plist').innerHTML='<p class="err">Could not load your projects. Refresh to try again.</p>';return}
- $('plist').innerHTML=data.length?data.map(projectCard).join(''):'<p class="sub">No projects yet. Post your first project, or preview a sample project to see how your dashboard will look.</p>'}
+async function loadDash(){show('dash');$('demo-btn').textContent=showDemo?'Back to my projects':'Preview sample project';
+ const [pr,pf]=await Promise.all([showDemo?{data:window.FIX_DEMO}:sb.from('projects').select('id,title,project_type,location,status,contractor_name,progress_pct,approved_budget,amount_paid,next_milestone,offers(id,status)').order('created_at',{ascending:false}),sb.from('profiles').select('full_name,mobile').eq('id',user.id).maybeSingle()]);
+ if(pr.error){$('plist').innerHTML='<p class="err">Could not load your projects. Refresh to try again.</p>';return}
+ const list=pr.data,prof=pf.data,todo=showDemo?[]:FixFmt.pending(list,prof);
+ $('greet').textContent='Good day, '+((prof?.full_name||'').split(' ')[0]||'there');
+ $('attn').innerHTML=todo.length?`<div class="attn"><b>Needs your attention (${todo.length})</b>${todo.map(t=>`<div class="row"><span>${esc(t.text)}</span><a class="btn s" style="text-decoration:none" href="${t.to}">${esc(t.cta)}</a></div>`).join('')}</div>`:'';
+ $('plist').innerHTML=list.length?list.map(p=>projectCard(p,list.length===1)).join(''):'<p class="sub">No projects yet. Post your first project, or preview a sample project to see how your dashboard will look.</p>'}
+const DL={lot_ownership:'Lot ownership',floors:'Floors',bedrooms:'Bedrooms',bathrooms:'Bathrooms',has_plans:'Plans ready',target_start:'Target start',areas:'Areas involved',floor_area:'Approx. floor area (sqm)'};
+const kv=(k,v)=>v?`<div class="row" style="padding:8px 0;border-bottom:1px solid #F0F4F8"><span class="sub" style="margin:0;font-size:14px">${esc(k)}</span><b style="font-size:14px;text-align:right">${esc(v)}</b></div>`:'';
+const journeyBar=s=>s?'<div class="jr">'+FixFmt.JOURNEY.map((x,i)=>`<span class="${i<s?'on':''}">${x}</span>`).join('')+'</div>':'';
 async function openProject(id){show('proj');
  const [p,m,o]=await Promise.all([sb.from('projects').select('*').eq('id',id).single(),sb.from('milestones').select('*').eq('project_id',id).order('sort'),sb.from('offers').select('*').eq('project_id',id).order('price')]);
  if(p.error){$('pdetail').innerHTML='<p class="sub" style="margin-top:16px">Project not found.</p>';return}
- const P=p.data,O=o.data||[];
- $('pdetail').innerHTML=`<div class="row" style="margin:16px 0 6px"><h1>${esc(P.title)}</h1>${chip(P.status)}</div><p class="sub">${esc(P.location)} · ${esc(P.budget_range||'Budget not set')}</p>
- <div class="card" style="margin-bottom:16px"><label>Progress</label><ul class="tl">${(m.data||[]).map(x=>`<li><span class="dot ${x.status==='Done'?'d':x.status==='In progress'?'i':''}"></span>${esc(x.stage)}${chip(x.status)}</li>`).join('')}</ul></div>
- <div class="card"><label>Offers</label>${O.length?O.map(x=>`<div class="row" style="padding:14px 0;border-bottom:1px solid #F0F4F8"><div><b>${esc(x.contractor_name||'Verified contractor')}</b><div class="sub" style="margin:2px 0 0">${php(x.price)} · ${esc(x.weeks)} weeks<br>${esc(x.inclusions||'')}</div></div><div style="text-align:right">${chip(x.status)}${['Submitted','Viewed'].includes(x.status)?`<div style="margin-top:8px"><button class="btn s" data-a="1" data-id="${x.id}">Accept</button> <button class="btn o s" data-a="0" data-id="${x.id}">Decline</button></div>`:''}</div></div>`).join(''):'<p class="sub" style="margin:8px 0 0">No offers yet. FIX is reviewing your project and will match you with verified contractors.</p>'}</div>`;
+ const P=p.data,O=o.data||[],F=FixFmt,money=n=>P.approved_budget?F.php(n):'To be confirmed';
+ const rows=kv('Budget range',P.budget_range)+kv('Lot size (sqm)',P.lot_sqm)+Object.entries(P.details||{}).filter(([k])=>DL[k]).map(([k,v])=>kv(DL[k],Array.isArray(v)?v.join(', '):v)).join('')+kv('Notes',P.notes);
+ $('pdetail').innerHTML=`<div class="row" style="margin:16px 0 6px;align-items:flex-start"><div><span class="tag">${esc(F.kindLabel(P.project_type))}</span><h1>${esc(P.title)}</h1></div>${chip(P.status)}</div><p class="sub">${esc(P.location)} · ${esc(P.contractor_name||'Contractor not assigned yet')}</p>${P.status==='Cancelled'?'':journeyBar(F.journeyStep(P.status))}
+ <div class="card" style="margin:16px 0"><label>Budget</label><div class="stats" style="border:0;margin:0;padding:0"><div><label>Approved budget</label><b>${P.approved_budget?F.php(P.approved_budget):'Pending quotation'}</b></div><div><label>Amount paid</label><b>${F.php(P.amount_paid)}</b></div><div><label>Balance</label><b>${money(F.balance(P.approved_budget,P.amount_paid))}</b></div><div><label>Overall progress</label><b>${F.pct(P.progress_pct)}%</b></div></div></div>
+ <div class="card" style="margin-bottom:16px"><label>Milestones</label><ul class="tl">${(m.data||[]).map(x=>`<li><span class="dot ${x.status==='Done'?'d':x.status==='In progress'?'i':''}"></span>${esc(x.stage)}${chip(x.status)}</li>`).join('')}</ul></div>
+ <div class="card" style="margin-bottom:16px"><label>Offers</label>${O.length?O.map(x=>`<div class="row" style="padding:14px 0;border-bottom:1px solid #F0F4F8"><div><b>${esc(x.contractor_name||'Verified contractor')}</b><div class="sub" style="margin:2px 0 0">${php(x.price)} · ${esc(x.weeks)} weeks<br>${esc(x.inclusions||'')}</div></div><div style="text-align:right">${chip(x.status)}${['Submitted','Viewed'].includes(x.status)?`<div style="margin-top:8px"><button class="btn s" data-a="1" data-id="${x.id}">Accept</button> <button class="btn o s" data-a="0" data-id="${x.id}">Decline</button></div>`:''}</div></div>`).join(''):'<p class="sub" style="margin:8px 0 0">No offers yet. FIX is reviewing your project and will match you with verified contractors.</p>'}</div>
+ <div class="card"><label>Your request</label>${rows||'<p class="sub" style="margin:8px 0 0">No additional details were provided.</p>'}</div>`;
  $('pdetail').querySelectorAll('[data-a]').forEach(b=>b.onclick=async()=>{b.disabled=true;await sb.rpc('respond_offer',{p_offer:b.dataset.id,p_accept:b.dataset.a==='1'});openProject(id)})}
-
 // ---- Phase 1: dashboard cards, sample preview, profile ----
 let showDemo=false;
-function projectCard(p){const F=FixFmt,pc=F.pct(p.progress_pct),T=p.demo?'div':'a',at=p.demo?'':' href="#project/'+p.id+'"';
- return `<${T}${at} class="card pc"><div class="row" style="align-items:flex-start"><div><span class="tag">${esc(F.kindLabel(p.project_type))}${p.demo?' · Sample':''}</span><b style="font-size:17px;display:block;margin-top:6px">${esc(p.title)}</b><div class="sub" style="margin:2px 0 0;font-size:13px">${esc(p.location||'Location to be confirmed')} · ${esc(p.contractor_name||'Contractor not assigned yet')}</div></div>${chip(p.status)}</div>
- <div class="row" style="margin:16px 0 6px"><span class="sub" style="margin:0;font-size:13px">Overall progress</span><b>${pc}%</b></div><div class="bar"><i style="width:${pc}%"></i></div>
- <div class="stats"><div><label>Approved budget</label><b>${p.approved_budget?F.php(p.approved_budget):'Pending quotation'}</b></div><div><label>Amount paid</label><b>${F.php(p.amount_paid)}</b></div><div><label>Next milestone</label><b>${esc(p.next_milestone||'To be scheduled')}</b></div><div><label>Pending actions</label><b>${p.pending_actions?p.pending_actions+' for you':'None'}</b></div></div></${T}>`}
+function projectCard(p,hero){const F=FixFmt,pc=F.pct(p.progress_pct),st=F.journeyStep(p.status),T=p.demo?'div':'a',at=p.demo?'':' href="#project/'+p.id+'"',cancelled=p.status==='Cancelled',review=st>0&&st<=2;
+ const body=cancelled?'<div class="note" style="background:#F0F4F8;color:var(--m)">This request was cancelled. Contact FIX if this is a mistake.</div>':review?'<div class="note">We are reviewing your request. This page will update once a contractor is matched.</div>':`<div class="row" style="margin:12px 0 6px"><span class="sub" style="margin:0;font-size:13px">Overall progress</span><b>${pc}%</b></div><div class="bar"><i style="width:${pc}%"></i></div><div class="stats"><div><label>Approved budget</label><b>${p.approved_budget?F.php(p.approved_budget):'Pending quotation'}</b></div><div><label>Amount paid</label><b>${F.php(p.amount_paid)}</b></div><div><label>Balance</label><b>${p.approved_budget?F.php(F.balance(p.approved_budget,p.amount_paid)):'To be confirmed'}</b></div><div><label>Next milestone</label><b>${esc(p.next_milestone||'To be scheduled')}</b></div></div>`;
+ return `<${T}${at} class="card pc${hero?' hero':''}${cancelled?' muted':''}"><div class="row" style="align-items:flex-start"><div><span class="tag">${esc(F.kindLabel(p.project_type))}${p.demo?' · Sample':''}</span><b style="font-size:${hero?22:17}px;display:block;margin-top:6px">${esc(p.title)}</b><div class="sub" style="margin:2px 0 0;font-size:13px">${esc(p.location||'Location to be confirmed')} · ${esc(p.contractor_name||'Contractor not assigned yet')}</div></div>${chip(p.status)}</div>${cancelled?'':journeyBar(st)}${body}</${T}>`}
 $('demo-btn').onclick=()=>{showDemo=!showDemo;loadDash()};
 async function showProfile(){show('profile');$('pf-ok').textContent='';$('pf-err').textContent='';$('pf-email').value=user.email;
  const {data}=await sb.from('profiles').select('full_name,mobile').eq('id',user.id).maybeSingle();$('pf-name').value=data?.full_name||'';$('pf-mobile').value=data?.mobile||''}
 $('pf').onsubmit=async e=>{e.preventDefault();$('pf-err').textContent='';$('pf-ok').textContent='';
  const {error}=await sb.rpc('update_my_profile',{p_name:$('pf-name').value,p_mobile:$('pf-mobile').value});
  if(error)$('pf-err').textContent='Could not save your changes. Please try again.';else $('pf-ok').textContent='Saved.'};
+
+function collectDetails(f){const d={};f.querySelectorAll('[data-d]').forEach(el=>{if(el.closest('[hidden]'))return;const k=el.dataset.d;if(el.type==='checkbox'){if(el.checked)(d[k]=d[k]||[]).push(el.value)}else if(el.value)d[k]=el.value});return d}
+function toggleDetails(){const t=$('req').querySelector('[name=project_type]').value;$('f-new').hidden=t!=='New build';$('f-reno').hidden=!(t==='Renovation'||t==='Extension')}
+$('req').querySelector('[name=project_type]').onchange=toggleDetails;
 
 </script></body></html>
